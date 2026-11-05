@@ -16,7 +16,11 @@ test('two curated looks use one true shared renderer and truthful per-view stati
  assert.ok(html.includes('id="gallery"'));
  assert.ok(html.includes('data-look="solid"'));
  assert.ok(html.includes('data-look="ghost"'));
- assert.equal((html.match(/type="range"/g)||[]).length,1);
+ // Material opacity still has exactly one slider; the additional range input
+  // is solely an explicit L2/R2 analog input simulator, not another material knob.
+  assert.equal((html.match(/id="materialMix"/g)||[]).length,1);
+  assert.equal((html.match(/id="triggerPressure"/g)||[]).length,1);
+  assert.equal((html.match(/type="range"/g)||[]).length,2);
 });
 
 test('Qt example explicitly supports no-light and key-light standard materials',()=>{

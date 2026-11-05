@@ -4,7 +4,11 @@ import {readFile} from 'node:fs/promises';
 const html=await readFile(new URL('../pbr-lab.html',import.meta.url),'utf8');
 const js=await readFile(new URL('../pbr-lab.js',import.meta.url),'utf8');
 test('final PBR lab has one slider and exactly the two intended look rows',()=>{
-  assert.equal((html.match(/type="range"/g)||[]).length,1);
+  // Material opacity still has exactly one slider; the additional range input
+  // is solely an explicit L2/R2 analog input simulator, not another material knob.
+  assert.equal((html.match(/id="materialMix"/g)||[]).length,1);
+  assert.equal((html.match(/id="triggerPressure"/g)||[]).length,1);
+  assert.equal((html.match(/type="range"/g)||[]).length,2);
   assert.ok(html.includes('id="materialMix"'));
   assert.ok(html.includes('id="gallery"'));
   assert.ok(js.includes('const variants=HERO_VARIANTS'));

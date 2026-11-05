@@ -17,7 +17,11 @@ test('index and old directory addresses lead to the one real comparison page',as
 test('hero comparison exposes two looks, one mix slider and explicit shared vs direct rendering',async()=>{
  const html=await readFile(new URL('pbr-lab.html',root),'utf8');
  const js=await readFile(new URL('pbr-lab.js',root),'utf8');
- assert.equal((html.match(/type="range"/g)||[]).length,1);
+ // Material opacity still has exactly one slider; the additional range input
+  // is solely an explicit L2/R2 analog input simulator, not another material knob.
+  assert.equal((html.match(/id="materialMix"/g)||[]).length,1);
+  assert.equal((html.match(/id="triggerPressure"/g)||[]).length,1);
+  assert.equal((html.match(/type="range"/g)||[]).length,2);
  assert.ok(html.includes('id="renderMode"'));
  assert.ok(html.includes('id="stickPose"'));
  assert.ok(js.includes('WebGLRenderTarget'));

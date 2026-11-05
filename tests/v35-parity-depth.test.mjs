@@ -79,7 +79,11 @@ test('material lab exposes synchronized flat 2D rows, retains only one mix slide
   const html=await read('./pbr-lab.html');
   const js=await read('./pbr-lab.js');
   const reference=await read('./controller-reference.js');
-  assert.equal((html.match(/type="range"/g)||[]).length,1);
+  // Material opacity still has exactly one slider; the additional range input
+  // is solely an explicit L2/R2 analog input simulator, not another material knob.
+  assert.equal((html.match(/id="materialMix"/g)||[]).length,1);
+  assert.equal((html.match(/id="triggerPressure"/g)||[]).length,1);
+  assert.equal((html.match(/type="range"/g)||[]).length,2);
   assert.ok(js.includes('ControllerReference'), 'same renderer for all 2D layouts');
   assert.ok(js.includes('flatSampleNodes'), 'one 2D sample per 3D viewport');
   assert.ok(reference.includes('applyMaterialAppearance'), 'same material recipe sent to 2D');
