@@ -102,9 +102,68 @@ try{
   images.push({file:cubeFile,modelId:'Gamecube',pressed:false,bytes:cubeBytes.length,
     sha256:createHash('sha256').update(cubeBytes).digest('hex'),
     webgl:cube.webglVersion,revision:cube.revision,drawStats:cube.drawStats});
+  const neutralPrevious=Number((await page.evaluate(()=>document.body.dataset.renderRevision))||0);
+  await page.locator('#controller').selectOption('GenericPro');
+  await page.waitForFunction(previous=>
+    document.body.dataset.renderReady==='three-rendered' &&
+    window.__exoPbrLab?.model?.model?.id==='GenericPro' &&
+    window.__exoPbrLab?.flatReferences?.size===12 &&
+    Number(document.body.dataset.renderRevision||0)>previous,
+    neutralPrevious,{timeout:60000});
+  let genericProof=await shotProof();
+  const genericPartState=await page.evaluate(()=>{
+    const rig=window.__exoPbrLab?.model;
+    const legends=[];
+    rig?.group?.traverse(x=>{if(['A','B','X','Y'].includes(x.userData?.buttonGlyph))legends.push(x.userData.buttonGlyph);});
+    return {parts:rig?.partCount,triangles:rig?.triangles,legends};
+  });
+  if(genericPartState.parts!==23||genericPartState.triangles<500||
+      genericPartState.legends.sort().join(',')!=='A,B,X,Y')
+    throw Error('Generic Pro is incomplete or has wrong button faces: '+JSON.stringify(genericPartState));
+  for(const [file,pressed] of [['generic-neutral.png',false],['generic-pressed.png',true]]){
+    if(pressed){
+      await page.locator('#pressAll').check();
+      await page.waitForFunction(previous=>Number(document.body.dataset.renderRevision||0)>previous,
+        genericProof.revision,{timeout:30000});
+      genericProof=await shotProof();
+    }
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    const bytes=await page.screenshot({path:path.join(output,file),fullPage:true,animations:'disabled',timeout:60000});
+    if(bytes.length<40000||bytes.subarray(0,8).toString('hex')!=='89504e470d0a1a0a')
+      throw Error('Invalid Generic Pro browser capture: '+file);
+    images.push({file,modelId:'GenericPro',pressed,bytes:bytes.length,
+      sha256:createHash('sha256').update(bytes).digest('hex'),
+      webgl:genericProof.webglVersion,revision:genericProof.revision,drawStats:genericProof.drawStats});
+  }
+  if(images.at(-1).sha256===images.at(-2).sha256)
+    throw Error('Generic Pro neutral and pressed captures are identical');
+  await page.locator('#pressAll').uncheck();
+
+  // Scenario B: ensure every CURRENTLY CLEARED core model can actually load,
+  // produce a WebGL frame, and pair with its corresponding authored 2D SVG.
+  // Do not call Xbox Series or Steam Controller 2026 cleared until licensed.
+  const coreModels=['GenericPro','DualSenseCompact','DS4Compact','XboxOneClean',
+    'SwitchPro','Gamecube','JoyconGrip','JoyconLeft','JoyconRight'];
+  const coreSmoke=[];
+  for(const id of coreModels){
+    const previous=Number((await page.evaluate(()=>document.body.dataset.renderRevision))||0);
+    if((await page.locator('#controller').inputValue())!==id)
+      await page.locator('#controller').selectOption(id);
+    await page.waitForFunction(({id,previous})=>
+      document.body.dataset.renderReady==='three-rendered' &&
+      window.__exoPbrLab?.model?.model?.id===id &&
+      window.__exoPbrLab?.flatReferences?.size===12 &&
+      Number(document.body.dataset.renderRevision||0)>=previous,
+      {id,previous},{timeout:60000});
+    const proof=await shotProof();
+    coreSmoke.push({id,threeViewports:proof.sampleCount,svgViewports:proof.flatCount,
+      rendered:true,webgl:proof.webglVersion});
+  }
   const manifest={revision,capturedAt:new Date().toISOString(),url:new URL('pbr-lab.html',base).href,
     content:'Real Three.js/WebGL2 + original controller OBJ + authored SVG',looks:['solid','ghost','outline','identity'],
     viewports:['3D dark','3D light','3D mixed','2D dark','2D light','2D mixed'],images,
+    scenarios:{A:{genericModel:'GenericPro',parts:genericPartState.parts,neutralAndPressed:true},
+      B:{coreSmoke,notCleared:['XboxSeries','SteamController2026'],fullTierABComplete:false}},
     visualAcceptance:'Pending human inspection; capture proves rendering, not visual quality'};
   await writeFile(path.join(output,'capture-manifest.json'),JSON.stringify(manifest,null,2)+'\n');
   console.log(`Captured real WebGL screenshots: ${images.map(x=>x.file).join(', ')} (${images[0].webgl})`);

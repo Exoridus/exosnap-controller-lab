@@ -13,6 +13,11 @@ export async function archiveSnapshots(captureDir,archiveDir,repository,commit){
   if(manifest.revision!==commit)throw Error('Capture was produced for a different source revision');
   const targets=['overview-neutral.png','overview-pressed.png'];
   if(manifest.images.some(image=>image.file==='gamecube-neutral.png'))targets.push('gamecube-neutral.png');
+  const genericFiles=['generic-neutral.png','generic-pressed.png'];
+  if(genericFiles.some(name=>manifest.images.some(image=>image.file===name))){
+    if(!genericFiles.every(name=>manifest.images.some(image=>image.file===name)))throw Error('Incomplete Generic Pro capture pair');
+    targets.push(...genericFiles);
+  }
   if(targets.some(name=>!manifest.images.some(x=>x.file===name&&x.bytes>=40000)))throw Error('Both verified screenshots are required');
   for(const name of targets){
     const record=manifest.images.find(x=>x.file===name);
@@ -30,6 +35,10 @@ export async function archiveSnapshots(captureDir,archiveDir,repository,commit){
   const root=`https://raw.githubusercontent.com/${repository}/visual-history/snapshots/${commit}/`;
   const record={sha:commit,capturedAt:manifest.capturedAt,neutralUrl:root+'overview-neutral.png',pressedUrl:root+'overview-pressed.png',manifestUrl:root+'capture-manifest.json'};
   if(targets.includes('gamecube-neutral.png'))record.gamecubeUrl=root+'gamecube-neutral.png';
+  if(targets.includes('generic-neutral.png')){
+    record.genericUrl=root+'generic-neutral.png';
+    record.genericPressedUrl=root+'generic-pressed.png';
+  }
   index=[record,...index.filter(x=>x.sha!==commit)].sort((a,b)=>b.capturedAt.localeCompare(a.capturedAt));
   await writeFile(path.join(archiveDir,'index.json'),JSON.stringify(index,null,2)+'\n');
   return record;

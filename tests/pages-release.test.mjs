@@ -74,3 +74,15 @@ test('visual history archives optional GameCube captures with immutable SHA link
       await readFile(path.join(cap,'gamecube-neutral.png')));
   }finally{await rm(w,{recursive:true,force:true});}
 });
+
+test('Generic Pro source is vendored, segmented and paired with original 2D',async()=>{
+ const manifest=JSON.parse(await readFile(path.join(root,'assets/GenericPro/info.json'),'utf8'));
+ assert.equal(manifest.parts.length,23);
+ assert.equal(manifest.license,'MIT');
+ const {CONTROLLERS,isLicensedModel}=await import('../models.js');
+ const {layoutForId}=await import('../controller-catalog.js');
+ assert.ok(isLicensedModel(CONTROLLERS.find(x=>x.id==='GenericPro')));
+ assert.equal(layoutForId('generic').modelId,'GenericPro');
+ assert.equal(layoutForId('generic').availability,'native');
+ for(const part of manifest.parts)await stat(path.join(root,'assets/GenericPro',part.filename));
+});

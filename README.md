@@ -1,5 +1,8 @@
 # ExoSnap Controller3D Lab – GitHub Pages / Screenshot-Historie
 
+**Generic Pro v1:** 23 original authored 3D-OBJ parts (`assets/GenericPro`), paired with the existing 2D generic layout. Browser-smoke and neutral/pressed screenshots are mandatory in CI. The existing cleared core models remain selectable; Xbox Series / Steam Controller 2026 are not misrepresented as cleared.
+
+
 **Live:** [Controller Lab](https://exoridus.github.io/exosnap-controller-lab/) · [Screenshot-Historie](https://exoridus.github.io/exosnap-controller-lab/screenshots.html). Veröffentlichung per GitHub Actions nach erfolgreichen Tests und echten WebGL2-Aufnahmen.
 
 - **Start:** `npm start` → `http://127.0.0.1:8792/` (ein 6-Spalten-Grid, vier Looks, 2D/3D).
