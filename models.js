@@ -24,7 +24,6 @@ const fromPadforge = (id, folder, name, brand, family, color, parts, extra={}) =
   id, source:'padforge', folder, name, brand, family, color, group:'Final', parts:parts.trim().split(/\s+/).map(n=>n+'.obj'), ...extra
 });
 export const CONTROLLERS = [
-  Object.freeze({id:'GenericPro',source:'exo',folder:'GenericPro',manifest:true,name:'Generic Pro',brand:'ExoSnap',family:'generic',color:'#d4d8db',group:'Final',orbitY:0,shellParts:['top_shell','bottom_shell']}),
   fromCo('DualSenseCompact','DualSense','DualSense','PlayStation 5','playstation','#e3e7ee',{orbitY:0, shellParts:['top_shell','bottom_shell','grip_left','grip_right']}),
   fromCo('DS4Compact','DualShock 4','DualShock 4','PlayStation 4','playstation','#404a58',{orbitY:0, shellParts:['top_shell','bottom_shell']}),
   fromCo('XboxOneClean','Xbox One','Xbox One','Microsoft Xbox One','xbox','#e5e9f1',{orbitY:0, shellParts:['top_shell','bottom_shell','left_grip','right_grip']}),
@@ -36,7 +35,8 @@ export const CONTROLLERS = [
   fromCo('JoyconRight','Right Joycon','Joy-Con · right','Nintendo Joy-Con right','nintendo','#536c78',{orbitY:0, shellParts:['top_shell','bottom_shell']}),
   fromCo('Gamecube','Gamecube','GameCube','Nintendo GameCube','nintendo','#5e6175',{orbitY:0, shellParts:['top_shell','bottom_shell','left_grip','right_grip']}),
   fromCo('Wavebird','Wavebird','WaveBird','Nintendo WaveBird','nintendo','#7d808e',{orbitY:0, shellParts:['top_shell','bottom_shell','left_grip','right_grip']}),
-  fromCo('SteamController2026','Steam Controller 2026','Steam Controller (2026)','Valve Steam Controller','steam','#353c48',{orbitY:0, shellParts:['shell_top','shell_bottom','left_grip','right_grip']})
+  fromCo('SteamController2026','Steam Controller 2026','Steam Controller (2026)','Valve Steam Controller','steam','#353c48',{orbitY:0, shellParts:['shell_top','shell_bottom','left_grip','right_grip']}),
+  Object.freeze({id:'GenericPro',source:'exo',folder:'GenericPro',manifest:true,name:'Generic Pro',brand:'ExoSnap',family:'generic',color:'#d4d8db',group:'Final',orbitY:0,shellParts:['top_shell','bottom_shell']})
 ];
 // Exact original MIT controller OBJ families verified against Larf's source.
 // Models outside this set MUST NOT be automatically downloaded or published.
