@@ -69,7 +69,7 @@ test('visual history archives optional GameCube captures with immutable SHA link
     }
     await writeFile(path.join(cap,'capture-manifest.json'),JSON.stringify({revision:sha,capturedAt:'2026-11-05T00:00:00Z',images}));
     const entry=await archiveSnapshots(cap,arc,'Exoridus/exosnap-controller-lab',sha);
-    assert.match(entry.gamecubeUrl,/gamecube-neutral\\.png$/);
+    assert.match(entry.gamecubeUrl,/gamecube-neutral\.png$/);
     assert.deepEqual(await readFile(path.join(arc,'snapshots',sha,'gamecube-neutral.png')),
       await readFile(path.join(cap,'gamecube-neutral.png')));
   }finally{await rm(w,{recursive:true,force:true});}
