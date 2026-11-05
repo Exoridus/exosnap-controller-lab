@@ -18,7 +18,10 @@ test('the 2D/3D catalog contains exactly 20 source identities plus one explicitl
   assert.equal(layoutForId('wavebird').availability,'3d-only');
   assert.equal(layoutForId('joycon_pair').availability,'composite');
   assert.deepEqual(layoutForId('joycon_pair').modelIds,['JoyconLeft','JoyconRight']);
-  assert.equal(layoutForId('xbox_360').modelId,null);
+  assert.equal(layoutForId('xbox_360').modelId,'Xbox360');
+  assert.equal(layoutForId('xbox_360').availability,'native');
+  assert.equal(layoutForId('xbox_series').availability,'license-review');
+  assert.equal(layoutForId('steam_controller_2026').availability,'license-review');
   assert.equal(layoutForId('dualsense_edge').availability,'proxy');
   assert.equal(layoutForId('steam_controller').availability,'reference');
 });
