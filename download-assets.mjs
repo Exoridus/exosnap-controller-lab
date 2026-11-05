@@ -1,5 +1,5 @@
 import { inspectObjText } from './mesh-validation.js';
-import { CONTROLLERS, remoteAssetMirrors } from './models.js';
+import { CONTROLLERS, remoteAssetMirrors, isLicensedModel, SOURCES } from './models.js';
 import { mkdir, writeFile, readFile, stat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -7,11 +7,15 @@ import path from 'node:path';
 const root=path.dirname(fileURLToPath(import.meta.url));
 const dir=path.join(root,'assets');
 const requested=process.argv.slice(2);
-const models=requested.length?CONTROLLERS.filter(x=>requested.includes(x.id)):CONTROLLERS;
-if(!models.length){console.error('No matching model. Available:',CONTROLLERS.map(x=>x.id).join(', '));process.exitCode=1;process.exit();}
+const legal=CONTROLLERS.filter(isLicensedModel);
+const blocked=requested.filter(id=>!legal.some(model=>model.id===id));
+if(blocked.length){console.error('Unlicensed, unverified or unknown model(s): '+blocked.join(', '));process.exit(1);}
+const models=requested.length?legal.filter(x=>requested.includes(x.id)):legal;
+if(!models.length){console.error('No licensed models available.');process.exit(1);}
 await mkdir(dir,{recursive:true});
 let existing=[];
 try {existing=JSON.parse(await readFile(path.join(dir,'index.json'),'utf8')).models||[];}catch{}
+existing=existing.filter(id=>legal.some(m=>m.id===id));
 async function fetchRetry(urls,{mesh=false}={}){
   let last;
   for(const url of urls){
@@ -71,6 +75,6 @@ for(const model of models){
     if(!existing.includes(model.id))existing.push(model.id);
     console.log(`\n${model.name} available locally.`);
   }
-  await writeFile(path.join(dir,'index.json'),JSON.stringify({models:existing,downloadedAt:new Date().toISOString()},null,2));
+  await writeFile(path.join(dir,'index.json'),JSON.stringify({models:existing.sort(),source:SOURCES.co,license:'MIT (original Larf models)',sourceRef:'73b3a602a0b2afeb2fc7a2e9db940f9d2004ef9c'},null,2)+'\n');
 }
 console.log('\nDone. Run start.cmd or npm start.');

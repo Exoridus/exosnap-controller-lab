@@ -12,7 +12,7 @@ const args=process.argv.slice(2);
 const arg=(name,def)=>{const i=args.indexOf(name);return i<0?def:args[i+1]};
 const base=arg('--base',process.env.CAPTURE_BASE_URL||'http://127.0.0.1:8792/');
 const output=path.resolve(arg('--out','.capture'));
-const revision=process.env.GITHUB_SHA||process.env.CAPTURE_COMMIT_SHA||'local-uncommitted';
+const revision=process.env.CAPTURE_COMMIT_SHA||process.env.GITHUB_SHA||'local-uncommitted';
 const playwright=await import('playwright').catch(()=>{throw Error('Playwright missing: npm install --no-save --package-lock=false playwright@1.64.1')});
 let browser;
 const runtimeErrors=[];

@@ -1,18 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  CONTROLLERS, SOURCES, remoteAssetUrl, remoteAssetMirrors, assetFolder,
+  CONTROLLERS, SOURCES, remoteAssetUrl, remoteAssetMirrors, assetFolder, APPROVED_3D_MODEL_IDS, isLicensedModel,
   controlFromFilename, controlDisplayName
 } from '../models.js';
 
 const expectedCo = [
   'DualSenseCompact','DS4Compact','XboxOneClean','SwitchPro','JoyconGrip',
-  'JoyconLeft','JoyconRight','Gamecube','Wavebird','SteamController2026'
+  'JoyconLeft','JoyconRight','Gamecube','Wavebird','Xbox360','SteamController2026'
 ];
 
 test('curated final controller list exposes only compact clean models', () => {
-  assert.equal(CONTROLLERS.length, 11);
-  assert.equal(new Set(CONTROLLERS.map(m=>m.id)).size, 11);
+  assert.equal(CONTROLLERS.length, 12);
+  assert.equal(new Set(CONTROLLERS.map(m=>m.id)).size, 12);
   assert.deepEqual(Object.keys(SOURCES).sort(), ['co','padforge']);
   for (const model of CONTROLLERS) {
     assert.ok(model.id && model.name && model.brand && model.family);
@@ -36,9 +36,9 @@ test('curated final controller list exposes only compact clean models', () => {
 
 test('download URLs point at actual source-specific OBJ paths with encoded directory names',()=>{
   assert.equal(remoteAssetUrl(CONTROLLERS.find(m=>m.id==='SwitchPro'),'top_shell.obj'),
-    'https://raw.githubusercontent.com/Khyretos/3dco-plus/main/assets/models/Switch%20Pro/top_shell.obj');
+    'https://raw.githubusercontent.com/Khyretos/3dco-plus/73b3a602a0b2afeb2fc7a2e9db940f9d2004ef9c/assets/models/Switch%20Pro/top_shell.obj');
   assert.equal(remoteAssetUrl(CONTROLLERS.find(m=>m.id==='SteamController2026'),'shell_top.obj'),
-    'https://raw.githubusercontent.com/Khyretos/3dco-plus/main/assets/models/Steam%20Controller%202026/shell_top.obj');
+    'https://raw.githubusercontent.com/Khyretos/3dco-plus/73b3a602a0b2afeb2fc7a2e9db940f9d2004ef9c/assets/models/Steam%20Controller%202026/shell_top.obj');
   assert.equal(remoteAssetUrl(CONTROLLERS.find(m=>m.id==='XboxSeries'),'MainBody.obj'),
     'https://raw.githubusercontent.com/hifihedgehog/PadForge/main/PadForge.App/3DModels/XboxSeries/Carbon/MainBody.obj');
 });
@@ -75,4 +75,14 @@ test('fallback mirrors are emitted for compact co and padforge models', () => {
     assert.equal(mirrors[0],remoteAssetUrl(model,file));
     assert.match(mirrors[1],/^https:\/\/cdn\.jsdelivr\.net\/gh\//);
   }
+});
+
+test('published 3D model pack is MIT-only and excludes unclear or noncommercial sources',()=>{
+  assert.equal(APPROVED_3D_MODEL_IDS.length,10);
+  for(const id of APPROVED_3D_MODEL_IDS){
+    const model=CONTROLLERS.find(m=>m.id===id);
+    assert.ok(model && model.source==='co' && isLicensedModel(model),id);
+  }
+  assert.equal(isLicensedModel(CONTROLLERS.find(m=>m.id==='XboxSeries')),false);
+  assert.equal(isLicensedModel(CONTROLLERS.find(m=>m.id==='SteamController2026')),false);
 });

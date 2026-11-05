@@ -4,7 +4,7 @@
 const BASES = Object.freeze({
   dualsense:       ['DualSenseCompact','native'],
   dualshock4:      ['DS4Compact','native'],
-  xbox_series:     ['XboxSeries','native'],
+  xbox_series:     [null,'license-review'],
   xbox_one:        ['XboxOneClean','native'],
   generic:         [null,'reference'],
   switch_pro:      ['SwitchPro','native'],
@@ -17,11 +17,11 @@ const BASES = Object.freeze({
   steam_controller:['', 'reference'],
   steam_deck_full: [null,'reference'],
   steam_deck_compact: [null,'reference'],
-  steam_controller_2026: ['SteamController2026','native'],
-  xbox_360:        [null,'reference'],
+  steam_controller_2026: [null,'license-review'],
+  xbox_360:        ['Xbox360','native'],
   gamecube:        ['Gamecube','native'],
   dualsense_edge:  ['DualSenseCompact','proxy'],
-  xbox_elite:      ['XboxSeries','proxy']
+  xbox_elite:      [null,'reference']
 });
 const NAMES = Object.freeze({
   dualsense:'DualSense',dualshock4:'DualShock 4',xbox_series:'Xbox Series',xbox_one:'Xbox One',
@@ -47,6 +47,7 @@ export const LAYOUTS=Object.freeze(Object.entries(BASES).map(([id,[modelId,avail
   mapping:`./references/controllers/${id}/mapping.json`,
   note:availability==='proxy'?'3D-Grundmodell: zusätzliche Tasten/Details sind nur in der 2D-Referenz vollständig.':
     availability==='composite'?'Zwei vorhandene 3D-Joy-Cons als Komposition. Riemen/SL-SR-Details nur in der 2D-Referenz vollständig.':
+    availability==='license-review'?'3D-Quelle vorhanden, aber die Weiterverwendungsrechte sind nicht für ExoSnap nachgewiesen.':
     availability==='reference'?'Für diese Variante ist noch kein verifiziertes 3D-Modell eingebunden.':'3D-Grundmodell und 2D-Referenz vorhanden.'
 })));
 export const VIEWER_LAYOUTS=Object.freeze([...LAYOUTS,Object.freeze({

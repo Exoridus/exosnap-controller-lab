@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import {loadStudioEnvironment} from './hdr-probe.js';
-import {CONTROLLERS,CONTROL_IDS} from './models.js';
+import {CONTROLLERS,CONTROL_IDS,isLicensedModel} from './models.js';
 import {layoutForModel} from './controller-catalog.js';
 import {ControllerReference,isolateReferenceIds} from './controller-reference.js';
 import {prepareGhostOcclusion,setRearHintViewport,hideOccludedRearControls} from './ghost-depth-policy.js';
@@ -323,7 +323,7 @@ async function exportQtRecipe(){
 }
 function bindUI(){
   const select=$('controller');
-  for(const model of CONTROLLERS.filter(m=>m.id!=='Wavebird')){
+  for(const model of CONTROLLERS.filter(m=>isLicensedModel(m)&&m.id!=='Wavebird')){
     const opt=new Option(model.name,model.id);select.add(opt);
   }
   select.value=state.modelId;

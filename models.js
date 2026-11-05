@@ -1,7 +1,7 @@
 // Final curated controller set for the local ExoSnap lab.
 // Focus: clean front-facing gamepads with a unibody shell impression.
 export const SOURCES = Object.freeze({
-  co: 'https://raw.githubusercontent.com/Khyretos/3dco-plus/main/assets/models',
+  co: 'https://raw.githubusercontent.com/Khyretos/3dco-plus/73b3a602a0b2afeb2fc7a2e9db940f9d2004ef9c/assets/models',
   padforge: 'https://raw.githubusercontent.com/hifihedgehog/PadForge/main/PadForge.App/3DModels',
 });
 export function assetFolder(model) { return model.folder ?? model.id; }
@@ -27,6 +27,7 @@ export const CONTROLLERS = [
   fromCo('DualSenseCompact','DualSense','DualSense','PlayStation 5','playstation','#e3e7ee',{orbitY:0, shellParts:['top_shell','bottom_shell','grip_left','grip_right']}),
   fromCo('DS4Compact','DualShock 4','DualShock 4','PlayStation 4','playstation','#404a58',{orbitY:0, shellParts:['top_shell','bottom_shell']}),
   fromCo('XboxOneClean','Xbox One','Xbox One','Microsoft Xbox One','xbox','#e5e9f1',{orbitY:0, shellParts:['top_shell','bottom_shell','left_grip','right_grip']}),
+  fromCo('Xbox360','Xbox 360','Xbox 360','Microsoft Xbox 360','xbox','#e1e5eb',{orbitY:0, shellParts:['top_shell','bottom_shell']}),
   fromPadforge('XboxSeries','XboxSeries/Carbon','Xbox Series X|S','Microsoft Xbox Series','xbox','#333d47',`B1 B2 B3 B4 Back DPadDown DPadLeft DPadRight DPadUp Joystick-Left-Ring Joystick-Right-Ring L1 LeftStickClick MainBody MotorLeft MotorRight R1 RightStickClick Share Shoulder-Left-Trigger Shoulder-Right-Trigger Special Start`,{orbitY:0, shellParts:['mainbody']}),
   fromCo('SwitchPro','Switch Pro','Switch Pro','Nintendo Switch Pro','nintendo','#303840',{orbitY:0, shellParts:['top_shell','bottom_shell']}),
   fromCo('JoyconGrip','Joycon Grip','Joy-Cons · Grip','Nintendo Joy-Cons in grip','nintendo','#343e49',{orbitY:0, shellParts:['grip_top','grip_bottom','left_shell','right_shell']}),
@@ -36,6 +37,13 @@ export const CONTROLLERS = [
   fromCo('Wavebird','Wavebird','WaveBird','Nintendo WaveBird','nintendo','#7d808e',{orbitY:0, shellParts:['top_shell','bottom_shell','left_grip','right_grip']}),
   fromCo('SteamController2026','Steam Controller 2026','Steam Controller (2026)','Valve Steam Controller','steam','#353c48',{orbitY:0, shellParts:['shell_top','shell_bottom','left_grip','right_grip']})
 ];
+// Exact original MIT controller OBJ families verified against Larf's source.
+// Models outside this set MUST NOT be automatically downloaded or published.
+export const APPROVED_3D_MODEL_IDS = Object.freeze([
+  'DualSenseCompact','DS4Compact','XboxOneClean','Xbox360','SwitchPro',
+  'JoyconGrip','JoyconLeft','JoyconRight','Gamecube','Wavebird'
+]);
+export const isLicensedModel = model => !!model && APPROVED_3D_MODEL_IDS.includes(model.id);
 export const CONTROL_IDS = ['b1','b2','b3','b4','up','right','down','left','l1','r1','l2','r2','ls','rs','start','select','home','touchpad'];
 export function controlFromFilename(filename) {
   const n = filename.replace(/\.obj$/i,'').toLowerCase();

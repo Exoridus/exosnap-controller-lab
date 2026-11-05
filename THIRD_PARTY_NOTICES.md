@@ -46,3 +46,13 @@ Further models may be loaded from
 runtime. Their individual conditions differ; notably Steam Controller 2026
 has CC BY-NC-SA 4.0 model restrictions. The MIT program license does not
 supersede model-specific licensing.
+
+## Commercial-use model import gate (November 2026)
+
+The automatic asset downloader publishes **only** 10 original controller model families traceable to Larf's [3D Controller Overlay](https://github.com/larfingshnew/3d-controller-overlay) MIT-licensed source: DualSense, DualShock 4, Xbox One, Xbox 360, Switch Pro, Joy-Con Grip, left/right Joy-Con, GameCube and WaveBird. Every included visible OBJ has an identical Git blob SHA in that upstream repository. The model manifests are taken from a pinned [3dco+](https://github.com/Khyretos/3dco-plus) revision (`73b3a602a0b2afeb2fc7a2e9db940f9d2004ef9c`), which carries the original meshes. Respect the upstream MIT notices in `licenses/`; any later geometry edits must retain attribution and notices.
+
+**Excluded from automatic import:** PadForge Xbox Series / DualSense Edge (paid CGTrader royalty-free models without established transferable redistribution rights); PadForge Steam Deck / Xbox 360 (CC BY-NC-SA 4.0); Steam Controller 2026 from 3dco+ (third-party author/link with no independently verified reuse license). Modifying or optimizing these sources does **not** remove their restrictions. No such 3D asset is included in the approved bundle until rights are verified or a commercially reusable alternative is available.
+
+The Xbox One `info.json` in 3dco+ contains a mismatched external Sketchfab `source` URL. The **24 imported OBJ files**, however, are byte-for-byte identical to the original Larf repository's MIT-model files. The mismatched metadata is not treated as proof of rights to unrelated Sketchfab material.
+
+The 2D artwork has independent terms: in particular, the GameCube reference is noted as GPL-3.0-only and Steam Controller 2026 outlines have outstanding provenance considerations. A valid 3D license does not automatically clear the matching SVG or proprietary names/logos.
