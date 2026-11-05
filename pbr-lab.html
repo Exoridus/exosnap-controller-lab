@@ -11,14 +11,15 @@
     <label class="field size-field"><span>Größe</span><select id="panelSize" aria-label="Panelgröße"><option value="240">240 × 160</option><option value="320" selected>320 × 214</option><option value="480">480 × 320</option></select></label>
     <label class="field mix-field"><span class="mix-title">Materialmix <output id="mixValue">70 %</output></span><input type="range" min="0" max="100" step="1" value="70" id="materialMix" aria-label="Gemeinsamer Materialmix"><span class="range-labels"><i>0</i><i>50</i><i>100</i></span></label>
     <label class="field view-field"><span>Sticks</span><select id="stickPose" aria-label="Stickzustand"><option value="neutral">Neutral</option><option value="move">Bewegt</option><option value="click">L3/R3 gedrückt</option><option value="live">Live</option></select></label>
+    <label class="field trigger-field"><span>Trigger L2/R2 <output id="triggerValue">0 %</output></span><input id="triggerPressure" type="range" min="0" max="100" step="1" value="0" aria-label="Analogen Druck der Trigger L2 und R2 simulieren"></label>
     <label class="press-field"><input type="checkbox" id="pressAll"> gedrückt</label>
     <label class="press-field" title="Environment Solid"><input type="checkbox" id="toggleSolid" data-look="solid" checked> A</label>
     <label class="press-field" title="Environment Ghost"><input type="checkbox" id="toggleGhost" data-look="ghost" checked> B</label>
     <label class="press-field" title="Outline Ghost"><input type="checkbox" id="toggleOutline" data-look="outline" checked> C</label>
     <label class="press-field" title="Hybrid Identity"><input type="checkbox" id="toggleIdentity" data-look="identity" checked> D</label>
-    <label class="press-field" title="Optional beide Press-Farben koppeln"><input type="checkbox" id="colorSync"> Sync</label>
-    <label class="field color-field"><span>2D aktiv</span><input id="color2D" type="color" value="#79bdff" aria-label="Aktivfarbe 2D"></label>
-    <label class="field color-field"><span>3D aktiv</span><input id="color3D" type="color" value="#79bdff" aria-label="Aktivfarbe 3D"></label>
+    <label class="press-field" title="Optional beide Press-Farben koppeln"><input type="checkbox" id="colorSync" checked> Sync</label>
+    <label class="field color-field"><span>2D aktiv</span><input id="color2D" type="color" value="#4f9eeb" aria-label="Aktivfarbe 2D"></label>
+    <label class="field color-field"><span>3D aktiv</span><input id="color3D" type="color" value="#4f9eeb" aria-label="Aktivfarbe 3D"></label>
     <select id="renderMode" hidden><option value="shared">1× 3D + 3 Blits</option><option value="direct">3× 3D</option></select><button id="exportRecipe" hidden>Rezept exportieren</button>
   </div>
   <div class="status-row"><span id="rendererStatus" role="status">Originalmodell wird geladen …</span><span id="modelInfo"></span><a href="./screenshots.html" title="Aktuelle und ältere echte Browseraufnahmen" style="color:#9dd8fa;text-decoration:none;white-space:nowrap">Screenshots</a></div>

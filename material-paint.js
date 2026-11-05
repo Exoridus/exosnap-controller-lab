@@ -10,7 +10,7 @@ const OUTLINES=Object.freeze({
 export function appearanceCacheKey(recipe,scene='dark'){
   const p=resolve2DPaint(recipe,scene);
   return [recipe.variant,Number(recipe.mix).toFixed(4),scene,p.pressedBlue,p.emission.color,
-    p.pressedEdge,p.shellFill,p.idleControl,p.shellOpacity.toFixed(4),p.controlsOpacity.toFixed(4),
+    p.pressedEdge,p.shellFill,p.idleControl,p.neutralStick,p.neutralTrigger,p.shellOpacity.toFixed(4),p.controlsOpacity.toFixed(4),
     p.outlineColor,p.strokeColor,p.strokeOpacity.toFixed(4)].join('|');
 }
 export function resolve2DPaint(recipe,scene='dark'){
@@ -25,6 +25,8 @@ export function resolve2DPaint(recipe,scene='dark'){
   return Object.freeze({
     shellFill:scene==='light'?'#6c8192':scene==='mixed'?'#7c98aa':shell.ghostTint,
     idleControl:controls.idleTint||EXO_PALETTE.idleControl,
+    neutralStick:EXO_PALETTE.neutralStick,
+    neutralTrigger:EXO_PALETTE.neutralTrigger,
     shellOpacity,controlsOpacity,pressedOpacity,
     pressedBlue:recipe.material.pressBlue||EXO_PALETTE.pressedSurface,pressedEdge:EXO_PALETTE.pressedEdge,
     outlineColor:look.outline,strokeColor:look.stroke,glyphColor:look.glyph,

@@ -16,9 +16,9 @@ PrincipledMaterial {
     property real surfaceClearcoatRoughness: 0.3
     // Shared v37 2D/3D LED palette (see palette.js and exported JSON).
     property color idleControl: "#a4c5df"
-    property color pressedBlue: "#79bdff"
-    property color pressedEmissive: "#a9e1ff"
-    property real pressedEmissiveIntensity: 1.05
+    property color pressedBlue: "#4f9eeb"
+    property color pressedEmissive: "#85c4fa"
+    property real pressedEmissiveIntensity: 0.88
     property real pressedAmount: 0.0 // 0..1 from the canonical control state
     property real pressedOpacity: 1.0
     readonly property real pressWeight: Math.min(1.0, Math.max(0.0, surface.pressedAmount))

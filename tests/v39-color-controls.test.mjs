@@ -22,10 +22,19 @@ test('sync explicitly couples picks and respects last edited source; unsync isol
 });
 test('2D paint cache invalidates for active blue even at unchanged pressed and mix state',()=>{
   const source=resolveHeroRecipe('ghost',.7);
-  const state=new ActiveColorState();
+  const state=new ActiveColorState({sync:false});
   const a=state.overrideRecipe(source,'2d');
   state.edit('2d','#07c5ff');
   const b=state.overrideRecipe(source,'2d');
   assert.notEqual(appearanceCacheKey(a,'dark'),appearanceCacheKey(b,'dark'));
-  assert.equal(state.overrideRecipe(source,'3d').material.pressBlue,'#79bdff');
+  assert.equal(state.overrideRecipe(source,'3d').material.pressBlue,'#4f9eeb');
+});
+
+test('2D/3D active colors match and stay linked by default',()=>{
+ const state=new ActiveColorState();
+ assert.equal(state.sync,true);
+ assert.equal(state.color2D,'#4f9eeb');
+ assert.equal(state.color3D,state.color2D);
+ state.edit('3d','#437fe2');
+ assert.deepEqual([state.color2D,state.color3D],['#437fe2','#437fe2']);
 });

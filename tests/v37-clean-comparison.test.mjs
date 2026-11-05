@@ -56,7 +56,7 @@ test('comparison has four distinct looks in one document, no nested viewers',()=
 
 test('Qt Quick 3D material reference also uses opaque bright LED faces',()=>{
   const qml=fs.readFileSync(new URL('../qt-quick3d-port/ControllerSurface.qml',import.meta.url),'utf8');
-  assert.match(qml,/property color pressedBlue:\s*"#79bdff"/);
+  assert.match(qml,/property color pressedBlue:\s*"#4f9eeb"/);
   assert.match(qml,/property real pressedOpacity:\s*1\.0/);
   assert.match(qml,/opacity:\s*pressedAmount > 0\.001 \? 1\.0 : surfaceOpacity/);
   assert.doesNotMatch(qml,/Math\.min\(0\.90/);

@@ -10,11 +10,18 @@ const pressedBlue=new THREE.Color(EXO_PALETTE.pressedBlue);
 const ghostColor=new THREE.Color();
 const idleColor=new THREE.Color();
 const motionColor=new THREE.Color(EXO_PALETTE.movingControl);
+const neutralStickColor=new THREE.Color(EXO_PALETTE.neutralStick);
+const neutralSocketColor=new THREE.Color(EXO_PALETTE.neutralStickSocket);
+const neutralTriggerColor=new THREE.Color(EXO_PALETTE.neutralTrigger);
 const tmpEuler=new THREE.Euler();
+const clamp01=x=>Math.max(0,Math.min(1,Number.isFinite(Number(x))?Number(x):0));
 function normalizeVisualInput(input){
-  if(typeof input==='boolean')return {allPressed:input,left:normalizeStickInput(),right:normalizeStickInput()};
-  return {allPressed:!!input?.allPressed,
-    left:normalizeStickInput(input?.left),right:normalizeStickInput(input?.right)};
+  if(typeof input==='boolean')return {allPressed:input,left:normalizeStickInput(),right:normalizeStickInput(),
+    triggers:{left:input?1:0,right:input?1:0}};
+  const allPressed=!!input?.allPressed;
+  return {allPressed,left:normalizeStickInput(input?.left),right:normalizeStickInput(input?.right),
+    triggers:{left:allPressed?1:clamp01(input?.triggers?.left??0),
+      right:allPressed?1:clamp01(input?.triggers?.right??0)}};
 }
 function relevantStick(file){
   const n=String(file).toLowerCase();
@@ -55,14 +62,30 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
     const stick=stickPart?pose[relevantStick(mesh.userData.sourceFile)]:null;
     if(stick){
       const state=stickVisualState(stick);
-      // Use an emissive-free colour boost for analog movement; physical click
-      // uses the same muted blue as other controls, without forcing alpha=1.
-      m.color.lerp(motionColor,state.moving*.22);
+      // Neutral: light cap, dark physical socket/shaft; NO colored ring or glow.
+      // Movement tints only the cap toward light blue. Click is a separate input.
+      if(mesh.userData.role==='stick-cap'){
+        m.color.copy(neutralStickColor).lerp(motionColor,state.moving);
+        m.opacity=Math.min(.88,Math.max(spec.opacity,.73)+state.moving*.10);
+      }else{
+        m.color.copy(neutralSocketColor);
+        m.opacity=Math.max(spec.opacity,.52);
+      }
       if(state.click||pose.allPressed){
         m.color.copy(pressedBlue);
-        m.opacity=1; // Bright opaque LED surface; no ghost translucency on press.
+        m.opacity=1;
         if(!unlit){m.roughness=Math.min(m.roughness,.42);m.emissive.set(recipe.material.pressEmissive);m.emissiveIntensity=recipe.material.pressEmissiveIntensity;}
-      }else m.opacity=Math.min(.88,spec.opacity+(1-spec.opacity)*state.opacityBoost);
+      }
+    }else if(mesh.userData.role==='trigger'){
+      // L2/R2: continuous neutral-white -> active-blue based on real pressure.
+      const side=relevantStick(mesh.userData.sourceFile);
+      const amount=pose.triggers[side]??0;
+      m.color.copy(neutralTriggerColor).lerp(pressedBlue,amount);
+      m.opacity=Math.max(spec.opacity,.72)+(1-Math.max(spec.opacity,.72))*amount;
+      if(amount>0&&!unlit){
+        m.emissive.set(recipe.material.pressEmissive);
+        m.emissiveIntensity=recipe.material.pressEmissiveIntensity*amount*.65;
+      }
     }else if(control&&(pose.allPressed&&mesh.userData.control)){
       m.color.copy(pressedBlue);
       m.opacity=1;

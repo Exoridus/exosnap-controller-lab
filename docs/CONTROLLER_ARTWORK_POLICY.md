@@ -25,3 +25,14 @@ For every 3D model matching an existing 2D reference:
 ### GameCube source-artwork parity pass (2026-11-05)
 
 The GameCube 3D A/B/X/Y legends are reconstructed at runtime from the **actual SVG glyph paths** in `references/controllers/gamecube/source.svg`. `applyGameCubeButtonArtwork` finds the button's native 2D face/glyph, determines its authored proportions with SVG `getBBox()`, creates a source-shaped decal texture and enlarges the otherwise tiny projected label to a legible 54–68% of the physical button's narrow face dimension. Decals remain source-attached. Neither OBJ geometry nor the 2D source changes. Preserve the original 2D GPL-3.0 attribution separately from the MIT 3D mesh attribution. CI checks the four author-drawn glyphs and captures the actual GameCube WebGL view.
+
+## Input color-state contract (2026-11-05)
+
+**Only three input states exist**: neutral, analog motion/pressure, and clicked/pressed. **No focus or hover state is part of the controller visualization.** UI form controls may have their own keyboard focus indicators, unrelated to gameplay.
+
+- Shared 2D/3D blue is `#4F9EEB` by default; `ActiveColorState` starts linked, and users can deliberately unlink the debug colors.
+- Digital ABXY/D-pad/menu/shoulder buttons: idle muted blue, pressed solid blue; restrained emission (avoid washed-out cyan/white).
+- Joystick: idle cap white-ish `#E6EFF6`, physical recesses dark neutral without *any idle colored accent ring or halo*. Moving the stick tints its cap toward pale blue; only L3/R3 click turns it fully active blue. A physical non-emissive socket outline is not an interactive status ring.
+- Analog triggers: idle light gray-white `#E6EFF6`, smooth color interpolation to active blue proportional to actual L2/R2 pressure. In the browser lab the optional `Trigger L2/R2` slider drives both equally, live standard Gamepad API reads button values 6/7, and Press All overrides to full pressure.
+- The material mix determines how transparent the *housing* and inactive controls are. The semantic input state and pressed blue do not change by dark/light/mixed backdrop; neutral stick and trigger surfaces remain legible.
+- The browser test views are the validation target first. The QML sample palette is aligned, but full native Qt Quick 3D parity still needs its own rendered verification.

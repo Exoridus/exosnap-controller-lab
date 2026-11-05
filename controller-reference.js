@@ -1,7 +1,7 @@
 // Interactive 2D reference from the supplied Gamepad-Overlay artwork package.
 // This is a lab renderer, not a replacement for native GamepadSprites.
 import { semanticControlFrom2DLayer } from './controller-catalog.js';
-import {EXO_PALETTE} from './palette.js';
+import {EXO_PALETTE,stickSurfaceColor,triggerSurfaceColor} from './palette.js';
 import {appearanceCacheKey,resolve2DPaint} from './material-paint.js';
 const SVG_NS='http://www.w3.org/2000/svg';
 const clamp=(v,low=0,high=1)=>Math.min(high,Math.max(low,Number(v)||0));
@@ -128,7 +128,9 @@ export class ControllerReference{
       // overrides only the fill, then restores this material-aware idle style.
       if(entry.originalSurfaceStyle==null)surface.removeAttribute('style');
       else surface.setAttribute('style',entry.originalSurfaceStyle);
-      surface.style.setProperty('fill',paint.idleControl,'important');
+      const idleFace=entry.stickSide?paint.neutralStick:
+        entry.layer.role==='trigger'?paint.neutralTrigger:paint.idleControl;
+      surface.style.setProperty('fill',idleFace,'important');
       surface.style.setProperty('fill-opacity',String(paint.controlsOpacity),'important');
       const original=entry.originalSurfaceStyle||'';
       if(/stroke:(?!\s*none)/i.test(original)){
@@ -194,25 +196,37 @@ export class ControllerReference{
       }
       if(layer.role==='directional-pad'&&!control)continue;
       if(!control||!surface)continue;
-      const value=clamp(values.get(control)||0);
-      if(Math.abs(value-entry.lastPressure)<.01)continue;
-      entry.lastPressure=value;
-      if(value<=.01){
+      const buttonPressure=clamp(values.get(control)||0);
+      const stick=entry.stickSide?(entry.stickSide==='left'?left:right):null;
+      // A moved stick isn't a clicked stick: its cap transitions white -> pale blue
+      // while only L3/R3 (or deliberate Press All) makes it fully active.
+      const pressure=entry.stickSide&&!buttonPressure?
+        clamp(stick?.activity||0)*.7:buttonPressure;
+      if(Math.abs(pressure-entry.lastPressure)<.01)continue;
+      entry.lastPressure=pressure;
+      if(pressure<=.01){
         const idle=entry.restMaterialStyle??entry.originalStyle;
         if(idle==null)surface.removeAttribute('style');
         else surface.setAttribute('style',idle);
         continue;
       }
-      // The native renderer has more sophisticated pressClip handling. This
-      // reference view highlights pressure and stick-click without claiming
-      // its pressure-fill implementation is pixel-identical to GamepadSprites.
-      const pressedColor=this.paint?.pressedBlue||EXO_PALETTE.pressedSurface;
+      const active=this.paint?.pressedBlue||EXO_PALETTE.pressedSurface;
       const edge=this.paint?.pressedEdge||EXO_PALETTE.pressedEdge;
-      // The actual control face lights up. No dark outline or blurry CSS halo.
-      surface.style.setProperty('fill',pressedColor,'important');
-      surface.style.setProperty('fill-opacity','1','important');
-      surface.style.setProperty('stroke',edge,'important');
-      surface.style.setProperty('stroke-opacity','1','important');
+      const isTrigger=entry.layer.role==='trigger';
+      // Analog triggers interpolate color continuously; digital buttons switch.
+      const color=entry.stickSide?
+        stickSurfaceColor(buttonPressure?1:stick?.activity||0,buttonPressure>.5,active):
+        isTrigger?triggerSurfaceColor(buttonPressure,active):active;
+      surface.style.setProperty('fill',color,'important');
+      const opacity=entry.stickSide||isTrigger?
+        (this.paint?.controlsOpacity||.8)+(1-(this.paint?.controlsOpacity||.8))*pressure:1;
+      surface.style.setProperty('fill-opacity',String(opacity),'important');
+      // No artificial highlight ring at neutral. Keep underlying authored
+      // outline, and only emphasize its color on a real active press.
+      if(buttonPressure>.99){
+        surface.style.setProperty('stroke',edge,'important');
+        surface.style.setProperty('stroke-opacity','1','important');
+      }
       surface.style.setProperty('filter','none','important');
     }
   }

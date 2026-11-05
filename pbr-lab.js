@@ -25,7 +25,7 @@ const variants=HERO_VARIANTS;
 const resolveVariant=resolveHeroRecipe;
 
 const state={mix:.70,modelId:'DualSenseCompact',selected:'ghost',view:'front',panelWidth:320,
-  renderMode:'shared',stickPose:'neutral',
+  renderMode:'shared',stickPose:'neutral',triggerPressure:0,
   pressed:false,native:null,renderer:null,renderPending:false,camera:null,scene:null,drawStats:{},
   yaw:0,pitch:0,radius:7.8,error:null,drag:null,renderTarget:null,blitScene:null,blitCamera:null,
   environmentMap:null};
@@ -131,6 +131,9 @@ function updateFlatReferences(){
   const values=new Map(state.pressed?CONTROL_IDS.map(id=>[id,1]):[]);
   if(inputs.left.click)values.set('ls',1);
   if(inputs.right.click)values.set('rs',1);
+  const triggerValues=state.stickPose==='live'?(inputs.triggers||{left:0,right:0}):
+    {left:state.triggerPressure,right:state.triggerPressure};
+  if(!state.pressed){values.set('l2',triggerValues.left);values.set('r2',triggerValues.right);}
   for(const variant of variants){
     const recipe=recipeFor2D(variant.key);
     for(const sceneName of scenes){
@@ -202,7 +205,9 @@ function render(){
   renderer.clear(true,true,true);
   renderer.setScissorTest(true);
   const inputs=state.stickPose==='live'?getLiveStickPose():poseForStickDemo(state.stickPose);
-  const pose={...inputs,allPressed:state.pressed};
+  const pose={...inputs,allPressed:state.pressed,
+    triggers:state.stickPose==='live'?(inputs.triggers||{left:0,right:0}):
+      {left:state.triggerPressure,right:state.triggerPressure}};
   applyStickPoseToRig(state.native,pose);
   state.native.group.updateMatrixWorld(true);
   for(const variant of variants){
@@ -284,7 +289,9 @@ function getLiveStickPose(){
   const pad=Array.from(pads).find(p=>p?.connected&&p.axes?.length>=4);
   if(!pad)return poseForStickDemo('neutral');
   return {left:normalizeStickInput({x:pad.axes[0],y:-pad.axes[1],click:pad.buttons?.[10]?.pressed}),
-    right:normalizeStickInput({x:pad.axes[2],y:-pad.axes[3],click:pad.buttons?.[11]?.pressed})};
+    right:normalizeStickInput({x:pad.axes[2],y:-pad.axes[3],click:pad.buttons?.[11]?.pressed}),
+    triggers:{left:Math.max(0,Math.min(1,Number(pad.buttons?.[6]?.value)||0)),
+      right:Math.max(0,Math.min(1,Number(pad.buttons?.[7]?.value)||0))}};
 }
 
 function scheduleRender(){
@@ -359,6 +366,11 @@ function bindUI(){
   color2D.addEventListener('input',()=>{activeColors.edit('2d',color2D.value);syncDisplay();scheduleRender();});
   color3D.addEventListener('input',()=>{activeColors.edit('3d',color3D.value);syncDisplay();scheduleRender();});
   $('pressAll').addEventListener('change',e=>{state.pressed=e.target.checked;scheduleRender();});
+  $('triggerPressure').addEventListener('input',e=>{
+    state.triggerPressure=Number(e.target.value)/100;
+    $('triggerValue').textContent=`${e.target.value} %`;
+    scheduleRender();
+  });
   $('renderMode').addEventListener('change',e=>{state.renderMode=e.target.value;scheduleRender();});
   $('stickPose').addEventListener('change',e=>{state.stickPose=e.target.value;scheduleRender();});
   $('exportRecipe').addEventListener('click',exportQtRecipe);
@@ -393,6 +405,6 @@ async function main(){
   createRenderer();
   if(state.renderer){try{await loadEnvironmentProbe();}catch(e){setFail(`HDR-Lichtprobe konnte nicht geladen werden: ${e.message}`);}}
   await loadModel(state.modelId);
-  window.__exoPbrLab={get flatReferences(){return flatReferences},get status(){return document.body.dataset.renderReady},get model(){return state.native},get variant(){return state.selected},get mix(){return state.mix},get renderer(){return state.renderer},get renderTarget(){return state.renderTarget},get drawStats(){return {...state.drawStats}},get renderMode(){return state.renderMode},get colors(){return {color2D:activeColors.color2D,color3D:activeColors.color3D,sync:activeColors.sync}}};
+  window.__exoPbrLab={get flatReferences(){return flatReferences},get status(){return document.body.dataset.renderReady},get model(){return state.native},get variant(){return state.selected},get mix(){return state.mix},get renderer(){return state.renderer},get renderTarget(){return state.renderTarget},get drawStats(){return {...state.drawStats}},get renderMode(){return state.renderMode},get colors(){return {color2D:activeColors.color2D,color3D:activeColors.color3D,sync:activeColors.sync}},get triggerPressure(){return state.triggerPressure}};
 }
 main().catch(error=>{console.error(error);setFail(`Startfehler: ${error.message}`);});

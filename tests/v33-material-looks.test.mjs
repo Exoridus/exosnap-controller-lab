@@ -24,7 +24,9 @@ test('idle stick matches control look, moving stick lightens, pressed click is o
   const idle=cap.material.color.clone(),idleAlpha=cap.material.opacity;
   applyPbrRecipeToRig(rig,recipe,{...poseForStickDemo('move'),allPressed:false});
   const moved=cap.material.color.clone(),moveAlpha=cap.material.opacity;
-  assert.ok(moved.getHSL({h:0,s:0,l:0}).l>idle.getHSL({h:0,s:0,l:0}).l);
+  assert.ok(!moved.equals(idle),'movement should shift white cap toward pale blue');
+  assert.equal(idle.getHexString(),'e6eff6');
+  assert.ok(moved.b>moved.r,'motion color remains pale blue');
   assert.ok(moveAlpha>=idleAlpha);
   applyPbrRecipeToRig(rig,recipe,{...poseForStickDemo('click'),allPressed:false});
   assert.ok(cap.material.opacity>moveAlpha);
