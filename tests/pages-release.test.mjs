@@ -86,3 +86,12 @@ test('Generic Pro source is vendored, segmented and paired with original 2D',asy
  assert.equal(layoutForId('generic').availability,'native');
  for(const part of manifest.parts)await stat(path.join(root,'assets/GenericPro',part.filename));
 });
+
+test('3D/2D ready gate prevents partial SVG loads from passing browser CI',async()=>{
+  const {readFile}=await import('node:fs/promises');
+  const app=await readFile(path.join(root,'pbr-lab.js'),'utf8');
+  const capture=await readFile(path.join(root,'tools/capture-pages.mjs'),'utf8');
+  assert.match(app,/flatReferences\\.size===variants\\.length\\*scenes\\.length/);
+  assert.match(app,/flatReady\\?'three-rendered':'incomplete'/);
+  assert.match(capture,/sample--flat svg'\\)\\.length===12/);
+});

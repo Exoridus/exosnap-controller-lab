@@ -270,7 +270,11 @@ function render(){
   renderer.setRenderTarget(null);
   renderer.setScissorTest(false);
   const expected=[...gallery.querySelectorAll('.variant')].filter(card=>!card.hidden).length*scenes.length;
-  document.body.dataset.renderReady=rendered===expected?'three-rendered':'incomplete';
+  // A 3D frame alone is not ready if 2D source-SVG panels are still loading.
+  // Switching controllers must never expose a partial 2D/3D comparison.
+  const flatReady=flatReferences.size===variants.length*scenes.length &&
+    flatSampleNodes.every(({stage})=>Boolean(stage.querySelector('svg')));
+  document.body.dataset.renderReady=rendered===expected&&flatReady?'three-rendered':'incomplete';
   if(rendered===expected)document.body.dataset.renderRevision=String(1+(Number(document.body.dataset.renderRevision)||0));
   $('modelInfo').textContent=`${state.native.partCount} Originalteile · ${Math.round(state.native.triangles).toLocaleString('de-DE')} Quell-Dreiecke · ${rendered}/${expected} Viewports`;
   setStatus(`${state.native.model.name} · Mix ${Math.round(state.mix*100)} % · ${state.renderMode==='shared'?'1× 3D pro Look + GPU-Composites':'3× direktes 3D'} · MSAA ${state.renderer?.capabilities?.isWebGL2?'4×':'Canvas'} · GPU gemessen`);

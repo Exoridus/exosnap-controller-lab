@@ -34,8 +34,17 @@ try{
   page.on('response',response=>{if(response.status()>=400&&!/\/favicon\.ico(?:\?|$)/.test(response.url()))runtimeErrors.push(`HTTP ${response.status()}: ${response.url()}`);});
   page.on('requestfailed',request=>{if(!/\/favicon\.ico(?:\?|$)/.test(request.url()))runtimeErrors.push(`request failed: ${request.url()}: ${request.failure()?.errorText}`);});
   await page.goto(new URL('pbr-lab.html',base).href,{waitUntil:'domcontentloaded',timeout:60000});
-  await page.waitForFunction(()=>document.body.dataset.renderReady==='three-rendered',{timeout:90000});
+  await page.waitForFunction(()=>
+    document.body.dataset.renderReady==='three-rendered' &&
+    document.querySelectorAll('.variant:not([hidden]) .sample--flat svg').length===12,
+    {timeout:90000});
   const shotProof=async()=>{
+    // Model switching renders WebGL before all independent 2D SVG loads finish.
+    // Wait for the *paired* views instead of racing asynchronous SVG loading.
+    await page.waitForFunction(()=>
+      document.body.dataset.renderReady==='three-rendered' &&
+      document.querySelectorAll('.variant:not([hidden]) .sample--flat svg').length===12,
+      {timeout:60000});
     const state=await page.evaluate(()=>({
       status:document.body.dataset.renderReady,
       revision:Number(document.body.dataset.renderRevision||0),
