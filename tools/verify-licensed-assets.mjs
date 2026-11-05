@@ -28,7 +28,7 @@ for(const entry of await readdir(assets,{withFileTypes:true})){
 for(const id of GENERATED_3D_MODEL_IDS){
  const folder=path.join(assets,id);const info=JSON.parse(await readFile(path.join(folder,'info.json'),'utf8'));
  if(info.source!=='ExoSnap original parametric model (no third-party mesh)'||info.license!=='MIT')throw Error('Unapproved generated model provenance');
- for(const p of info.parts){if(!/^[\\w.-]+\\.obj$/.test(p.filename))throw Error('Invalid generated OBJ filename');
+ for(const p of info.parts){if(!/^[\w.-]+\.obj$/.test(p.filename))throw Error('Invalid generated OBJ filename');
  const report=inspectObjText(await readFile(path.join(folder,p.filename),'utf8'));
  if(!report.valid)throw Error('Invalid original model part: '+id+'/'+p.filename);
  total++;bytes+=(await stat(path.join(folder,p.filename))).size;}
