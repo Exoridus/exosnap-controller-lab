@@ -3,7 +3,7 @@
 // its geometry, moving thumbstick caps away from their shafts.
 export function controllerPartTransform(source,meta,center){
   const p=Array.isArray(meta?.position)?meta.position.map(Number):[0,0,0];
-  if(source==='co')return {pivot:p,geometryOffset:[0,0,0]};
+  if(source==='co'||source==='exo')return {pivot:p,geometryOffset:[0,0,0]};
   return {pivot:center.map((v,i)=>v+p[i]),geometryOffset:center.map(v=>-v)};
 }
 
@@ -47,7 +47,7 @@ const SKIRT_PROFILES=Object.freeze({
 });
 export function thumbstickCapStyle(modelId,side='left'){
   if(['DualSenseCompact','DS4Compact'].includes(modelId))return 'sony';
-  if(['XboxOneClean','XboxSeries'].includes(modelId))return 'xbox';
+  if(['XboxOneClean','XboxSeries','GenericPro'].includes(modelId))return 'xbox';
   if(modelId==='SwitchPro')return 'switch';
   if(['JoyconGrip','JoyconLeft','JoyconRight'].includes(modelId))return 'joycon';
   if(['Gamecube','Wavebird'].includes(modelId))return side==='right'?'gamecubeC':'gamecubeMain';

@@ -34,10 +34,12 @@ function drawMark(ctx,glyph){
  }
 }
 export function makeFaceGlyph(file,source,bounds,model){
- if(source!=='co')return null;
+ if(source!=='co'&&source!=='exo')return null;
  const glyph=faceButtonGlyph(file,model);
  if(!glyph)return null;
- const geo=new THREE.PlaneGeometry(.075,.075);
+ const face=Math.min(Math.abs(bounds.max.x-bounds.min.x),Math.abs(bounds.max.z-bounds.min.z));
+ const extent=source==='exo'?Math.min(face*.69,.17):.075;
+ const geo=new THREE.PlaneGeometry(extent,extent);
  const material=new THREE.MeshBasicMaterial({
    color:'#ffffff',transparent:true,opacity:1,side:THREE.DoubleSide,
    depthTest:true,depthWrite:false,toneMapped:false,alphaTest:.02,

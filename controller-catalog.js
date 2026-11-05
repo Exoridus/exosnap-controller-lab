@@ -6,7 +6,7 @@ const BASES = Object.freeze({
   dualshock4:      ['DS4Compact','native'],
   xbox_series:     [null,'license-review'],
   xbox_one:        ['XboxOneClean','native'],
-  generic:         [null,'reference'],
+  generic:         ['GenericPro','native'],
   switch_pro:      ['SwitchPro','native'],
   joycon_grip:     ['JoyconGrip','native'],
   joycon_pair:     [null,'composite'], // Two existing, independently animated Joy-Cons.

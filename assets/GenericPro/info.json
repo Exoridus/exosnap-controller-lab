@@ -1,0 +1,375 @@
+{
+  "source": "ExoSnap original parametric model (no third-party mesh)",
+  "license": "MIT",
+  "description": "Compact, symmetric-sticks generic 3D gamepad with distinct controls and no brand markings",
+  "parts": [
+    {
+      "filename": "top_shell.obj",
+      "name": "top shell",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.83,
+        0.84,
+        0.86
+      ]
+    },
+    {
+      "filename": "bottom_shell.obj",
+      "name": "bottom shell",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.24,
+        0.29,
+        0.35
+      ]
+    },
+    {
+      "filename": "left_ring.obj",
+      "name": "left ring",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.34,
+        0.41,
+        0.48
+      ]
+    },
+    {
+      "filename": "left_stick.obj",
+      "name": "left stick",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        -0.53,
+        0.22,
+        0.28
+      ],
+      "color": [
+        0.19,
+        0.24,
+        0.3
+      ]
+    },
+    {
+      "filename": "left_cap.obj",
+      "name": "left cap",
+      "visible": true,
+      "parent": 3,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.19,
+        0.24,
+        0.3
+      ]
+    },
+    {
+      "filename": "right_ring.obj",
+      "name": "right ring",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.34,
+        0.41,
+        0.48
+      ]
+    },
+    {
+      "filename": "right_stick.obj",
+      "name": "right stick",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0.53,
+        0.22,
+        0.28
+      ],
+      "color": [
+        0.19,
+        0.24,
+        0.3
+      ]
+    },
+    {
+      "filename": "right_cap.obj",
+      "name": "right cap",
+      "visible": true,
+      "parent": 6,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.19,
+        0.24,
+        0.3
+      ]
+    },
+    {
+      "filename": "a_button.obj",
+      "name": "a button",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.26,
+        0.32,
+        0.39
+      ]
+    },
+    {
+      "filename": "b_button.obj",
+      "name": "b button",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.26,
+        0.32,
+        0.39
+      ]
+    },
+    {
+      "filename": "x_button.obj",
+      "name": "x button",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.26,
+        0.32,
+        0.39
+      ]
+    },
+    {
+      "filename": "y_button.obj",
+      "name": "y button",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.26,
+        0.32,
+        0.39
+      ]
+    },
+    {
+      "filename": "dpad_up.obj",
+      "name": "dpad up",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.26,
+        0.32,
+        0.39
+      ]
+    },
+    {
+      "filename": "dpad_down.obj",
+      "name": "dpad down",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.26,
+        0.32,
+        0.39
+      ]
+    },
+    {
+      "filename": "dpad_left.obj",
+      "name": "dpad left",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.26,
+        0.32,
+        0.39
+      ]
+    },
+    {
+      "filename": "dpad_right.obj",
+      "name": "dpad right",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.26,
+        0.32,
+        0.39
+      ]
+    },
+    {
+      "filename": "back_button.obj",
+      "name": "back button",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.34,
+        0.41,
+        0.48
+      ]
+    },
+    {
+      "filename": "start_button.obj",
+      "name": "start button",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.34,
+        0.41,
+        0.48
+      ]
+    },
+    {
+      "filename": "guide_button.obj",
+      "name": "guide button",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.38,
+        0.52,
+        0.63
+      ]
+    },
+    {
+      "filename": "left_bumper.obj",
+      "name": "left bumper",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.44,
+        0.49,
+        0.56
+      ]
+    },
+    {
+      "filename": "left_trigger.obj",
+      "name": "left trigger",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.19,
+        0.24,
+        0.3
+      ]
+    },
+    {
+      "filename": "right_bumper.obj",
+      "name": "right bumper",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.44,
+        0.49,
+        0.56
+      ]
+    },
+    {
+      "filename": "right_trigger.obj",
+      "name": "right trigger",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.19,
+        0.24,
+        0.3
+      ]
+    }
+  ]
+}

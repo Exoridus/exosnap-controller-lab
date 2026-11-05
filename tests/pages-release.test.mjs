@@ -10,7 +10,7 @@ test('static Pages build exports a deployable offline-look viewer without source
   const dir=await mkdtemp(path.join(tmpdir(),'exosnap-pages-test-'));
   try{
     await buildPages(root,dir);
-    for(const p of ['index.html','pbr-lab.html','pbr-lab.js','assets/DualSenseCompact/top_shell.obj','assets/studio-neutral.hdr','references/controllers/dualsense/source.svg','node_modules/three/build/three.module.js','.nojekyll','screenshots.html'])await stat(path.join(dir,p));
+    for(const p of ['index.html','pbr-lab.html','pbr-lab.js','assets/DualSenseCompact/top_shell.obj','assets/GenericPro/top_shell.obj','assets/studio-neutral.hdr','references/controllers/dualsense/source.svg','node_modules/three/build/three.module.js','.nojekyll','screenshots.html'])await stat(path.join(dir,p));
     await assert.rejects(stat(path.join(dir,'tests/pages-release.test.mjs')));
     await assert.rejects(stat(path.join(dir,'server.mjs')));
     const html=await readFile(path.join(dir,'pbr-lab.html'),'utf8');

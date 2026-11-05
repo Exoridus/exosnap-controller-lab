@@ -16,6 +16,8 @@ test('the 2D/3D catalog contains exactly 20 source identities plus one explicitl
   assert.equal(source.length,20);assert.equal(LAYOUTS.length,20);assert.equal(VIEWER_LAYOUTS.length,21);
   assert.deepEqual(source.map(x=>x.id),LAYOUTS.map(x=>x.id));
   assert.equal(layoutForId('wavebird').availability,'3d-only');
+  assert.equal(layoutForId('generic').modelId,'GenericPro');
+  assert.equal(layoutForId('generic').availability,'native');
   assert.equal(layoutForId('joycon_pair').availability,'composite');
   assert.deepEqual(layoutForId('joycon_pair').modelIds,['JoyconLeft','JoyconRight']);
   assert.equal(layoutForId('xbox_360').modelId,'Xbox360');

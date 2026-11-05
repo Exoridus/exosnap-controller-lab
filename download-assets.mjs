@@ -7,10 +7,12 @@ import path from 'node:path';
 const root=path.dirname(fileURLToPath(import.meta.url));
 const dir=path.join(root,'assets');
 const requested=process.argv.slice(2);
-const legal=CONTROLLERS.filter(isLicensedModel);
-const blocked=requested.filter(id=>!legal.some(model=>model.id===id));
+const legal=CONTROLLERS.filter(m=>isLicensedModel(m)&&m.source==='co');
+const generated=CONTROLLERS.filter(m=>isLicensedModel(m)&&m.source==='exo');
+const blocked=requested.filter(id=>![...legal,...generated].some(model=>model.id===id));
 if(blocked.length){console.error('Unlicensed, unverified or unknown model(s): '+blocked.join(', '));process.exit(1);}
 const models=requested.length?legal.filter(x=>requested.includes(x.id)):legal;
+// Original generated meshes are already versioned in assets/GenericPro; never fetch them from the network.
 if(!models.length){console.error('No licensed models available.');process.exit(1);}
 await mkdir(dir,{recursive:true});
 let existing=[];

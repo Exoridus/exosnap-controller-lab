@@ -3,7 +3,7 @@
 import {readdir,readFile,stat} from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {CONTROLLERS,APPROVED_3D_MODEL_IDS,isLicensedModel} from '../models.js';
+import {CONTROLLERS,APPROVED_3D_MODEL_IDS,GENERATED_3D_MODEL_IDS,isLicensedModel} from '../models.js';
 import {inspectObjText} from '../mesh-validation.js';
 const assets=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../assets');
 let total=0,bytes=0;
@@ -23,6 +23,14 @@ for(const id of APPROVED_3D_MODEL_IDS){
  }
 }
 for(const entry of await readdir(assets,{withFileTypes:true})){
- if(entry.isDirectory()&&!APPROVED_3D_MODEL_IDS.includes(entry.name))throw Error('Uncleared 3D asset folder '+entry.name);
+ if(entry.isDirectory()&&![...APPROVED_3D_MODEL_IDS,...GENERATED_3D_MODEL_IDS].includes(entry.name))throw Error('Uncleared 3D asset folder '+entry.name);
+}
+for(const id of GENERATED_3D_MODEL_IDS){
+ const folder=path.join(assets,id);const info=JSON.parse(await readFile(path.join(folder,'info.json'),'utf8'));
+ if(info.source!=='ExoSnap original parametric model (no third-party mesh)'||info.license!=='MIT')throw Error('Unapproved generated model provenance');
+ for(const p of info.parts){if(!/^[\\w.-]+\\.obj$/.test(p.filename))throw Error('Invalid generated OBJ filename');
+ const report=inspectObjText(await readFile(path.join(folder,p.filename),'utf8'));
+ if(!report.valid)throw Error('Invalid original model part: '+id+'/'+p.filename);
+ total++;bytes+=(await stat(path.join(folder,p.filename))).size;}
 }
 console.log('Verified '+total+' original MIT OBJ meshes across '+APPROVED_3D_MODEL_IDS.length+' controller families ('+(bytes/1024/1024).toFixed(2)+' MiB)');

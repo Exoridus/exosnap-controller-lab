@@ -11,18 +11,18 @@ const expectedCo = [
 ];
 
 test('curated final controller list exposes only compact clean models', () => {
-  assert.equal(CONTROLLERS.length, 12);
-  assert.equal(new Set(CONTROLLERS.map(m=>m.id)).size, 12);
+  assert.equal(CONTROLLERS.length, 13);
+  assert.equal(new Set(CONTROLLERS.map(m=>m.id)).size, 13);
   assert.deepEqual(Object.keys(SOURCES).sort(), ['co','padforge']);
   for (const model of CONTROLLERS) {
     assert.ok(model.id && model.name && model.brand && model.family);
-    assert.ok(['co','padforge'].includes(model.source),model.id);
+    assert.ok(['co','padforge','exo'].includes(model.source),model.id);
     assert.ok(assetFolder(model),model.id);
     assert.ok(typeof model.orbitY === 'number', model.id);
     assert.ok(Array.isArray(model.shellParts) && model.shellParts.length>0, model.id);
     if (model.manifest) {
-      assert.equal(model.source,'co',model.id);
-      assert.ok(expectedCo.includes(model.id),model.id);
+      assert.ok(['co','exo'].includes(model.source),model.id);
+      assert.ok([...expectedCo,'GenericPro'].includes(model.id),model.id);
       assert.ok(!model.parts,model.id);
     } else {
       assert.equal(model.id,'XboxSeries');
@@ -85,4 +85,10 @@ test('published 3D model pack is MIT-only and excludes unclear or noncommercial 
   }
   assert.equal(isLicensedModel(CONTROLLERS.find(m=>m.id==='XboxSeries')),false);
   assert.equal(isLicensedModel(CONTROLLERS.find(m=>m.id==='SteamController2026')),false);
+});
+
+test('Generic Pro original segmented model is an approved local 3D identity',()=>{
+  const model=CONTROLLERS.find(m=>m.id==='GenericPro');
+  assert.equal(model.source,'exo');assert.ok(isLicensedModel(model));
+  assert.equal(model.manifest,true);assert.equal(model.family,'generic');
 });

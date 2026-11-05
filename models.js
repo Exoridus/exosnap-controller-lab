@@ -24,6 +24,7 @@ const fromPadforge = (id, folder, name, brand, family, color, parts, extra={}) =
   id, source:'padforge', folder, name, brand, family, color, group:'Final', parts:parts.trim().split(/\s+/).map(n=>n+'.obj'), ...extra
 });
 export const CONTROLLERS = [
+  Object.freeze({id:'GenericPro',source:'exo',folder:'GenericPro',manifest:true,name:'Generic Pro',brand:'ExoSnap',family:'generic',color:'#d4d8db',group:'Final',orbitY:0,shellParts:['top_shell','bottom_shell']}),
   fromCo('DualSenseCompact','DualSense','DualSense','PlayStation 5','playstation','#e3e7ee',{orbitY:0, shellParts:['top_shell','bottom_shell','grip_left','grip_right']}),
   fromCo('DS4Compact','DualShock 4','DualShock 4','PlayStation 4','playstation','#404a58',{orbitY:0, shellParts:['top_shell','bottom_shell']}),
   fromCo('XboxOneClean','Xbox One','Xbox One','Microsoft Xbox One','xbox','#e5e9f1',{orbitY:0, shellParts:['top_shell','bottom_shell','left_grip','right_grip']}),
@@ -43,7 +44,8 @@ export const APPROVED_3D_MODEL_IDS = Object.freeze([
   'DualSenseCompact','DS4Compact','XboxOneClean','Xbox360','SwitchPro',
   'JoyconGrip','JoyconLeft','JoyconRight','Gamecube','Wavebird'
 ]);
-export const isLicensedModel = model => !!model && APPROVED_3D_MODEL_IDS.includes(model.id);
+export const GENERATED_3D_MODEL_IDS = Object.freeze(['GenericPro']);
+export const isLicensedModel = model => !!model && (APPROVED_3D_MODEL_IDS.includes(model.id)||GENERATED_3D_MODEL_IDS.includes(model.id));
 export const CONTROL_IDS = ['b1','b2','b3','b4','up','right','down','left','l1','r1','l2','r2','ls','rs','start','select','home','touchpad'];
 export function controlFromFilename(filename) {
   const n = filename.replace(/\.obj$/i,'').toLowerCase();
