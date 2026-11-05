@@ -24,7 +24,13 @@ try{
   });
   const page=await browser.newPage({viewport:{width:2170,height:1250},deviceScaleFactor:1,reducedMotion:'reduce'});
   page.on('pageerror',error=>runtimeErrors.push('pageerror: '+error.message));
-  page.on('console',message=>{if(message.type()==='error')runtimeErrors.push('console.error: '+message.text());});
+  page.on('console',message=>{
+    if(message.type()!=='error')return;
+    const url=message.location()?.url||'';
+    // Missing default favicons are harmless; retain all other browser errors.
+    if(/\/favicon\.ico(?:\?|$)/.test(url)&&/Failed to load resource/i.test(message.text()))return;
+    runtimeErrors.push(`console.error (${url||'unknown source'}): ${message.text()}`);
+  });
   page.on('response',response=>{if(response.status()>=400&&!/\/favicon\.ico(?:\?|$)/.test(response.url()))runtimeErrors.push(`HTTP ${response.status()}: ${response.url()}`);});
   page.on('requestfailed',request=>{if(!/\/favicon\.ico(?:\?|$)/.test(request.url()))runtimeErrors.push(`request failed: ${request.url()}: ${request.failure()?.errorText}`);});
   await page.goto(new URL('pbr-lab.html',base).href,{waitUntil:'domcontentloaded',timeout:60000});
