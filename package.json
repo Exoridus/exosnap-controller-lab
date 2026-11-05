@@ -13,7 +13,8 @@
     "build:pages": "node tools/build-pages.mjs --out dist",
     "capture:pages": "node tools/capture-pages.mjs --out .capture",
     "topology": "node topology-report.mjs",
-    "audit:v33": "node tools/v33-audit.mjs"
+    "audit:v33": "node tools/v33-audit.mjs",
+    "audit:3d-sources": "node tools/validate-3d-sources.mjs"
   },
   "engines": {
     "node": ">=20"

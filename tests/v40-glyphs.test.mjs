@@ -43,7 +43,7 @@ test('functional labels on GameCube/Xbox/Nintendo do not become PlayStation symb
  }finally{disposeNativeRig(rig)}
 });
 
-test('GameCube 3D face legend scales from actual 2D glyph footprint for readable overlay size',()=>{
+test('GameCube 3D face legend scales from actual 2D glyph footprint for readable overlay size',async()=>{
   // The GameCube A glyph in the source SVG is ~135x135 inside a 480px face.
   const a=faceDecalSizeFrom2D({width:.219784,height:.219784},
     {width:480,height:480},{width:126,height:135});
@@ -55,7 +55,7 @@ test('GameCube 3D face legend scales from actual 2D glyph footprint for readable
   assert.ok(b.readableCoverage>=.54&&b.readableCoverage<=.68);
   assert.throws(()=>faceDecalSizeFrom2D({width:0,height:.2},
     {width:100,height:100},{width:10,height:10}),RangeError);
-  const svg=fs.readFile(new URL('../references/controllers/gamecube/source.svg',import.meta.url),'utf8');
+  const svg=await fs.readFile(new URL('../references/controllers/gamecube/source.svg',import.meta.url),'utf8');
   for(const id of ['a','b','x','y']){
     const block=svg.match(new RegExp('<g id="btn-'+id+'">([\\s\\S]*?)<\\/g>'))?.[1];
     assert.ok(block?.includes('class="glyph"'),'2D source must provide author-drawn path: '+id);

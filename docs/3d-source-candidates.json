@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "reviewedOn": "2026-11-05",
+  "purpose": "Discovery and source-license audit only; no candidate is automatically cleared for redistribution",
+  "candidates": [
+    {
+      "id": "existing-xbox360-larf",
+      "layoutIds": [
+        "xbox_360"
+      ],
+      "sourceUrl": "https://github.com/larfingshnew/3d-controller-overlay",
+      "license": "MIT",
+      "licenseEvidenceUrl": "https://github.com/larfingshnew/3d-controller-overlay/blob/main/LICENSE",
+      "status": "approved-in-repo",
+      "assetSpecific": true,
+      "mayAutoPublish": true,
+      "note": "Exact source OBJ Git blobs already matched and vendored; visual polish outstanding."
+    },
+    {
+      "id": "existing-joycons-larf",
+      "layoutIds": [
+        "joycon_left",
+        "joycon_right",
+        "joycon_grip",
+        "joycon_pair",
+        "joycon_left_horizontal",
+        "joycon_right_horizontal"
+      ],
+      "sourceUrl": "https://github.com/larfingshnew/3d-controller-overlay",
+      "license": "MIT",
+      "licenseEvidenceUrl": "https://github.com/larfingshnew/3d-controller-overlay/blob/main/LICENSE",
+      "status": "approved-in-repo",
+      "assetSpecific": true,
+      "mayAutoPublish": true,
+      "note": "Only left/right/grip original OBJ assets are approved. Pair/horizontal derived layouts not implemented yet."
+    },
+    {
+      "id": "polyhaven-gamepad",
+      "layoutIds": [
+        "generic"
+      ],
+      "sourceUrl": "https://polyhaven.com/a/gamepad",
+      "license": "CC0-1.0",
+      "licenseEvidenceUrl": "https://polyhaven.com/license",
+      "status": "candidate",
+      "assetSpecific": true,
+      "mayAutoPublish": false,
+      "note": "Real ~10k triangle retro 3D gamepad, not same as any branded controller; segmented control rig not inspected."
+    },
+    {
+      "id": "innerscene-generic-gamepad",
+      "layoutIds": [
+        "generic"
+      ],
+      "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/gamepad-controller-90f536b4",
+      "license": "CC0-1.0",
+      "licenseEvidenceUrl": "https://www.innerscene.com/tools/library/3d-parts/gamepad-controller-90f536b4",
+      "status": "candidate",
+      "assetSpecific": true,
+      "mayAutoPublish": false,
+      "note": "Source declares original CC0 generic gamepad; geometry, downloadable bytes and moving parts not yet inspected."
+    },
+    {
+      "id": "innerscene-handheld",
+      "layoutIds": [
+        "steam_deck_full",
+        "steam_deck_compact"
+      ],
+      "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/handheld-console-3224875c",
+      "license": "CC0-1.0",
+      "licenseEvidenceUrl": "https://www.innerscene.com/tools/library/3d-parts/handheld-console-3224875c",
+      "status": "candidate",
+      "assetSpecific": true,
+      "mayAutoPublish": false,
+      "note": "Generic handheld, not an authentic Steam Deck; could be inspiration for an independently stylized master, after source inspection."
+    },
+    {
+      "id": "meshy-community-controller-discovery",
+      "layoutIds": [
+        "generic",
+        "xbox_series",
+        "steam_controller",
+        "steam_controller_2026",
+        "dualsense_edge",
+        "xbox_elite",
+        "steam_deck_full",
+        "steam_deck_compact"
+      ],
+      "sourceUrl": "https://www.meshy.ai/tags/gamepad",
+      "license": "CC0-1.0",
+      "licenseEvidenceUrl": "https://www.meshy.ai/terms-of-use",
+      "status": "discovery",
+      "assetSpecific": false,
+      "mayAutoPublish": false,
+      "note": "Browse only: not an individual item. Community 3D output CC0 under section 3.3, uploaded reference images have other terms; each candidate needs exact item and provenance."
+    },
+    {
+      "id": "valve-steam-deck-cad",
+      "layoutIds": [
+        "steam_deck_full",
+        "steam_deck_compact"
+      ],
+      "sourceUrl": "https://github.com/KagamiChan/steam-hardware",
+      "license": "CC-BY-NC-SA-4.0",
+      "licenseEvidenceUrl": "https://github.com/KagamiChan/steam-hardware/blob/master/license.txt",
+      "status": "blocked",
+      "assetSpecific": true,
+      "mayAutoPublish": false,
+      "note": "Official Valve CAD reference is noncommercial. Do not copy mesh/topology into an ExoSnap commercial model."
+    },
+    {
+      "id": "handheld-companion-steamdeck",
+      "layoutIds": [
+        "steam_deck_full",
+        "steam_deck_compact"
+      ],
+      "sourceUrl": "https://github.com/CasperH2O/3DControllerModels",
+      "license": "unverified-upstream-rights",
+      "licenseEvidenceUrl": "https://github.com/CasperH2O/3DControllerModels/blob/main/README.md",
+      "status": "blocked",
+      "assetSpecific": true,
+      "mayAutoPublish": false,
+      "note": "Repository has CC0 label but credits Steam Deck geometry to Valve CAD, licensed NC: do not rely on re-licensing."
+    },
+    {
+      "id": "padforge-series-and-edge",
+      "layoutIds": [
+        "xbox_series",
+        "xbox_elite",
+        "dualsense_edge"
+      ],
+      "sourceUrl": "https://github.com/hifihedgehog/PadForge",
+      "license": "restricted-third-party",
+      "licenseEvidenceUrl": "https://github.com/hifihedgehog/PadForge/blob/main/LICENSE",
+      "status": "blocked",
+      "assetSpecific": false,
+      "mayAutoPublish": false,
+      "note": "README/License identifies some models purchased on CGTrader with separate royalty-free terms, not transferable via repository."
+    }
+  ]
+}
