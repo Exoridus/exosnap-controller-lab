@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>ExoSnap · Qt Material Vergleichslabor</title>
+<style>
+:root{color-scheme:dark;font:13px/1.5 system-ui,'Segoe UI',sans-serif;background:#090e15;color:#e8f0f8}
+*{box-sizing:border-box}
+body{margin:0;min-width:340px}
+header{position:sticky;top:0;z-index:5;background:#101a25f5;border-bottom:1px solid #374c61;padding:13px max(17px,calc((100vw - 1520px)/2)) 11px;}
+.nav{display:flex;justify-content:space-between;gap:15px;align-items:baseline;margin-bottom:11px}
+h1{font-size:20px;font-weight:720;letter-spacing:-.45px;margin:0;color:#eff8ff}
+h1 span{color:#96c8e8}
+a{color:#9ecdec;text-decoration:none}a:hover{text-decoration:underline}
+.controls{display:flex;flex-wrap:wrap;gap:18px;align-items:end}
+.field{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#a6bccd}
+.field select{padding:7px 11px;border:1px solid #3b5065;border-radius:7px;background:#182734;color:#eef4f9;min-width:160px;font:inherit;font-size:13px}
+.slider-field{flex:1;min-width:260px;max-width:550px}
+.slider-title{display:flex;justify-content:space-between;gap:20px;align-items:center}
+input[type=range]{width:100%;accent-color:#78c6fa;cursor:pointer;margin:6px 0}
+.check{display:flex;align-items:center;gap:7px;font-size:12px;color:#d1e0ea;padding-bottom:9px;white-space:nowrap}
+.check input{accent-color:#77c8ff}
+button{font:inherit;border:1px solid #41617b;background:#21364a;color:#e0f3ff;padding:8px 11px;border-radius:7px;cursor:pointer}
+button:hover{background:#2c4b65}
+.header-notes{display:flex;justify-content:space-between;align-items:center;gap:18px;margin:10px 0 0;color:#9fb6c9;font-size:11px}
+.header-notes small{color:#6f96b0}
+main{padding:15px max(17px,calc((100vw - 1520px)/2)) 50px}
+.intro{display:flex;justify-content:space-between;gap:24px;align-items:center;margin-bottom:15px;color:#a9bfce;font-size:12px}
+.intro p{margin:0}
+.variant{padding:14px 14px 17px;border-radius:12px;border:1px solid #253b4f;background:#101b27;margin-bottom:14px;max-width:1520px;cursor:pointer}
+.variant.selected{border-color:#6c9dbc;background:#15283a;box-shadow:inset 0 0 0 1px #3e6882}
+.variant-heading{display:flex;justify-content:space-between;gap:20px;margin-bottom:9px;align-items:baseline}
+.variant-name{font-size:15px;font-weight:720;color:#e6f2fb}
+.variant-detail{margin:2px 0 0;color:#9db5c9;font-size:11px}
+.qt-tag{white-space:nowrap;color:#80afca;border:1px solid #335367;background:#19364a;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:700}
+.samples{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;overflow:auto}
+.samples figure{margin:0;display:flex;flex-direction:column;align-items:center;min-width:0}
+.samples figcaption{font-size:11px;font-weight:650;color:#a7bfd2;margin-bottom:5px;text-align:center}
+.sample{position:relative;flex:0 0 auto;width:min(100%,var(--sample-width,320px));height:var(--sample-height,214px);background-size:cover;background-position:center;overflow:hidden;border:1px solid #52657977;border-radius:5px}
+.sample[data-scene=dark]{background-color:#080d13;background-image:linear-gradient(#020712c9,#020712c9),url('./backgrounds/arena.svg')}
+.sample[data-scene=light]{background:#f7f9fb}
+.sample[data-scene=mixed]{background-color:#607f8d;background-image:url('./backgrounds/racing.svg')}
+.sample svg{display:block;width:100%;height:100%}
+.sample-info{position:absolute;bottom:5px;left:7px;font-size:9px;color:#a7b7c8;pointer-events:none;text-shadow:0 1px 2px #06111caa}
+.sample[data-scene=light] .sample-info{color:#546675;text-shadow:none}
+#sourceReference{display:none}
+.status{text-align:right;margin:8px 0;color:#96b8ce;font-size:11px}
+.note{border:1px solid #2e4255;background:#12202c;border-radius:8px;padding:12px 15px;margin-top:20px;color:#b8cbd9}
+.note strong{color:#e5f2fa}
+@media(max-width:850px){.samples{grid-template-columns:1fr;gap:16px}.variant-heading{align-items:flex-start}.sample{width:min(100%,var(--sample-width,320px))}.intro{display:block}.controls{gap:10px}.slider-field{order:0;flex:1 1 100%;max-width:none}.nav{flex-wrap:wrap}}
+</style>
+</head>
+<body><a href="./labs.html" style="display:inline-flex;align-items:center;border:1px solid #4d7a99;background:#142b3b;color:#b4e0f8;padding:6px 10px;border-radius:7px;text-decoration:none;font:700 12px system-ui,sans-serif;margin:4px 8px 4px 0">Alle Labs</a>
+<header>
+  <div class="nav"><h1>ExoSnap <span>Qt Material Lab</span></h1><a href="./index.html?layout=dualsense">Zur 3D-/2D-Hauptvorschau</a></div>
+  <div class="controls">
+    <label class="field"><span>Controller</span><select id="controller" aria-label="Controller"></select></label>
+    <label class="field"><span>Größe</span><select id="size" aria-label="Panelgröße"><option value="240">240 × 160</option><option value="320" selected>320 × 214</option><option value="480">480 × 320</option></select></label>
+    <label class="field slider-field"><span class="slider-title"><b>Materialmix</b><output id="mixValue">65 %</output></span><input id="mix" type="range" min="0" max="100" step="1" aria-label="Materialmix" value="65"/></label>
+    <label class="check"><input type="checkbox" id="pressed"/> Alle Controls aktiv</label>
+    <button type="button" id="export">Gewählte Variante als SVG für Qt</button>
+  </div>
+  <div class="header-notes"><span id="status" role="status">Materialvarianten werden geladen …</span><small id="warning">Keine Filter und keine Render-Passes.</small></div>
+</header>
+<main>
+<div class="intro"><p><b>Acht direkt vergleichbare Varianten.</b> Alle folgen demselben Materialmix von 0 (Normal) bis 100 (Ghost). Die 3 Szenen verwenden dieselbe Pose. Ein Klick auf eine Reihe wählt sie für den SVG-Export aus.</p><p>Gewählt: <strong id="selected">03 · Frost</strong></p></div>
+<div id="variants" aria-label="Qt-kompatible Materialvarianten"></div>
+<section class="note"><strong>Was hier wirklich geprüft wird</strong><p>Diese Galerie rendert Original-SVGs im Browser (kein WebGL). Sie verwendet feste Farbwerte, skalierte Alpha-Werte, normale Pfadkonturen und allenfalls zwei zusätzliche Vektorstriche. Der Materialmix aktualisiert alle Varianten synchron. Keine CPU-Pixelabfrage, adaptive Farbumkehr, CSS-Filter, Blur, Multiply/Screen oder separater Effekt-Pass. Eine Qt-6-Portierung ist mit QPainter/QSvgRenderer möglich; Antialiasing und Herstellerfarben müssen separat verglichen werden. Die hier verwendeten Grundfarben sind nur angenäherte Modellpaletten, solange keine autoritativen Farbdaten vorliegen.</p></section>
+</main>
+<div id="sourceReference" aria-hidden="true"></div>
+<script type="module" src="./qt-material-lab.js"></script>
+</body>
+</html>

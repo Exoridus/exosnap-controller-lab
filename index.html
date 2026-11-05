@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+
+<html lang="de">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="#11151b" name="theme-color"/>
+<title>ExoSnap · Controller3D Lab v40</title>
+<link href="./styles.css" rel="stylesheet"/>
+<script type="importmap">{
+    "imports": {
+      "three": "./node_modules/three/build/three.module.js",
+      "three/addons/": "./node_modules/three/examples/jsm/"
+    }
+  }</script>
+<link href="./styles-simple.css" rel="stylesheet"/><link href="./styles-parity.css" rel="stylesheet"/><script>
+(function(){
+  const q=new URLSearchParams(location.search);
+  if(!q.has('diagnostic')&&!q.has('layout')){
+    location.replace('./pbr-lab.html');
+  }
+})();
+</script>
+</head>
+<body>
+<div class="app-shell">
+<header class="app-header">
+<div class="brand"><span class="brand-symbol">◇</span><strong>ExoSnap</strong><span class="header-split"></span><span>3D Preview</span><span class="version-label">V40</span></div>
+<div class="app-status"><a href="./labs.html" title="Materialvergleich" style="color:#a5d9f8;border:1px solid #38556c;padding:5px 9px;border-radius:6px;margin-right:12px;text-decoration:none">Materialvergleich</a><span class="footer-dot"></span><span id="headerStatus">3D viewer</span></div>
+</header>
+<main class="workspace">
+<section aria-label="Synchronisierter 3D- und 2D-Paritätsvergleich" class="stage" id="parityStage">
+<div class="parity-grid" id="parityGrid">
+<div class="parity-cell parity-3d parity-dark" data-parity-kind="3d" data-parity-scene="dark" id="parity-3d-dark" aria-label="3D auf dunkelem Hintergrund">
+    <div class="parity-cell-head"><span class="parity-cell-type">3D</span><span class="parity-cell-scene">Dunkel</span></div>
+    <span class="parity-cell-foot">Original-3D-Modell</span>
+  </div>
+<div class="parity-cell parity-3d parity-light" data-parity-kind="3d" data-parity-scene="light" id="parity-3d-light" aria-label="3D auf hellem Hintergrund">
+    <div class="parity-cell-head"><span class="parity-cell-type">3D</span><span class="parity-cell-scene">Hell</span></div>
+    <span class="parity-cell-foot">Original-3D-Modell</span>
+  </div>
+<div class="parity-cell parity-3d parity-mixed" data-parity-kind="3d" data-parity-scene="mixed" id="parity-3d-mixed" aria-label="3D auf gemischtem Hintergrund">
+    <div class="parity-cell-head"><span class="parity-cell-type">3D</span><span class="parity-cell-scene">Gemischt</span></div>
+    <span class="parity-cell-foot">Original-3D-Modell</span>
+  </div>
+<div class="parity-cell parity-2d parity-dark" data-parity-kind="2d" data-parity-scene="dark" id="parity-2d-dark" aria-label="2D auf dunkelem Hintergrund">
+    <div class="parity-cell-head"><span class="parity-cell-type">2D</span><span class="parity-cell-scene">Dunkel</span></div>
+    <span class="parity-cell-foot">2D-SVG · flache Projektion</span>
+  </div>
+<div class="parity-cell parity-2d parity-light" data-parity-kind="2d" data-parity-scene="light" id="parity-2d-light" aria-label="2D auf hellem Hintergrund">
+    <div class="parity-cell-head"><span class="parity-cell-type">2D</span><span class="parity-cell-scene">Hell</span></div>
+    <span class="parity-cell-foot">2D-SVG · flache Projektion</span>
+  </div>
+<div class="parity-cell parity-2d parity-mixed" data-parity-kind="2d" data-parity-scene="mixed" id="parity-2d-mixed" aria-label="2D auf gemischtem Hintergrund">
+    <div class="parity-cell-head"><span class="parity-cell-type">2D</span><span class="parity-cell-scene">Gemischt</span></div>
+    <span class="parity-cell-foot">2D-SVG · flache Projektion</span>
+  </div>
+</div>
+<div aria-hidden="true" class="game-backdrop" hidden id="gameBackdrop"></div>
+<div aria-hidden="true" class="game-backdrop-dim" hidden id="gameBackdropDim"></div>
+<canvas aria-label="3D-Ansichten drehen; alle sechs Ansichten zoomen und verschieben" id="scene"></canvas>
+<div class="reference-frame" hidden id="referenceFrame" aria-label="2D-Controllerreferenz"><div class="reference-graphic" id="referenceGraphic"></div><span id="referenceTag">2D Referenz</span></div>
+<div class="parity-notice" hidden id="parityNotice"></div>
+<div class="stage-head"><div class="stage-title" id="modelStageTitle">DualSense</div><div class="stage-sub" id="modelStageSub">PlayStation 5</div></div>
+<div class="stage-indicator"><span class="stage-led"></span><span id="partCount">—</span></div>
+<div class="stage-center-message" id="loadOverlay" aria-live="polite"><span class="spinner"></span><strong id="loadTitle">Lade Modell</strong><span id="loadProgress">Bitte warten…</span><div class="progress-track"><span id="progressBar"></span></div><button hidden id="retryLoad" type="button">Erneut laden</button></div>
+<div class="scene-toolbar" role="toolbar" aria-label="Synchronisierte Kamerasteuerung"><button class="view-choice" data-view="angled" type="button" title="3D-Perspektiven: Dreiviertelansicht">3/4</button><button class="view-choice selected" data-view="front" type="button" title="3D-Perspektiven: Front">Front</button><button class="view-choice" data-view="rear" type="button" title="3D-Perspektiven: Hinten">Hinten</button><button class="orbit-action" id="resetView" title="Alle Kameras zurücksetzen" type="button">⌖</button></div>
+<div class="axis-guide" hidden id="axisGuide" role="status"></div><div class="action-toast" id="actionToast"></div>
+<div class="stage-hint">3D: Drehen · 3D/2D synchron · Rad: Zoom · Rechtsziehen: Verschieben</div>
+</section><section aria-label="Vorschau-Einstellungen" class="viewer-controls">
+<div class="viewer-primary">
+<label class="viewer-field viewer-model"><span>Controller</span><select aria-label="Controller auswählen" id="simpleModel"></select></label>
+<label class="viewer-field viewer-mode"><span>Modus</span><select aria-label="Eingabemodus" id="simpleMode"><option value="manual">Vorschau</option><option value="live">Controller (Live)</option></select></label>
+<span class="parity-mode-indicator">3D / 2D · 3 Hintergründe · 2D frontal</span><label hidden><select id="simpleBackground" aria-label="Hintergrund (Kompatibilität)"><option value="dark">Dunkel</option><option value="light">Hell</option><option value="racing">Gemischt</option><option value="custom">Eigenes Bild</option></select></label>
+<button aria-label="Kamera zurücksetzen" class="viewer-reset" id="simpleReset" title="Kamera zurücksetzen" type="button">↺</button>
+</div>
+<div class="viewer-style">
+<label class="viewer-quick-check"><input type="checkbox" id="simpleAllButtons"/>Alle Tasten + Sticks max.</label>
+<div class="viewer-pose-options" id="simpleStickPoseOptions" hidden>
+  <label class="viewer-pose-field"><span>Stick-Richtung</span><select id="simpleStickDirection" aria-label="Maximale Stick-Auslenkung und automatischer Richtungswechsel">
+    <option value="auto" selected>Automatisch · 3 s</option>
+    <option value="up-right">↗ Oben rechts</option><option value="right">→ Rechts</option>
+    <option value="down-right">↘ Unten rechts</option><option value="down">↓ Unten</option>
+    <option value="down-left">↙ Unten links</option><option value="left">← Links</option>
+    <option value="up-left">↖ Oben links</option><option value="up">↑ Oben</option>
+  </select></label>
+  <output id="simplePoseStatus" class="viewer-pose-status" aria-live="polite"></output>
+</div>
+<button class="viewer-defaults viewer-reset-input" type="button" id="simpleResetInputs">Eingaben löschen</button>
+
+<div aria-label="Material-Presets" class="viewer-segments">
+<button data-look="0" type="button">Normal</button>
+<button data-look="0.5" type="button">Glass</button>
+<button data-look="1" type="button">Ghost</button>
+</div>
+<label class="viewer-mix"><span>Material-Mix</span><input aria-label="Stil zwischen Normal, Glass und Ghost überblenden" id="simpleLookMix" max="100" min="0" step="1" type="range" value="50"/><output id="simpleLookLabel">Glass · 50 %</output></label>
+<button aria-controls="simpleDetails" aria-expanded="false" class="viewer-more" id="simpleDetailsToggle" type="button">Details <span aria-hidden="true">⌄</span></button>
+</div>
+<div class="viewer-details" hidden="" id="simpleDetails">
+<label class="viewer-field"><span>Gehäuse <output id="simpleShellValue">52 %</output></span><input id="simpleShell" max="100" min="0" type="range" value="52"/></label>
+<label class="viewer-field"><span>Controls <output id="simpleControlValue">74 %</output></span><input id="simpleControl" max="100" min="0" type="range" value="74"/></label>
+<label class="viewer-field"><span>Kantenlicht <output id="simpleRimValue">38 %</output></span><input id="simpleRim" max="100" min="0" type="range" value="38"/></label>
+<label class="viewer-quick-check"><input type="checkbox" id="simpleRearHints" checked />Rear-Hints</label>
+<button class="viewer-defaults" id="simpleDefaults" type="button">Preset zurücksetzen</button>
+<p class="viewer-details-note">Gehäuse und Controls bleiben transparent; verdeckte Oberflächen bleiben ausgeblendet.</p>
+</div>
+<div class="viewer-foot">
+<div class="viewer-indicator"><span class="viewer-led" id="simpleLed"></span><span id="simpleStatus">Vorschau bereit</span></div>
+<a class="viewer-qt-material-link" href="./qt-material-lab.html" title="Acht Qt-portable 2D-Materialvarianten mit einem gemeinsamen Regler">Qt-Materialvergleich</a>
+<span class="viewer-foot-help">3D: identische Szene aus drei Viewports · 2D: natives SVG frontal · Zoom und Pan synchron</span>
+</div>
+</section>
+<section aria-hidden="true" aria-label="Controller Steuerleiste" class="quick-controls"><button aria-checked="false" hidden="" id="orbitToggle" type="button"></button>
+<div class="control-row primary-row">
+<label class="control-field model-field"><span>Controller</span><select id="controllerSelect"></select></label>
+<label class="control-field reference-mode-field"><span>2D / 3D</span><select aria-label="2D-Referenzdarstellung" id="referenceMode"><option value="off">Nur 3D</option><option value="overlay">Überlagern</option><option value="2d">Nur 2D</option></select></label>
+<label class="control-field reference-alpha-field" id="referenceOpacitySetting"><span>2D Deckkraft <output id="referenceOpacityValue">50%</output></span><input aria-label="Deckkraft der 2D-Referenz" id="referenceOpacity" max="100" min="10" step="5" type="range" value="50"/></label>
+<label class="control-field appearance-field"><span>Appearance</span><select id="appearanceSelect"><option selected="" value="ghost">Ghost</option><option value="glass">Glass</option><option value="studio">Studio</option><option value="graphite">Graphite</option><option value="wire">Wire</option></select></label>
+<label class="control-field range-field"><span>Shell <output id="shellOpacityValue">10%</output></span><input aria-label="Gehäusedeckkraft" id="shellOpacity" max="90" min="6" step="1" type="range" value="10"/></label>
+<label class="control-field range-field"><span>Controls <output id="controlsOpacityValue">20%</output></span><input aria-label="Button-Füllstärke im Ghost-Modus und Deckkraft im Glass-Modus" id="controlsOpacity" max="100" min="15" step="1" type="range" value="20"/></label>
+<label class="control-field range-field" id="ghostContoursSetting"><span>Contours <output id="ghostContoursValue">50%</output></span><input aria-label="Konturstärke" id="ghostContours" max="100" min="0" step="1" type="range" value="50"/></label>
+<label class="control-field scene-field"><span>Background</span><select id="backgroundSelect"><option value="arena">Sci-Fi</option><option value="racing">Racing</option><option value="fantasy">Fantasy</option><option value="none">Keiner</option><option value="custom">Eigener…</option></select></label>
+<label class="control-field dim-field"><span>Dim <output id="backgroundDimValue">16%</output></span><input aria-label="Hintergrundabdunklung" id="backgroundDim" max="85" min="0" type="range" value="16"/></label>
+<label class="icon-file-label" for="screenshotFile" title="Eigenen Screenshot auswählen">＋<input accept="image/png,image/jpeg,image/webp,image/avif" aria-label="Screenshot wählen" id="screenshotFile" type="file"/></label>
+</div>
+<div aria-label="3D v24 Geometrie und Ghost-Einstellungen" class="control-row v24-row">
+<label class="mini-switch" title="Statische Gehäuseteile nach Material in wenige Geometrien zusammenfassen. Bewegliche Controls bleiben separat."><input checked="" id="solidBody" type="checkbox"/><span>Solid Body</span></label>
+<label class="mini-switch" title="Gemeinsames 3D-Stickprofil für DualSense, Xbox One und Switch Pro; GameCube bleibt original."><input checked="" id="sharedSticks" type="checkbox"/><span>Shared Sticks</span></label>
+<label class="control-field v24-outline-field"><span>Ghost-Kontur</span><select id="ghostOutlineMode"><option value="silhouette">Nur außen</option><option value="detailed">Mit Details</option></select></label>
+<label class="mini-switch" title="Verdeckte Schultertasten und Paddles mit einer zurückhaltenden gestrichelten Linie andeuten."><input checked="" id="rearHints" type="checkbox"/><span>Rear-Hints</span></label>
+<span aria-live="polite" class="v24-stats" id="v24Stats">3D-Meshes / Dreiecke: —</span>
+<a class="v24-gallery-link" href="./gallery-v24.html" rel="noopener" target="_blank">Bildreferenzen</a>
+</div>
+<div class="control-row input-row">
+<label class="control-field input-field"><span>Input</span><select id="inputSource"><option value="demo">Demo</option><option selected="" value="live">Live Gamepad/HID</option><option value="manual">Manuell</option></select></label>
+<label class="control-field device-field"><span>Gamepad</span><select id="gamepadDevice"><option value="auto">Automatisch</option></select></label>
+<div class="sensor-strip">
+<span class="strip-label">Motion</span>
+<button id="motionConnect" title="WebHID-Sensoren verbinden (DualSense, DS4, Switch Pro, Joy-Con)" type="button">Sensoren</button>
+<label class="control-field pose-field"><span>Neutral</span><select id="motionPose"><option selected="" value="held">In Hand</option><option value="flat">Flach (Tisch)</option><option value="upright">Aufrecht</option></select></label>
+<label class="control-field pose-field"><span>Drehung</span><select id="motionDisplayMode" title="Handhaltung: justierbar und begrenzt, optionale Front-Rückkehr. Direkt begrenzt oder frei in 360°"><option selected="" value="overlay">Handhaltung</option><option value="direct">Direkt ±</option><option value="free">360° frei</option></select></label>
+<button id="motionCalibrate" title="Position ruhig halten und kalibrieren" type="button">Kalibrieren</button>
+<button disabled="" hidden="" id="motionAxisLearn" title="Optionaler DualSense-Achsendiagnosetest" type="button">Achsen lernen</button>
+<button id="motionRecenter" title="Aktuelle Ausrichtung auf Null setzen" type="button">Nullpunkt</button>
+<label class="mini-switch" title="Sensorbewegung auf Controller anwenden"><input checked="" id="motionTilt" type="checkbox"/><span>3D-Tilt</span></label>
+</div>
+</div>
+<div class="status-row"><span class="sensor-status" id="motionStatus">Handhaltung · Bewegungseinstellungen verfügbar · bereit für Gamepad</span><span class="status-divider"></span><span class="sensor-status" id="gamepadStatus">Gamepad verbinden</span><span class="stretch"></span><span class="sensor-status" id="footerStatus">Bereit</span><span class="status-detail" id="footerDetail"></span><button disabled="" id="motionDisconnect" title="Sensorverbindung trennen" type="button">Trennen</button><button aria-expanded="false" class="subtle-button" id="manualToggle" type="button">Tasten</button><button aria-expanded="false" class="subtle-button" id="telemetryToggle" type="button">Werte</button><button aria-controls="motionTuningPanel" aria-expanded="false" class="subtle-button" id="motionTuningToggle" title="Ergonomische Bewegungseinstellungen" type="button">Feinjustierung</button></div>
+<div class="advanced-panel motion-tuning-panel" hidden="" id="motionTuningPanel">
+<label class="control-field tuning-preset-field"><span>Profil</span><select aria-label="Bewegungsprofil" id="motionPreset"><option selected="" value="comfort">Komfort</option><option value="balanced">Ausgeglichen</option><option value="dynamic">Dynamisch</option><option value="adaptive60">Adaptiv 60 · Test</option><option value="custom">Individuell</option></select></label>
+<label class="control-field tuning-field"><span>Pitch Sens. <output id="pitchGainValue">90 %</output></span><input aria-label="Vorwärts/Rückwärts Empfindlichkeit" id="pitchGain" max="150" min="10" step="5" type="range" value="90"/></label>
+<label class="control-field tuning-field"><span>Roll Sens. <output id="rollGainValue">90 %</output></span><input aria-label="Seitlich neigen Empfindlichkeit" id="rollGain" max="150" min="10" step="5" type="range" value="90"/></label>
+<label class="control-field tuning-field"><span>Yaw Sens. <output id="yawGainValue">90 %</output></span><input aria-label="Horizontal drehen Empfindlichkeit" id="yawGain" max="150" min="10" step="5" type="range" value="90"/></label>
+<label class="control-field tuning-field"><span>Pitch Limit <output id="pitchMaxDegValue">20°</output></span><input aria-label="Vorwärts/Rückwärts Maximalwinkel" id="pitchMaxDeg" max="65" min="10" step="1" type="range" value="20"/></label>
+<label class="control-field tuning-field"><span>Roll Limit <output id="rollMaxDegValue">20°</output></span><input aria-label="Seitlich neigen Maximalwinkel" id="rollMaxDeg" max="45" min="8" step="1" type="range" value="20"/></label>
+<label class="control-field tuning-field"><span>Yaw Limit <output id="yawMaxDegValue">20°</output></span><input aria-label="Horizontal drehen Maximalwinkel" id="yawMaxDeg" max="70" min="8" step="1" type="range" value="20"/></label>
+<label class="control-field tuning-field"><span>Roll + Yaw <output id="rollYawCombinedMaxDegValue">20°</output></span><input aria-label="Gemeinsamer Roll- und Yaw-Maximalwinkel" id="rollYawCombinedMaxDeg" max="70" min="8" step="1" type="range" value="20"/></label>
+<label class="control-field tuning-field"><span>Alle Achsen <output id="totalCombinedMaxDegValue">25°</output></span><input aria-label="Gesamtauslenkung aus Pitch, Roll und Yaw" id="totalCombinedMaxDeg" max="70" min="10" step="1" type="range" value="25"/></label>
+<label class="control-field tuning-field"><span>Ruhezone <output id="deadzoneDegValue">0,2°</output></span><input aria-label="Bewegungsruhezone" id="deadzoneDeg" max="3" min="0" step="0.05" type="range" value="0.2"/></label>
+<label class="control-field tuning-field"><span>Reaktion <output id="responseMsValue">50 ms</output></span><input aria-label="Reaktionszeit der Anzeige" id="responseMs" max="180" min="25" step="5" type="range" value="50"/></label>
+<label class="mini-switch tuning-checkbox" title="Experiment: 60 Samples (ca. 1 s), 0,5 s Ruhe, langsame Handreferenz mit 2 s Halbwertszeit. Sensorbewegung bleibt immer direkt."><input id="motionAdaptiveHand" type="checkbox"/><span>Handlage adaptiv · 60</span></label>
+<label class="mini-switch tuning-checkbox" title="Nach einer Ruhepause sanft in die Frontansicht zurückkehren"><input id="motionAutoReturn" title="Nach Ruhe zur virtuellen Handhaltungsansicht (-12°) zurückkehren; nicht zur physischen Tischlage" type="checkbox"/><span>Autom. zentrieren</span></label>
+<button class="mini-button" id="motionTuningReset" title="Ergonomische Standardwerte wiederherstellen" type="button">Standard</button>
+</div>
+<div class="advanced-panel" hidden="" id="manualPanel">
+<div class="controls-grid" id="faceControls"></div><div class="controls-grid" id="dpadControls"></div><div class="controls-grid" id="otherControls"></div><span hidden="" id="touchHeading">Touch</span><div class="controls-grid" hidden="" id="touchControls"></div>
+<button class="mini-button" id="runSequence" type="button">Demo</button><button aria-checked="true" class="mini-button" hidden="" id="demoToggle" role="switch" type="button">Demo-Toggle</button>
+</div>
+<div class="advanced-panel telemetry-panel" hidden="" id="telemetryPanel"><span id="gamepadReadout">Gamepad —</span><span>Gyro <output id="gyroReadout">—</output></span><span>Accel <output id="accelReadout">—</output></span><span>Pitch/Roll/Yaw <output id="tiltReadout">—</output></span><span>Haltung <output id="postureReadout">—</output></span><span id="modelSource"></span></div>
+</section>
+</main>
+</div>
+<script src="./app.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+/* v26: full-bleed six-up 3D / 2D parity. Camera is shared across all cells. */
+:root{--accent:#83cbf5;--parity-gap:5px}
+html,body{margin:0!important;min-height:100%;background:#080e15!important}
+body{overflow-x:hidden!important}
+.app-shell{width:100%!important;max-width:none!important;min-height:100dvh;margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;display:flex;flex-direction:column;background:#0b121a!important;overflow:visible}
+.app-header{display:none!important}
+.workspace{width:100%;flex:1;display:flex!important;flex-direction:column;min-height:100dvh}
+.viewer-controls{order:0;flex:0 0 auto;gap:11px;padding:12px 22px 11px!important;border:0!important;border-bottom:1px solid #2a3b4a!important;background:#111b25!important}
+.viewer-primary{gap:13px}.viewer-model{max-width:390px}.viewer-mode{max-width:220px}
+.parity-mode-indicator{color:#83a8bf;font-weight:600;font-size:11px;padding:9px 12px;border-radius:7px;background:#1b2a37;border:1px solid #2b4150;white-space:nowrap}
+.viewer-quick-check{display:flex;align-items:center;gap:7px;color:#b8d5e4;font-size:11px;font-weight:650;white-space:nowrap;cursor:pointer}
+.viewer-quick-check input{accent-color:#70c6ff;cursor:pointer}
+.viewer-reset-input{height:31px;min-width:90px;padding:0 11px;white-space:nowrap}
+.viewer-halo{max-width:180px}.viewer-halo input[type=range]{width:100%}
+.viewer-style{gap:16px!important;flex-wrap:wrap;align-items:center!important}.viewer-mix{max-width:550px;flex:2 1 320px}
+.viewer-details{grid-template-columns:repeat(6,minmax(100px,1fr)) auto}
+.viewer-foot{padding-top:8px}.viewer-foot-help{max-width:70%;text-align:right}
+.stage{order:1;position:relative!important;flex:1 1 auto;height:auto!important;min-height:min(660px,calc(100svh - 145px))!important;overflow:hidden!important;background:#0c1620!important}
+.parity-grid{position:absolute;inset:0;z-index:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:var(--parity-gap);padding:var(--parity-gap);background:#06101b}
+.parity-cell{position:relative;overflow:hidden;isolation:isolate;border:1px solid #ffffff12;border-radius:5px;background-position:center;background-repeat:no-repeat;background-size:cover;min-width:0;min-height:0}
+.parity-dark{background-color:#06090e;background-image:linear-gradient(#03060de6,#03060de6),url('./backgrounds/arena.svg')}
+.parity-light{background-color:#f7f8fa}
+.parity-mixed{background-color:#587c8c;background-image:url('./backgrounds/racing.svg')}
+.parity-cell::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(115deg,#0000 35%,#0001)}
+.parity-cell-head{position:absolute;z-index:5;top:11px;left:13px;display:flex;gap:9px;align-items:center;pointer-events:none;font-size:11px;font-weight:740;letter-spacing:.015em;color:#deedfa;text-shadow:0 1px 5px #07131b88}
+.parity-light .parity-cell-head,.parity-light .parity-cell-foot{color:#304458;text-shadow:0 1px 1px #ffffff99}
+.parity-cell-type{padding:3px 6px;background:#122235ad;border:1px solid #ffffff2b;border-radius:4px;font-weight:780;font-size:10px;color:#aee1ff}
+.parity-light .parity-cell-type{background:#cee2f1bb;color:#345d7a;border-color:#284a6d33}
+.parity-cell-scene{font-size:11px;letter-spacing:0}
+.parity-cell-foot{position:absolute;bottom:11px;left:13px;z-index:5;font-size:9px;color:#acc5d8a8;pointer-events:none;text-shadow:0 1px 4px #07131b99}
+#scene{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:2!important;cursor:grab;touch-action:none}
+.stage-head,.stage-indicator,.reference-frame,.parity-notice,.game-backdrop,.game-backdrop-dim{display:none!important}
+.scene-toolbar{z-index:5!important;top:10px!important;right:10px!important;bottom:auto!important;left:auto!important;transform:none!important;box-shadow:0 5px 18px #0007!important}
+.stage-hint{z-index:5!important;bottom:7px!important;left:50%!important;transform:translateX(-50%);background:#0e2031d5;border:1px solid #ffffff25;border-radius:5px;padding:5px 10px;white-space:nowrap}
+#loadOverlay{z-index:6}
+@media(max-width:1000px){.viewer-controls{padding:10px 12px!important}.viewer-details{grid-template-columns:repeat(3,minmax(0,1fr))}.viewer-foot-help{display:none!important}.viewer-mix{flex:1 1 230px;max-width:none}.parity-cell-head{font-size:9px;gap:4px;top:8px;left:8px}.parity-cell-foot{font-size:8px;bottom:6px;left:8px}.parity-mode-indicator{display:none}}
+@media(max-width:640px){.stage{min-height:670px!important}.parity-grid{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:3px;padding:3px}.parity-cell-head{display:flex;flex-direction:column;align-items:flex-start;gap:3px}.parity-cell-foot{display:none}.viewer-primary{flex-wrap:wrap}.viewer-model{flex:1 1 100%;max-width:none}.viewer-mode{flex:1 1 150px}.viewer-style{gap:10px!important}.viewer-segments{width:100%}.viewer-segments button{flex:1;min-width:0}.viewer-mix{grid-template-columns:80px 1fr 80px;gap:6px}.viewer-foot{display:none}.stage-hint{display:none!important}.scene-toolbar{top:auto!important;bottom:8px!important;right:8px!important;transform:scale(.8)!important;transform-origin:right bottom}}
+
+/* v26: small synthetic input-pose controls, only visible when All pressed is on. */
+.viewer-pose-options{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.viewer-pose-options[hidden]{display:none!important}
+.viewer-pose-field{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:650;color:#b8d5e4}
+.viewer-pose-field select{min-width:148px;max-width:190px;font-size:12px;padding:6px 9px;border:1px solid #36536a;background:#182b3a;color:#e3f2ff;border-radius:6px}
+.viewer-pose-status{font-size:11px;color:#8ed3ff;min-width:95px;font-variant-numeric:tabular-nums}
+@media(max-width:640px){.viewer-pose-status{display:none}}
+
+/* Controller coverage is now composited in WebGL; no DOM shadow layer. */
+#scene{background:transparent!important}
+
+.viewer-qt-material-link{color:#86c5f0;font-size:11px;white-space:nowrap;text-decoration:underline;text-underline-offset:2px;margin-left:auto}
+.viewer-qt-material-link+.viewer-foot-help{margin-left:0}

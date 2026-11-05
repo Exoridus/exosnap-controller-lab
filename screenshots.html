@@ -1,0 +1,22 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ExoSnap · Screenshot-Verlauf</title>
+<style>
+:root{color-scheme:dark;background:#09111b;color:#e6f3ff;font:14px/1.45 system-ui,sans-serif}body{margin:0;padding:24px}main{max-width:1400px;margin:auto}a{color:#9dd8fa}h1{margin:10px 0 5px;font-size:22px}p{color:#a5baca}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}.shot{border:1px solid #345067;border-radius:8px;overflow:hidden;background:#112132}.shot img{display:block;width:100%;height:auto}.shot p{padding:0 12px}.history{list-style:none;padding:0}.history li{border-top:1px solid #304456;padding:12px 0}.muted{color:#97afbf;font-size:12px}
+</style></head><body><main><a href="./">Lab öffnen</a><h1>Screenshot-Verlauf</h1><p>Nur echte Chromium-WebGL-Aufnahmen nach erfolgreicher Renderer- und Laufzeitprüfung. Bilder belegen einen erzeugten Renderframe, keine ästhetische Freigabe.</p>
+<section class="grid"><div class="shot"><img src="./screenshots/latest.png" alt="Neuester tatsächlich gerenderter Vier-Looks-Vergleich, neutral" onerror="const p=this.parentElement;this.remove();p.insertAdjacentText('beforeend','Noch kein erfolgreicher CI-Screenshot veröffentlicht.')"><p>Aktueller Stand – neutral</p></div><div class="shot"><img src="./screenshots/pressed.png" alt="Neuester tatsächlich gerenderter Vier-Looks-Vergleich, gedrückte Controls" onerror="const p=this.parentElement;this.remove();p.insertAdjacentText('beforeend','Noch kein erfolgreicher CI-Screenshot veröffentlicht.')"><p>Aktueller Stand – gedrückt</p></div></section>
+<h2>Frühere Revisionen</h2><ul id="history" class="history"><li class="muted">Lade Versionshistorie …</li></ul></main>
+<script type="module">
+try{
+ const response=await fetch('./screenshots/history.json',{cache:'no-store'});const history=await response.json();
+ const parent=document.getElementById('history');parent.replaceChildren();
+ if(!Array.isArray(history)||!history.length){parent.textContent='Noch keine archivierten Screenshots.';}
+ else for(const entry of history){
+  const li=document.createElement('li');const heading=document.createElement('strong');heading.textContent=`${entry.sha.slice(0,12)} · ${entry.capturedAt}`;
+  li.append(heading,document.createTextNode(' — '));
+  for(const [i,label] of ['Neutral','Gedrückt'].entries()){
+   if(i)li.append(document.createTextNode(' · '));
+   const a=document.createElement('a');a.href=entry[i?'pressedUrl':'neutralUrl'];a.rel='noopener';a.target='_blank';a.textContent=label;li.append(a);
+  }
+  parent.append(li);
+ }
+}catch(error){document.getElementById('history').textContent=`Verlauf nicht erreichbar: ${error.message}`;}
+</script></body></html>

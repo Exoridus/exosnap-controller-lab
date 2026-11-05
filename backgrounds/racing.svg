@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+<defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#72b9e5"/><stop offset=".74" stop-color="#d6edfa"/><stop offset="1" stop-color="#f7e7c3"/></linearGradient><linearGradient id="road" x2="0" y2="1"><stop stop-color="#566773"/><stop offset="1" stop-color="#252d34"/></linearGradient><linearGradient id="car" x2="0" y2="1"><stop stop-color="#e44839"/><stop offset=".65" stop-color="#8b1b27"/><stop offset="1" stop-color="#33151f"/></linearGradient><filter id="fog"><feGaussianBlur stdDeviation="10"/></filter></defs>
+<rect width="1920" height="1080" fill="url(#sky)"/>
+<circle cx="1510" cy="205" r="86" fill="#fffce5" opacity=".6"/>
+<path d="M0 476 215 302 340 424 544 270 760 480 960 340 1230 488 1400 320 1920 480v220H0z" fill="#7d9aa1" opacity=".7"/>
+<path d="M0 510 190 383 350 505 600 374 880 534 1195 401 1550 526 1920 388v180H0Z" fill="#547b79"/>
+<path d="M0 542q250-130 410 4t398-13q192-72 372-20t380 0q210-95 360-6v184H0Z" fill="#416e63"/>
+<path d="M785 515h330l900 565H-100z" fill="url(#road)"/>
+<path d="M787 515 0 1080h-145l922-570M1112 515l920 565h-158Z" fill="#c8c3b6"/>
+<path d="M781 517 125 1032M1131 517l725 502" stroke="#f8f7ec" stroke-opacity=".76" stroke-width="15" fill="none"/>
+<path d="M962 534 957 590M956 639 952 724M949 800 939 928M937 994l-4 86" stroke="#fff9e0" stroke-width="13" stroke-dasharray="45 33"/>
+<path d="M0 615 610 547M1310 547 1920 596" stroke="#eec94f" stroke-width="22" fill="none"/>
+<path d="M0 614 616 545M1314 548l606 50" stroke="#fff8e3" stroke-width="7"/>
+<g opacity=".8"><rect x="114" y="412" width="280" height="113" fill="#c9d2cb" stroke="#5b695e" stroke-width="10"/><rect x="133" y="430" width="91" height="69" fill="#3e6075"/><rect x="241" y="430" width="111" height="69" fill="#3e6075"/><path d="m395 412 130 66v49H393Z" fill="#aeb9b6"/></g>
+<g opacity=".8"><path d="M1595 420 1790 367 1920 430v114h-325z" fill="#e8e0c8"/><path d="M1605 432h267v36h-267" fill="#47545b"/><path d="M1620 494h250v22h-250" fill="#6c827c"/></g>
+<g transform="translate(960 821)"><ellipse cx="0" cy="185" rx="365" ry="65" fill="#121923" opacity=".42"/><path d="m-283 87 70-112 137-55H77l136 55 70 112 30 146h-622z" fill="url(#car)" stroke="#681f29" stroke-width="13"/><path d="m-132-61 76-59h118l80 59 29 56h-330Z" fill="#243e53" stroke="#83b3bf" stroke-width="9"/><path d="M-279 87h558v84h-558Z" fill="#ab3030"/><path d="M-296 119h105v55h-105M188 119h108v55H188" fill="#ffe8be"/><path d="M-192 165h383l35 48h-455z" fill="#19232c"/><rect x="-83" y="177" width="170" height="34" rx="8" fill="#e3d6ae"/><path d="M-226 104q218-37 446 0" stroke="#ffb5a0" stroke-width="10" fill="none"/></g>
+<g font-family="Arial,sans-serif" fill="white" font-weight="bold"><text x="55" y="108" font-size="60" fill="#f7faff">02 / 08</text><text x="61" y="150" font-size="23" fill="#fff">POSITION</text><text x="1500" y="100" font-size="33">LAP 02 / 03</text><text x="1513" y="143" font-size="29">01:18.204</text><text x="1510" y="1016" font-size="100">186</text><text x="1750" y="1015" font-size="31">KM/H</text></g><path d="M1490 952h359" stroke="#e3edf0" stroke-width="6"/><path d="M1489 951h222" stroke="#ffbe3d" stroke-width="13"/><rect x="48" y="892" width="227" height="116" rx="10" fill="#233e4b" opacity=".6"/><path d="M80 949q45-55 90 0t80 0" stroke="white" stroke-width="10" fill="none"/><circle cx="169" cy="949" r="9" fill="#fed366"/>
+</svg>

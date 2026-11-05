@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.capture/
+.workspace/
+.superpowers/
+*.log
+.DS_Store
+Thumbs.db
+# Old local evidence archives are supplied in the ZIP but not committed;
+# new screenshots are preserved separately in the visual-history branch.
+evidence/

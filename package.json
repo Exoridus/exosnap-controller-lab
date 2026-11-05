@@ -1,0 +1,24 @@
+{
+  "name": "exosnap-controller-3d-prototype",
+  "version": "0.40.0-rc.1",
+  "private": true,
+  "type": "module",
+  "description": "ExoSnap Controller3D Lab v40: background-aware contrast, physical depth fixes, synchronized zoom, source OBJ button decals",
+  "scripts": {
+    "export:pbr-recipes": "node tools/export-pbr-recipes.mjs",
+    "start": "node server.mjs",
+    "download-assets": "node download-assets.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "verify": "node --check app.js && node --check motion-render-policy.js && node --check adaptive-hand-reference.js && node --test tests/*.test.mjs",
+    "build:pages": "node tools/build-pages.mjs --out dist",
+    "capture:pages": "node tools/capture-pages.mjs --out .capture",
+    "topology": "node topology-report.mjs",
+    "audit:v33": "node tools/v33-audit.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "three": "0.180.0"
+  }
+}

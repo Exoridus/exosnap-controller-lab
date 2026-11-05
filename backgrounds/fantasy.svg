@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+<defs><linearGradient id="night" x2="0" y2="1"><stop stop-color="#101632"/><stop offset=".51" stop-color="#455678"/><stop offset="1" stop-color="#192f38"/></linearGradient><radialGradient id="mist"><stop stop-color="#bedbf0" stop-opacity=".65"/><stop offset="1" stop-color="#b0dee9" stop-opacity="0"/></radialGradient><radialGradient id="sun"><stop stop-color="#fff8d9"/><stop offset="1" stop-color="#fff8d9" stop-opacity="0"/></radialGradient><filter id="bloom"><feGaussianBlur stdDeviation="24"/></filter></defs>
+<rect width="1920" height="1080" fill="url(#night)"/>
+<circle cx="1210" cy="308" r="190" fill="url(#sun)" opacity=".8"/>
+<path d="M0 605 220 325 430 607 730 293 960 602 1250 215 1560 583 1780 302 1920 498v290H0Z" fill="#344365"/>
+<path d="M0 633 307 470 502 618 757 451 974 669 1277 456 1571 635 1750 480 1920 615v259H0Z" fill="#243c52"/>
+<path d="M0 682q263-182 478-28t457-43q189-130 410 11 300 100 575-45v503H0Z" fill="#173d41"/>
+<path d="M0 800q335-88 681 50t710-45q297-108 529-7v282H0Z" fill="#17382d"/>
+<ellipse cx="952" cy="650" rx="860" ry="222" fill="url(#mist)" opacity=".3"/>
+<path d="M610 1080 950 702l220 1 315 377z" fill="#303c3d" opacity=".62"/>
+<path d="M790 1059 1030 733M1118 789 1300 1080" stroke="#a1b5a7" stroke-width="5" stroke-opacity=".2"/>
+<g fill="#112e2c"><path d="M40 1080V520l-85-80 150 47 40-210 56 213 130-48-137 110v528Z"/><path d="M1595 1080V460l-98-74 141 52 48-234 51 221 176-61-158 114v602Z"/><path d="M320 1010V530l-57-61 100 23 32-155 38 147 112-27-97 80v473Z"/><path d="M1440 1032V570l-60-68 105 32 32-178 54 175 112-30-107 85v446Z"/></g>
+<g fill="none" stroke="#7db9b2" stroke-opacity=".45" stroke-width="9"><path d="M52 635q121-72 233-8M1620 566q161-68 269 5M355 634q103-45 189 9"/></g>
+<g opacity=".9"><path d="M820 747V525h90V405h115v115h100v227h-68V568H885v179z" fill="#556879"/><path d="M850 745V510h41V418h84v93h52v234" fill="#233e51"/><path d="M827 756h340l73 48H758z" fill="#2c333c"/></g>
+<g transform="translate(1032 797)"><path d="M-45 283l5-180 20-35-16-67 48-35 41 38-9 61 42 54 14 164Z" fill="#101e26"/><path d="M-25 36h62l23 80-101 7Z" fill="#1c2c3c"/><path d="M-11 34q-22-35-5-53t39-6q17 20-1 54z" fill="#0c1922"/><path d="M-37 142l-92 137M46 138l82 137" stroke="#071925" stroke-width="25"/><path d="M118 53v160" stroke="#8fa9b4" stroke-width="12"/><path d="m118 51-19 57h39z" fill="#9cd0dc"/></g>
+<g opacity=".7"><circle cx="552" cy="658" r="19" fill="#90f9e1" filter="url(#bloom)"/><circle cx="552" cy="658" r="5" fill="#bffef7"/><circle cx="1363" cy="546" r="22" fill="#8de8e0" filter="url(#bloom)"/><circle cx="1363" cy="546" r="6" fill="#d4fff5"/></g>
+<g font-family="Georgia,serif" fill="#f0ead5"><text x="80" y="95" font-size="42">THE ASHEN VALLEY</text><text x="85" y="137" font-size="23">THE FORGOTTEN PASS</text></g><g><rect x="77" y="945" width="330" height="24" rx="8" fill="#090f19" stroke="#d2b3a4" stroke-width="3"/><rect x="87" y="951" width="263" height="12" rx="5" fill="#bc565e"/><rect x="77" y="983" width="250" height="14" rx="5" fill="#090f19" stroke="#9ea6ca" stroke-width="3"/><rect x="83" y="986" width="178" height="8" fill="#77a3c8"/></g><circle cx="1750" cy="130" r="104" fill="#081b2b" opacity=".58" stroke="#a0bac1" stroke-width="4"/><path d="M1690 156q77-115 128-57m-92 117q-61-47-7-119" stroke="#aac4ae" stroke-width="8" fill="none" opacity=".7"/><circle cx="1733" cy="108" r="8" fill="#f8eac5"/>
+</svg>
