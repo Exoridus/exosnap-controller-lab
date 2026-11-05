@@ -14,6 +14,7 @@ import {summarizePanelBudget} from './render-budget.js';
 import {HERO_VARIANTS,resolveHeroRecipe,qtQuickDescriptor,HERO_ENVIRONMENT} from './pbr-recipes.js';
 import {prepareSilhouette,updateSilhouette} from './pbr-silhouette.js';
 import {ActiveColorState} from './active-color-state.js';
+import {applyGameCubeButtonArtwork} from './control-glyphs.js';
 
 const $=id=>document.getElementById(id);
 const scenes=['dark','light','mixed']; // all three share the same THREE.Scene, model and camera.
@@ -114,7 +115,12 @@ async function loadFlatReferences(model){
     isolateReferenceIds(ref.svg,`pbr-${serial}-${index}`);
     flatReferences.set(`${variant}:${scene}`,ref);
   }));
-  if(serial===flatLoadSerial)updateFlatReferences();
+  if(serial===flatLoadSerial){
+    updateFlatReferences();
+    const reference=[...flatReferences.values()][0];
+    if(state.native?.model?.id==='Gamecube'&&reference?.svg)
+      applyGameCubeButtonArtwork(state.native,reference.svg);
+  }
 }
 function updateFlatReferences(){
   // A wheel over either 3D or 2D changes the common apparent size.

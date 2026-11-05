@@ -61,5 +61,77 @@ export function makeFaceGlyph(file,source,bounds,model){
  decal.name=`Face glyph ${glyph}`;
  decal.userData.buttonGlyph=glyph;
  decal.userData.surfaceArtwork='button-face';
+ decal.userData.sourceFaceDimensions={width:Math.abs(bounds.max.x-bounds.min.x),height:Math.abs(bounds.max.z-bounds.min.z)};
  return decal;
+}
+
+// The GameCube A/B/X/Y shapes are sourced from the actual authored 2D SVG,
+// rather than a generic system-font approximation. At overlay resolutions the
+// projected glyph must be optically enlarged to remain legible.
+export function faceDecalSizeFrom2D(dimensions,faceBox,glyphBox){
+ const {width,height}=dimensions||{};
+ const surface=Math.min(width,height);
+ if(![surface,faceBox?.width,faceBox?.height,glyphBox?.width,glyphBox?.height].every(x=>Number.isFinite(x)&&x>0))
+   throw new RangeError('Expected positive source SVG and 3D button dimensions');
+ const originalCoverage=Math.max(glyphBox.width/faceBox.width,glyphBox.height/faceBox.height);
+ const readableCoverage=THREE.MathUtils.clamp(originalCoverage*1.65,.54,.68);
+ return {size:surface*readableCoverage/.75,originalCoverage,readableCoverage};
+}
+function gamecubeGlyphTexture(paths){
+ const boxes=paths.map(node=>node.getBBox());
+ const minX=Math.min(...boxes.map(x=>x.x)),maxX=Math.max(...boxes.map(x=>x.x+x.width));
+ const minY=Math.min(...boxes.map(x=>x.y)),maxY=Math.max(...boxes.map(x=>x.y+x.height));
+ const extent=Math.max(maxX-minX,maxY-minY);
+ if(!(extent>0))throw new Error('Empty GameCube glyph path');
+ const canvas=document.createElement('canvas');canvas.width=128;canvas.height=128;
+ const ctx=canvas.getContext('2d');
+ if(!ctx)throw new Error('Cannot create 2D button-glyph texture');
+ ctx.clearRect(0,0,128,128);
+ ctx.translate(64,64);ctx.scale(96/extent,96/extent);
+ ctx.translate(-(minX+maxX)/2,-(minY+maxY)/2);
+ ctx.lineJoin='round';ctx.lineCap='round';
+ ctx.lineWidth=extent*.075;ctx.strokeStyle='#192d42';ctx.fillStyle='#f5fbff';
+ for(const item of paths){
+   const mark=new Path2D(item.getAttribute('d'));
+   ctx.stroke(mark);ctx.fill(mark);
+ }
+ const texture=new THREE.CanvasTexture(canvas);
+ texture.colorSpace=THREE.SRGBColorSpace;
+ texture.minFilter=THREE.LinearMipmapLinearFilter;
+ texture.magFilter=THREE.LinearFilter;
+ return texture;
+}
+// Call only after the full original 2D SVG has loaded; preserve the physical
+// GameCube OBJ geometry, pivot hierarchy and original palette.
+export function applyGameCubeButtonArtwork(native,original2DSvg){
+ if(native?.model?.id!=='Gamecube'||!original2DSvg||typeof Path2D==='undefined')return 0;
+ const decals=new Map();
+ native.group.traverse(node=>{
+   if(['A','B','X','Y'].includes(node.userData?.buttonGlyph))
+     decals.set(node.userData.buttonGlyph,node);
+ });
+ let updated=0;
+ for(const letter of ['a','b','x','y']){
+   const group=original2DSvg.querySelector(`g[id$="-btn-${letter}"]`);
+   const face=group?.querySelector(`[id$="-btn-${letter}-face"]`);
+   const paths=[...(group?.querySelectorAll('path.glyph')||[])].filter(x=>x.getAttribute('d'));
+   const decal=decals.get(letter.toUpperCase());
+   if(!face||!paths.length||!decal)continue;
+   const boxes=paths.map(x=>x.getBBox());
+   const glyphBox={
+     width:Math.max(...boxes.map(x=>x.x+x.width))-Math.min(...boxes.map(x=>x.x)),
+     height:Math.max(...boxes.map(x=>x.y+x.height))-Math.min(...boxes.map(x=>x.y))
+   };
+   const metrics=faceDecalSizeFrom2D(decal.userData.sourceFaceDimensions,face.getBBox(),glyphBox);
+   const texture=gamecubeGlyphTexture(paths);
+   const oldGeometry=decal.geometry,oldTexture=decal.material.map;
+   decal.geometry=new THREE.PlaneGeometry(metrics.size,metrics.size);
+   decal.material.map=texture;decal.material.needsUpdate=true;
+   oldGeometry.dispose();oldTexture?.dispose();
+   decal.userData.artworkSource='2d-svg';
+   decal.userData.readableCoverage=metrics.readableCoverage;
+   decal.userData.originalCoverage=metrics.originalCoverage;
+   updated++;
+ }
+ return updated;
 }

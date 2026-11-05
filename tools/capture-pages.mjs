@@ -87,6 +87,14 @@ try{
     previousRevision,{timeout:60000});
   await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
   const cube=await shotProof();
+  const artwork=await page.evaluate(()=>{
+    const marks=[];window.__exoPbrLab?.model?.group?.traverse(obj=>{
+      if(obj.userData?.artworkSource==='2d-svg')marks.push(obj.userData.buttonGlyph);
+    });return marks;
+  });
+  if(artwork.sort().join(',')!=='A,B,X,Y')
+    throw Error('Expected all four original GameCube 2D face-glyph paths as 3D decals');
+
   const cubeFile='gamecube-neutral.png';
   const cubeBytes=await page.screenshot({path:path.join(output,cubeFile),fullPage:true,animations:'disabled',timeout:60000});
   if(cubeBytes.length<40000||cubeBytes.subarray(0,8).toString('hex')!=='89504e470d0a1a0a')

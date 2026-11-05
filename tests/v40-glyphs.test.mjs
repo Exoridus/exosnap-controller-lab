@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import * as THREE from 'three';
 import {CONTROLLERS} from '../models.js';
 import {loadNativeRig,disposeNativeRig} from '../pbr-model.js';
-import {faceButtonGlyph} from '../control-glyphs.js';
+import {faceButtonGlyph,faceDecalSizeFrom2D} from '../control-glyphs.js';
 const read=async url=>fs.readFile(new URL('../'+url.replace(/^\.\//,''),import.meta.url),'utf8');
 test('DualSense physical face buttons have actual front-facing PlayStation glyph planes without replacing their authored geometry',async()=>{
  const rig=await loadNativeRig(CONTROLLERS.find(x=>x.id==='DualSenseCompact'),read);
@@ -41,4 +41,23 @@ test('functional labels on GameCube/Xbox/Nintendo do not become PlayStation symb
    assert.ok(color('b_button.obj').r>color('b_button.obj').g);
    assert.ok(color('right_cap.obj').r>color('right_cap.obj').b);
  }finally{disposeNativeRig(rig)}
+});
+
+test('GameCube 3D face legend scales from actual 2D glyph footprint for readable overlay size',()=>{
+  // The GameCube A glyph in the source SVG is ~135x135 inside a 480px face.
+  const a=faceDecalSizeFrom2D({width:.219784,height:.219784},
+    {width:480,height:480},{width:126,height:135});
+  const b=faceDecalSizeFrom2D({width:.134916,height:.134916},
+    {width:296,height:296},{width:70,height:103});
+  assert.ok(a.size>.14,'A glyph decal must be significantly larger than old 0.075-plane');
+  assert.ok(b.size>.09,'B glyph decal must be more legible than old 0.075-plane');
+  assert.ok(a.readableCoverage>=.54&&a.readableCoverage<=.68);
+  assert.ok(b.readableCoverage>=.54&&b.readableCoverage<=.68);
+  assert.throws(()=>faceDecalSizeFrom2D({width:0,height:.2},
+    {width:100,height:100},{width:10,height:10}),RangeError);
+  const svg=fs.readFile(new URL('../references/controllers/gamecube/source.svg',import.meta.url),'utf8');
+  for(const id of ['a','b','x','y']){
+    const block=svg.match(new RegExp('<g id="btn-'+id+'">([\\s\\S]*?)<\\/g>'))?.[1];
+    assert.ok(block?.includes('class="glyph"'),'2D source must provide author-drawn path: '+id);
+  }
 });

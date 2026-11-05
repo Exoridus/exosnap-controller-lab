@@ -21,3 +21,7 @@ For every 3D model matching an existing 2D reference:
 ### Current first-pass implementation
 
 `control-glyphs.js` paints source-attached face-button decals per model family, rather than using PlayStation glyphs on all models. Existing shell text is not being painted by the runtime. Branded center-button marks are not synthesized when absent from licensed input assets; those need a verified/source-authorized embedded-button artwork pass.
+
+### GameCube source-artwork parity pass (2026-11-05)
+
+The GameCube 3D A/B/X/Y legends are reconstructed at runtime from the **actual SVG glyph paths** in `references/controllers/gamecube/source.svg`. `applyGameCubeButtonArtwork` finds the button's native 2D face/glyph, determines its authored proportions with SVG `getBBox()`, creates a source-shaped decal texture and enlarges the otherwise tiny projected label to a legible 54–68% of the physical button's narrow face dimension. Decals remain source-attached. Neither OBJ geometry nor the 2D source changes. Preserve the original 2D GPL-3.0 attribution separately from the MIT 3D mesh attribution. CI checks the four author-drawn glyphs and captures the actual GameCube WebGL view.
