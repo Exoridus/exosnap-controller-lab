@@ -1,5 +1,13 @@
 [
   {
+    "sha": "85fe45d252536635d1982e1f9b052279ee513443",
+    "capturedAt": "2026-11-05T11:07:18.760Z",
+    "neutralUrl": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/85fe45d252536635d1982e1f9b052279ee513443/overview-neutral.png",
+    "pressedUrl": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/85fe45d252536635d1982e1f9b052279ee513443/overview-pressed.png",
+    "manifestUrl": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/85fe45d252536635d1982e1f9b052279ee513443/capture-manifest.json",
+    "gamecubeUrl": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/85fe45d252536635d1982e1f9b052279ee513443/gamecube-neutral.png"
+  },
+  {
     "sha": "26ca0dbc71721b8ec3d27a7268ed70b9854a62fd",
     "capturedAt": "2026-11-05T10:39:34.414Z",
     "neutralUrl": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/26ca0dbc71721b8ec3d27a7268ed70b9854a62fd/overview-neutral.png",
