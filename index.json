@@ -1,5 +1,12 @@
 [
   {
+    "sha": "d9bd49f95d3f201fea123c0f6e27a95794048389",
+    "capturedAt": "2026-11-05T09:55:51.845Z",
+    "neutralUrl": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/d9bd49f95d3f201fea123c0f6e27a95794048389/overview-neutral.png",
+    "pressedUrl": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/d9bd49f95d3f201fea123c0f6e27a95794048389/overview-pressed.png",
+    "manifestUrl": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/d9bd49f95d3f201fea123c0f6e27a95794048389/capture-manifest.json"
+  },
+  {
     "sha": "1da7e7a5d9e05aa403c5e04598ed62889d4516f9",
     "capturedAt": "2026-11-05T09:51:57.089Z",
     "neutralUrl": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/1da7e7a5d9e05aa403c5e04598ed62889d4516f9/overview-neutral.png",
