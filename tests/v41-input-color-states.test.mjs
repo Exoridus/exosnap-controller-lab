@@ -68,8 +68,8 @@ test('left/right analog trigger independently interpolates idle white to pressed
   const right=rig.meshes.find(m=>m.userData.sourceFile==='right_trigger.obj');
   assert.ok(left&&right);
   applyPbrRecipeToRig(rig,recipe,state(neutral(),neutral(),.5,0));
-  assert.ok(left.material.color.distanceToSquared(new (left.material.color.constructor)(EXO_PALETTE.neutralTrigger))>0);
-  assert.ok(left.material.color.distanceToSquared(new (left.material.color.constructor)(EXO_PALETTE.pressedSurface))>0);
+  assert.notEqual(left.material.color.getHexString(),EXO_PALETTE.neutralTrigger.slice(1));
+  assert.notEqual(left.material.color.getHexString(),EXO_PALETTE.pressedSurface.slice(1));
   assert.equal(right.material.color.getHexString(),EXO_PALETTE.neutralTrigger.slice(1));
   assert.equal(right.material.emissiveIntensity,0);
   applyPbrRecipeToRig(rig,recipe,state(neutral(),neutral(),1,1));
