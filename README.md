@@ -1,12 +1,12 @@
 # ExoSnap Controller3D Lab – GitHub Pages / Screenshot-Historie
 
-Das Repository ist auf **GitHub-Pages-Veröffentlichung mit echter WebGL-Screenshot-Pflicht** vorbereitet.
+**Live:** [Controller Lab](https://exoridus.github.io/exosnap-controller-lab/) · [Screenshot-Historie](https://exoridus.github.io/exosnap-controller-lab/screenshots.html). Veröffentlichung per GitHub Actions nach erfolgreichen Tests und echten WebGL2-Aufnahmen.
 
 - **Start:** `npm start` → `http://127.0.0.1:8792/` (ein 6-Spalten-Grid, vier Looks, 2D/3D).
 - **Setup:** [GITHUB_PAGES_SETUP.md](GITHUB_PAGES_SETUP.md).
 - **Aktuelle und alte Screenshots:** `/screenshots.html` nach erfolgreichem Pages-Deploy; historische Bilder im Branch `visual-history`, unter der Quell-SHA.
 - **CI:** `.github/workflows/pages-and-screenshots.yml` – Tests → echte Chromium-WebGL-Aufnahmen → Versionsarchiv → Pages.
-- **Wichtig:** Für diesen Stand wurde hier noch **kein gültiges neues v40-WebGL-Screenshot** erzeugt, deshalb wird kein Mockup ausgeliefert.
+- **Rendering-Nachweis:** Die CI erzeugt und archiviert echte WebGL2-Screenshots (neutral/pressed) im Branch [`visual-history`](https://github.com/Exoridus/exosnap-controller-lab/tree/visual-history). Ein Screenshot belegt Rendering, aber noch keine visuelle Qualitätsfreigabe.
 
 ---
 
@@ -23,7 +23,7 @@ Das Repository ist auf **GitHub-Pages-Veröffentlichung mit echter WebGL-Screens
 - 2D-SVGs mit 86 % Panelgröße und einem auf Hell/Mixed angepassten Flächenkontrast. Gemeinsamer Zoom auch für das flache SVG, das nicht dem 3D-Orbit folgt.
 - Vier Looks und separate 2D-/3D-Press-Color-Picker bleiben erhalten.
 
-**Qualitätsgrenze:** In dieser Umgebung verweigert Chromium lokale HTTP- **und** Datei-Navigation mit `ERR_BLOCKED_BY_ADMINISTRATOR`. Deshalb ist weder WebGL-/GPU-Shader-Kompilierung noch neue visuelle 3D-/Qt-Freigabe möglich. Die Tests sind Quell-/Zustands-/Geometrieverifikation, **kein Ersatz für echte Bildnachweise**. Für den Qt-Port siehe `QT_V40_COMPOSITOR.md`.
+**Qualitätsgrenze:** Frühere lokale Browserprüfungen dieser Chat-Umgebung scheiterten mit `ERR_BLOCKED_BY_ADMINISTRATOR`. Die GitHub-CI erzeugt inzwischen echte Chromium-WebGL2-Bildnachweise; eine ästhetische 3D-Freigabe oder native Qt-Quick-3D-Parität folgt daraus noch nicht. Für den Qt-Port siehe `QT_V40_COMPOSITOR.md`.
 
 ---
 

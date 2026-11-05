@@ -1,30 +1,18 @@
 # GitHub Pages für das ExoSnap Controller3D Lab
 
-Dieses Paket ist **repository-ready**, aber wurde **nicht auf GitHub veröffentlicht**. In dieser Session steht keine GitHub-Repository-Erstellungsfunktion zur Verfügung.
+**Status:** GitHub Pages wird über **GitHub Actions** aus dem öffentlichen Repository [`Exoridus/exosnap-controller-lab`](https://github.com/Exoridus/exosnap-controller-lab) veröffentlicht.
 
-## Einmalige Einrichtung
+- **Lab:** https://exoridus.github.io/exosnap-controller-lab/
+- **Screenshot-Verlauf:** https://exoridus.github.io/exosnap-controller-lab/screenshots.html
+- **Erster bestätigter Deploy:** [Workflowlauf vom 5. November 2026](https://github.com/Exoridus/exosnap-controller-lab/actions/runs/41974037777), Quell-Commit `1da7e7a`; Build und Deploy erfolgreich.
+- **Dauerhaftes Bildarchiv:** [Branch `visual-history`](https://github.com/Exoridus/exosnap-controller-lab/tree/visual-history).
 
-1. Das öffentliche Repository [`Exoridus/exosnap-controller-lab`](https://github.com/Exoridus/exosnap-controller-lab) ist bereits erstellt und derzeit leer. **Kein weiteres Repository anlegen.**
-2. Die enthaltenen Dateien im Repository-Ordner mittels Git hochladen:
+## Betrieb und Einstellungen
 
-   ```powershell
-   git init -b main
-   git add .
-   git commit -m "feat: publish Controller3D Lab v40 with visual history"
-   git remote add origin https://github.com/Exoridus/exosnap-controller-lab.git
-   git push -u origin main
-   ```
-
-   Die Remote-Adresse ist bereits der bestätigte Repositoryname.
-3. In **Settings → Pages → Build and deployment → Source** den Eintrag **GitHub Actions** wählen.
-4. Unter **Settings → Actions → General → Workflow permissions** sicherstellen, dass GitHub Actions **Read and write permissions** besitzt. Das wird für die separate `visual-history`-Branch benötigt. Im Zweifelsfall die Branch-/Organisationsrichtlinien prüfen.
-5. In **Actions → Verify, capture real WebGL screenshots, publish Pages** den ersten Run starten (`Run workflow`) oder den bereits gestarteten Push-Run prüfen.
-
-Die erwartete Projekt-URL lautet nach erfolgreicher Veröffentlichung:
-
-`https://exoridus.github.io/exosnap-controller-lab/`
-
-**Diese URL ist ein erwartetes Ziel, kein bestätigter Live-Link.** Erst den erfolgreichen GitHub-Pages-Deploy-Job abwarten.
+1. **Settings → Pages → Build and deployment → Source:** `GitHub Actions` (bereits eingerichtet).
+2. Der Workflow [`.github/workflows/pages-and-screenshots.yml`](.github/workflows/pages-and-screenshots.yml) läuft bei jedem Push auf `main` und kann über `Actions → Run workflow` manuell gestartet werden.
+3. Die CI benötigt `contents: write` für den Archiv-Branch `visual-history`, `pages: write` und `id-token: write` für das Deployment. Die entsprechenden Workflow-Permissions sind definiert; Repository-/Organisationsregeln dürfen sie nicht unterbinden.
+4. Die aktuelle Ausführung und ggf. Fehler stehen unter [Actions](https://github.com/Exoridus/exosnap-controller-lab/actions). Ein verifiziertes Deploy ist Voraussetzung für die Aktualisierung der öffentlichen Website.
 
 ## Automatischer Ablauf bei jedem Push auf `main`
 
@@ -54,4 +42,4 @@ Das Paket enthält referenzierte Controller-Objekte und SVG-Grafiken mit **unter
 - Keine serverseitige API nötig; Node ist nur für Entwicklung, Tests und Deployment erforderlich.
 - Die Funktion „weitere Modelle herunterladen“ speichert Assets zur Entwicklungszeit. GitHub Pages kann zur Laufzeit keine zusätzlichen OBJ-Dateien in das Repository schreiben. Bundled DualSense ist offline vorhanden.
 - Qt Quick 3D wird hier **nicht** in Pages ausgeführt. Die Seite zeigt den echten Three.js-Prototyp und die historischen Referenzen.
-- Der lokale Prüf-Browser dieser Chat-Umgebung hat keine erfolgreiche WebGL-3D-Aufnahme geliefert; das erste verifizierte **aktuelle** Bild entsteht erst bei einem erfolgreichen GitHub-Actions-Lauf.
+- Der lokale Prüf-Browser der ursprünglichen Entwicklungsumgebung konnte keine WebGL-3D-Aufnahme liefern. Der GitHub-Actions-Lauf vom 5. November 2026 hat anschließend erfolgreich echte Chromium-WebGL2-Aufnahmen erstellt und veröffentlicht.
