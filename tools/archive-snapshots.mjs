@@ -12,6 +12,7 @@ export async function archiveSnapshots(captureDir,archiveDir,repository,commit){
   const manifest=JSON.parse(await readFile(path.join(captureDir,'capture-manifest.json'),'utf8'));
   if(manifest.revision!==commit)throw Error('Capture was produced for a different source revision');
   const targets=['overview-neutral.png','overview-pressed.png'];
+  if(manifest.images.some(image=>image.file==='gamecube-neutral.png'))targets.push('gamecube-neutral.png');
   if(targets.some(name=>!manifest.images.some(x=>x.file===name&&x.bytes>=40000)))throw Error('Both verified screenshots are required');
   for(const name of targets){
     const record=manifest.images.find(x=>x.file===name);
@@ -28,6 +29,7 @@ export async function archiveSnapshots(captureDir,archiveDir,repository,commit){
   if(!Array.isArray(index))throw Error('Visual history index must be an array');
   const root=`https://raw.githubusercontent.com/${repository}/visual-history/snapshots/${commit}/`;
   const record={sha:commit,capturedAt:manifest.capturedAt,neutralUrl:root+'overview-neutral.png',pressedUrl:root+'overview-pressed.png',manifestUrl:root+'capture-manifest.json'};
+  if(targets.includes('gamecube-neutral.png'))record.gamecubeUrl=root+'gamecube-neutral.png';
   index=[record,...index.filter(x=>x.sha!==commit)].sort((a,b)=>b.capturedAt.localeCompare(a.capturedAt));
   await writeFile(path.join(archiveDir,'index.json'),JSON.stringify(index,null,2)+'\n');
   return record;

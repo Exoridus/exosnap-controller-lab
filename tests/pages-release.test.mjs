@@ -51,3 +51,26 @@ test('visual history creates immutable commit-addressed references and rejects c
     await assert.rejects(archiveSnapshots(capture,archive,'Exoridus/exosnap-controller-lab',sha),/integrity/);
   }finally{await rm(workspace,{recursive:true,force:true});}
 });
+
+test('visual history archives optional GameCube captures with immutable SHA links',async()=>{
+  const {archiveSnapshots}=await import('../tools/archive-snapshots.mjs');
+  const {createHash}=await import('node:crypto');
+  const {mkdir,writeFile,readFile}=await import('node:fs/promises');
+  const w=await mkdtemp(path.join(tmpdir(),'exosnap-gamecube-history-'));
+  const cap=path.join(w,'capture'),arc=path.join(w,'archive'),sha='b'.repeat(40);
+  try{
+    await mkdir(cap,{recursive:true});
+    const images=[];
+    for(const file of ['overview-neutral.png','overview-pressed.png','gamecube-neutral.png']){
+      const buf=Buffer.alloc(45000,file.length);
+      Buffer.from('89504e470d0a1a0a','hex').copy(buf);
+      await writeFile(path.join(cap,file),buf);
+      images.push({file,bytes:buf.length,sha256:createHash('sha256').update(buf).digest('hex')});
+    }
+    await writeFile(path.join(cap,'capture-manifest.json'),JSON.stringify({revision:sha,capturedAt:'2026-11-05T00:00:00Z',images}));
+    const entry=await archiveSnapshots(cap,arc,'Exoridus/exosnap-controller-lab',sha);
+    assert.match(entry.gamecubeUrl,/gamecube-neutral\\.png$/);
+    assert.deepEqual(await readFile(path.join(arc,'snapshots',sha,'gamecube-neutral.png')),
+      await readFile(path.join(cap,'gamecube-neutral.png')));
+  }finally{await rm(w,{recursive:true,force:true});}
+});

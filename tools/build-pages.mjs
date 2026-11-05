@@ -21,6 +21,9 @@ export async function buildPages(source,dest,{captureDir=null,historyFile=null}=
   if(captureDir){
     const shots=[['overview-neutral.png','latest.png'],['overview-pressed.png','pressed.png']];
     for(const [src,dst] of shots)await copyFile(path.join(captureDir,src),path.join(dest,'screenshots',dst));
+    // Optional model-specific comparison, absent in older history builds.
+    try{await copyFile(path.join(captureDir,'gamecube-neutral.png'),path.join(dest,'screenshots','gamecube.png'));}
+    catch(error){if(error.code!=='ENOENT')throw error;}
     await copyFile(path.join(captureDir,'capture-manifest.json'),path.join(dest,'screenshots','latest.json'));
   }
   if(historyFile){const text=await readFile(historyFile,'utf8'); JSON.parse(text);await writeFile(path.join(dest,'screenshots','history.json'),text);}

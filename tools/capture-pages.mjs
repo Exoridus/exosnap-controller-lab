@@ -75,6 +75,25 @@ try{
     before=proof;
   }
   if(images[0].sha256===images[1].sha256)throw Error('Neutral and pressed-state screenshots are identical: input response not verified');
+  // A separate, actual GameCube render validates model switching, model-specific
+  // A/B/X/Y button legends and the source-authored purple/green/red/yellow palette.
+  const previousRevision=before.revision;
+  await page.locator('#pressAll').uncheck();
+  await page.locator('#controller').selectOption('Gamecube');
+  await page.waitForFunction(previous=>
+    document.body.dataset.renderReady==='three-rendered' &&
+    window.__exoPbrLab?.model?.model?.id==='Gamecube' &&
+    Number(document.body.dataset.renderRevision||0)>previous,
+    previousRevision,{timeout:60000});
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  const cube=await shotProof();
+  const cubeFile='gamecube-neutral.png';
+  const cubeBytes=await page.screenshot({path:path.join(output,cubeFile),fullPage:true,animations:'disabled',timeout:60000});
+  if(cubeBytes.length<40000||cubeBytes.subarray(0,8).toString('hex')!=='89504e470d0a1a0a')
+    throw Error('GameCube screenshot is missing or invalid');
+  images.push({file:cubeFile,modelId:'Gamecube',pressed:false,bytes:cubeBytes.length,
+    sha256:createHash('sha256').update(cubeBytes).digest('hex'),
+    webgl:cube.webglVersion,revision:cube.revision,drawStats:cube.drawStats});
   const manifest={revision,capturedAt:new Date().toISOString(),url:new URL('pbr-lab.html',base).href,
     content:'Real Three.js/WebGL2 + original controller OBJ + authored SVG',looks:['solid','ghost','outline','identity'],
     viewports:['3D dark','3D light','3D mixed','2D dark','2D light','2D mixed'],images,
