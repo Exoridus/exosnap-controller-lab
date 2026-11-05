@@ -65,7 +65,7 @@ export async function loadNativeRig(model, readText=httpText){
       meshes.push(o);
     });
     if(parsed.children.every(c=>!c.isMesh && !c.children?.some(d=>d.isMesh)))throw new Error(`OBJLoader returned no triangles: ${source.file}`);
-    const glyph=makeFaceGlyph(source.file,model.source,sourceBounds);
+    const glyph=makeFaceGlyph(source.file,model.source,sourceBounds,model);
     if(glyph)parsed.add(glyph);
     holder.add(parsed);partMap.set(source.index,holder);parts.push({file:source.file,meta:source.meta,holder});
   }
