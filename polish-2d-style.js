@@ -312,6 +312,13 @@ export function paintPolished2D(reference,mode,scene,{
     if(child.hasAttribute('data-exo-polish-silhouette'))continue;
     if(!['path','ellipse','rect'].includes(child.localName))continue;
     const detail=child.classList.contains('detail')||child.id.endsWith('speaker-grille');
+    // An SVG shape without an explicit fill still inherits SVG's black
+    // default. Ghost review must remove the paint itself, not just set alpha
+    // on shapes that happen to declare a fill property.
+    if(colors.reviewLook){
+      paint(child,'fill','none');
+      paint(child,'fill-opacity','0');
+    }
     if(visibleFill(child)){
       paint(child,'fill',colors.shell);
       paint(child,'fill-opacity',detail?colors.detailAlpha:colors.shellAlpha);
