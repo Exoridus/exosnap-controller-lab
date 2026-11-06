@@ -24,7 +24,7 @@ export async function buildPages(source,dest,{captureDir=null,historyFile=null}=
     // Optional model-specific comparison, absent in older history builds.
     try{await copyFile(path.join(captureDir,'gamecube-neutral.png'),path.join(dest,'screenshots','gamecube.png'));}
     catch(error){if(error.code!=='ENOENT')throw error;}
-    for(const [source,target] of [['generic-neutral.png','generic.png'],['generic-pressed.png','generic-pressed.png']]){
+    for(const [source,target] of [['generic-neutral.png','generic.png'],['generic-pressed.png','generic-pressed.png'],['2d-polish-neutral.png','2d-polish-neutral.png'],['2d-polish-active.png','2d-polish-active.png']]){
       try{await copyFile(path.join(captureDir,source),path.join(dest,'screenshots',target));}
       catch(error){if(error.code!=='ENOENT')throw error;}
     }

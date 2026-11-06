@@ -65,7 +65,7 @@ function ensureBaseFill(ref,colors){
   // It is an additive preview layer; no original geometry is discarded.
   let silhouette=body.querySelector('[data-exo-polish-silhouette]');
   if(!drawn.length&&!silhouette){
-    const source=body.querySelector('#outline-strong');
+    const source=body.querySelector('[id="outline-strong"],[id$="-outline-strong"]');
     if(source?.getAttribute('d')){
       silhouette=document.createElementNS(svgNs,'path');
       silhouette.setAttribute('d',source.getAttribute('d'));

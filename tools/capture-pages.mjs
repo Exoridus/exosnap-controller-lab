@@ -168,6 +168,44 @@ try{
     coreSmoke.push({id,threeViewports:proof.sampleCount,svgViewports:proof.flatCount,
       rendered:true,webgl:proof.webglVersion});
   }
+  // Verify actual authored SVGs, unlike native Qt/D3D whose acceptance remains open.
+  const polishErrors=[];
+  const polish=await browser.newPage({viewport:{width:1500,height:1250},deviceScaleFactor:1,reducedMotion:'reduce'});
+  polish.on('pageerror',error=>polishErrors.push(error.message));
+  polish.on('response',response=>{
+    if(response.status()>=400&&!/\/favicon\.ico(?:\?|$)/.test(response.url()))
+      polishErrors.push('HTTP '+response.status()+' '+response.url());
+  });
+  await polish.goto(new URL('polish-2d.html',base).href,{waitUntil:'domcontentloaded',timeout:60000});
+  await polish.waitForFunction(()=>
+    document.body.dataset.polishReady==='ready'&&document.querySelectorAll('.stage svg').length===6,
+    null,{timeout:60000});
+  const capturePolish=async(file,activated)=>{
+    const bytes=await polish.screenshot({path:path.join(output,file),fullPage:true,animations:'disabled',timeout:60000});
+    if(bytes.length<40000||bytes.subarray(0,8).toString('hex')!=='89504e470d0a1a0a')
+      throw Error('Invalid 2D polish screenshot: '+file);
+    images.push({file,modelId:'DualSense2D',pressed:activated,bytes:bytes.length,
+      sha256:createHash('sha256').update(bytes).digest('hex'),source:'Browser SVG; not native Qt'});
+  };
+  await capturePolish('2d-polish-neutral.png',false);
+  for(const [id,value] of [['stick','100'],['trigger','50']]){
+    await polish.locator('#'+id).evaluate((element,value)=>{
+      element.value=value;element.dispatchEvent(new Event('input',{bubbles:true}));
+    },value);
+  }
+  await polish.locator('#faces').check();
+  const activeColor=await polish.evaluate(()=>{
+    const node=document.querySelector('.stage[data-scene="dark"] [id$="-stick-l-cap-top"]');
+    return node?getComputedStyle(node).fill:null;
+  });
+  if(activeColor!=='rgb(255, 255, 255)')
+    throw Error('Full 2D stick is not white: '+activeColor);
+  await capturePolish('2d-polish-active.png',true);
+  if(images.at(-1).sha256===images.at(-2).sha256)
+    throw Error('2D neutral and analog screenshots are identical');
+  if(polishErrors.length)throw Error('2D polish browser errors: '+polishErrors.join('; '));
+  await polish.close();
+
   const manifest={revision,capturedAt:new Date().toISOString(),url:new URL('pbr-lab.html',base).href,
     content:'Real Three.js/WebGL2 + original controller OBJ + authored SVG',looks:['solid','ghost','outline','identity'],
     viewports:['3D dark','3D light','3D mixed','2D dark','2D light','2D mixed'],images,

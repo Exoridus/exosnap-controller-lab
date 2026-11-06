@@ -1,5 +1,5 @@
 import {LAYOUTS,layoutForId} from './controller-catalog.js';
-import {ControllerReference} from './controller-reference.js';
+import {ControllerReference,isolateReferenceIds} from './controller-reference.js';
 import {readStandardGamepad} from './gamepad-input.js';
 import {paintPolished2D} from './polish-2d-style.js';
 
@@ -69,7 +69,9 @@ async function load(id){
   $('layout').value=selected.id;
   document.body.dataset.polishReady='loading';
   setStatus('Lade '+selected.name+' ...');
-  await Promise.all(refs.map(entry=>entry.reference.load(selected)));
+  await Promise.all(refs.map((entry,index)=>entry.reference.load(selected).then(()=>{
+    if(token===serial&&entry.reference.svg)isolateReferenceIds(entry.reference.svg,'polish-'+token+'-'+index);
+  })));
   if(token!==serial)return;
   paint();
 }
