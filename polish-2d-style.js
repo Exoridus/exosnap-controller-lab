@@ -80,8 +80,8 @@ export function lookPalette(id,mode,scene,colorway='auto'){
 // geometry changes can masquerade as an edge-light improvement.
 export const GHOST_REVIEW_LOOKS=Object.freeze([
   Object.freeze({key:'pure',name:'A · Pure Outline',summary:'Nur die originalen Konturen',light:0,shadow:0}),
-  Object.freeze({key:'soft',name:'B · Soft Rim',summary:'Sanftes Licht, kaum Schatten',light:.24,shadow:.12}),
-  Object.freeze({key:'shadow',name:'C · Quiet Shadow',summary:'Wenig Licht, klarere Form',light:.06,shadow:.46})
+  Object.freeze({key:'soft',name:'B · Soft Rim',summary:'Sanftes Licht, kaum Schatten',light:.48,shadow:.08}),
+  Object.freeze({key:'shadow',name:'C · Quiet Shadow',summary:'Wenig Licht, klarere Form',light:.02,shadow:.78})
 ]);
 export function ghostReviewSettings(key,scene){
   const option=GHOST_REVIEW_LOOKS.find(v=>v.key===key);
@@ -154,13 +154,23 @@ function paintStick(reference,entry,colors,values,axes,variant){
   // The authored outer ellipse IS the moving rim. Its material lies behind
   // the authored inner top. A subdued idle rim avoids alpha build-up in Ghost;
   // higher input levels smoothly approach fully opaque white.
-  paint(outer,'fill',mixColor(colors.cap,PRESS_WHITE,ring));
-  const rimAlpha=colors.reviewLook?
-    colors.controlAlpha+(1-colors.controlAlpha)*ring:
-    colors.ghost?(colors.controlAlpha*.52+(1-colors.controlAlpha*.52)*ring):1;
-  paint(outer,'fill-opacity',String(rimAlpha));
-  paint(outer,'stroke',colors.reviewLook&&ring<1?colors.line:colors.pressedOutline);
-  paint(outer,'stroke-opacity',String(Math.max(colors.lineAlpha,.83)));
+  if(colors.reviewLook){
+    // No filled ellipse under the translucent center. That double alpha
+    // previously made neutral sticks darker than every other control, and
+    // could turn a moved ring into a nearly white center before L3/R3.
+    // Highlight the authored moving RIM stroke only; the static socket
+    // and centered cap fill remain independent.
+    paint(outer,'fill','none');
+    paint(outer,'fill-opacity','0');
+    paint(outer,'stroke',mixColor(colors.line,PRESS_WHITE,ring));
+    paint(outer,'stroke-opacity',String(colors.lineAlpha+(1-colors.lineAlpha)*ring));
+  }else{
+    paint(outer,'fill',mixColor(colors.cap,PRESS_WHITE,ring));
+    const rimAlpha=colors.ghost?(colors.controlAlpha*.52+(1-colors.controlAlpha*.52)*ring):1;
+    paint(outer,'fill-opacity',String(rimAlpha));
+    paint(outer,'stroke',colors.pressedOutline);
+    paint(outer,'stroke-opacity',String(Math.max(colors.lineAlpha,.83)));
+  }
   if(center){
     const level=levels.center;
     paint(center,'fill',mixColor(colors.control,PRESS_WHITE,level));

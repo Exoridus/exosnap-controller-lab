@@ -38,4 +38,8 @@ test('comparison uses original SVGs with correct independent input states',async
   assert.ok(js.includes("paintPolished2D(item.reference,'ghost'"));
   assert.ok(style.includes("group.id.endsWith('btn-touchpad')"));
   assert.ok(!html.includes('Gehaeusefarbe'));
+  // The moving RIM cannot have any overlapping fill beneath the neutral
+  // center: motion and L3 click must remain independently visible.
+  assert.match(style,/paint\(outer,'fill','none'\)/);
+  assert.match(style,/mixColor\(colors\.line,PRESS_WHITE,ring\)/);
 });
