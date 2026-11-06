@@ -109,64 +109,40 @@ function ensureBaseFill(reference,colors){
     paint(silhouette,'stroke','none');
   }
 }
-// Use the TWO authored, moving stick ellipses. A static body socket never
-// participates. The mask cuts the exact source-authored center out of the
-// source-authored outer ellipse, preventing stacked semi-transparent alphas.
-function ensureStickRingMask(reference,outer,center){
-  if(!outer||!center)return;
-  const id=outer.id+'-polish-ring-mask';
-  if(outer.getAttribute('mask')===`url(#${id})`)return;
-  let defs=reference.svg.querySelector('defs');
-  if(!defs){defs=document.createElementNS(svgNs,'defs');reference.svg.prepend(defs);}
-  if(!defs.querySelector('[id="'+CSS.escape(id)+'"]')){
-    const bounds=outer.getBBox(),pad=Math.max(bounds.width,bounds.height)*.12;
-    const mask=document.createElementNS(svgNs,'mask');
-    for(const [key,value] of Object.entries({
-      id,maskUnits:'userSpaceOnUse',maskContentUnits:'userSpaceOnUse',
-      x:bounds.x-pad,y:bounds.y-pad,
-      width:bounds.width+pad*2,height:bounds.height+pad*2
-    }))mask.setAttribute(key,String(value));
-    const copy=(source,fill)=>{
-      const shape=source.cloneNode(false);
-      shape.removeAttribute('id');shape.removeAttribute('class');
-      shape.removeAttribute('style');shape.removeAttribute('mask');
-      shape.setAttribute('fill',fill);shape.setAttribute('stroke','none');
-      return shape;
-    };
-    mask.append(copy(outer,'white'),copy(center,'black'));
-    defs.append(mask);
-  }
-  outer.setAttribute('mask',`url(#${id})`);
-}
+// The source SVG already contains a movable rim and center. Never apply a
+// second ring mask: getBBox() does not include authored ellipse transforms,
+// so a user-space mask clipped off parts of the cap and produced crescents.
+// Reuse the original two ellipses directly; do not touch the static socket.
 function paintStick(reference,entry,colors,values,axes,variant){
   const group=entry.group;
   const outer=group.querySelector('[id$="-outline"]');
   const center=group.querySelector('[id$="-top"]');
   const pressure=group.querySelector('[id$="-pressure"]');
+  // The separate click/pressure shape is NOT the cap material and cannot be
+  // used to fake a third button. It remains invisible in this 2D experiment.
   if(pressure){paint(pressure,'fill','none');paint(pressure,'stroke','none');}
   if(!outer)return;
   const movement=analogStickLevel(axes?.[entry.stickSide]);
   const clicked=clamp(values?.get(entry.control)||0)>.5;
   const levels=stickFeedbackLevels(movement,clicked,variant);
-  if(center)ensureStickRingMask(reference,outer,center);
-  const setPart=(node,base,intensity)=>{
-    if(!node)return;
-    paint(node,'fill',mixColor(base,PRESS_WHITE,intensity));
-    paint(node,'fill-opacity',colors.controlAlpha+(1-colors.controlAlpha)*intensity);
-    paint(node,'stroke',intensity>=.65?colors.pressedOutline:colors.line);
-    paint(node,'stroke-opacity',intensity>=.65?1:colors.lineAlpha);
-  };
-  setPart(outer,colors.cap,levels.ring);
+  const ring=center?levels.ring:Math.max(levels.ring,levels.center);
+  // The authored outer ellipse IS the moving rim. Its material lies behind
+  // the authored inner top. A subdued idle rim avoids alpha build-up in Ghost;
+  // higher input levels smoothly approach fully opaque white.
+  paint(outer,'fill',mixColor(colors.cap,PRESS_WHITE,ring));
+  const rimAlpha=colors.ghost?(colors.controlAlpha*.52+(1-colors.controlAlpha*.52)*ring):1;
+  paint(outer,'fill-opacity',String(rimAlpha));
+  paint(outer,'stroke',colors.pressedOutline);
+  paint(outer,'stroke-opacity',String(Math.max(colors.lineAlpha,.83)));
   if(center){
-    setPart(center,colors.control,levels.center);
-    // The authored center stroke remains visible when both regions are white.
-  }else{
-    // A few unusual source SVGs (e.g. the GameCube C-stick) do not author a
-    // separate top. Never synthesize one: use the authored rim for feedback.
-    const fallback=Math.max(levels.ring,levels.center);
-    setPart(outer,colors.cap,fallback);
+    const level=levels.center;
+    paint(center,'fill',mixColor(colors.control,PRESS_WHITE,level));
+    paint(center,'fill-opacity',String(colors.controlAlpha+(1-colors.controlAlpha)*level));
+    // Keep this existing physical boundary distinct even when both parts
+    // become pure white. No dark halo, cloned geometry or knockout mask.
+    paint(center,'stroke',colors.pressedOutline);
+    paint(center,'stroke-opacity',String(Math.max(colors.lineAlpha,.88)));
   }
-  // Nothing touches the unmoving socket in the body group.
 }
 function paintDpad(entry,colors,values){
   const group=entry.group;
@@ -257,17 +233,30 @@ export function paintPolished2D(reference,mode,scene,{
         ['path','ellipse','rect'].includes(node.localName)&&node!==pressure&&
         !node.classList.contains('glyph')):null)||entry.surface;
     if(!face)continue;
-    if(entry.surface&&entry.surface!==face&&entry.surface.id.endsWith('-pressure')){
-      paint(entry.surface,'fill','none');paint(entry.surface,'stroke','none');
-    }
     const level=controlLevel(entry,values,{left,right});
     const base=entry.layer.role==='trigger'?colors.trigger:colors.control;
-    paint(face,'fill',mixColor(base,PRESS_WHITE,level));
-    paint(face,'fill-opacity',colors.controlAlpha+(1-colors.controlAlpha)*level);
-    // Neutral, contrasting source contours survive even completely white faces.
-    if(visibleStroke(face)||face.id.endsWith('-face')){
-      paint(face,'stroke',level?colors.pressedOutline:colors.line);
-      paint(face,'stroke-opacity',level?1:colors.lineAlpha);
+    if(entry.layer.role==='trigger'&&pressure&&face!==pressure){
+      // The binding's authored -pressure path is the real analog activation
+      // surface. The sibling outline is a structural border, not a second
+      // opaque face that may occlude that pressure path.
+      paint(pressure,'fill',mixColor(base,PRESS_WHITE,level));
+      paint(pressure,'fill-opacity',colors.controlAlpha+(1-colors.controlAlpha)*level);
+      paint(pressure,'stroke','none');
+      paint(face,'fill','none');
+      if(visibleStroke(face)){
+        paint(face,'stroke',colors.line);
+        paint(face,'stroke-opacity',String(colors.lineAlpha));
+      }
+    }else{
+      if(pressure&&face!==pressure){
+        paint(pressure,'fill','none');paint(pressure,'stroke','none');
+      }
+      paint(face,'fill',mixColor(base,PRESS_WHITE,level));
+      paint(face,'fill-opacity',colors.controlAlpha+(1-colors.controlAlpha)*level);
+      if(visibleStroke(face)||face.id.endsWith('-face')){
+        paint(face,'stroke',level?colors.pressedOutline:colors.line);
+        paint(face,'stroke-opacity',level?1:colors.lineAlpha);
+      }
     }
     paintGlyphs(entry,colors,showFaceSymbols);
   }

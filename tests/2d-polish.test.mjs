@@ -84,8 +84,9 @@ test('every tested stick uses authored moving outline + center; no synthetic cli
   }
   const code=await file('polish-2d-style.js');
   assert.doesNotMatch(code,/data-exo-stick-click/);
-  assert.match(code,/ensureStickRingMask/);
-  assert.match(code,/copy\(outer,'white'\),copy\(center,'black'\)/);
+  assert.doesNotMatch(code,/ensureStickRingMask|polish-ring-mask|cloneNode\(false\)/);
+  assert.match(code,/group\.querySelector\('\[id\$="-outline"\]'\)/);
+  assert.match(code,/group\.querySelector\('\[id\$="-top"\]'\)/);
   assert.match(code,/paintSilhouetteGlow/);
   assert.match(code,/strength===0.*removeProperty\('filter'\)/);
   assert.match(code,/paintGlyphs/);
@@ -122,9 +123,18 @@ test('browser release will capture all specified 2D review states',async()=>{
     '2d-xbox-series-light.png','2d-dualshock4-auto.png',
     '2d-dualshock4-dark.png','2d-ghost-glow-0.png','2d-ghost-glow-50.png',
     '2d-ghost-glow-100.png'];
-  for(const name of names.filter(n=>!n.startsWith('2d-ghost-glow-')))
+  for(const name of [...names.filter(n=>!n.startsWith('2d-ghost-glow-')),
+    '2d-dualsense-trigger-neutral.png','2d-dualsense-trigger-100.png'])
     assert.ok(capture.includes(name),name);
   assert.match(capture,/for\(const pct of \[0,50,100\]\)/);
   assert.match(capture,/2d-ghost-glow-/);
   assert.match(capture,/capturePolish\('2d-ghost-glow-'\+pct\+'\.png'/);
+});
+
+test('authored trigger pressure is painted, with its own source outline above it',async()=>{
+  const code=await file('polish-2d-style.js');
+  assert.match(code,/entry\.layer\.role==='trigger'&&pressure&&face!==pressure/);
+  assert.match(code,/paint\(pressure,'fill',mixColor\(base,PRESS_WHITE,level\)\)/);
+  assert.match(code,/paint\(face,'fill','none'\)/);
+  assert.doesNotMatch(code,/data-exo-stick-click|polish-ring-mask/);
 });
