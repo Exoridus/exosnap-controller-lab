@@ -447,11 +447,15 @@ try{
       const touchpadFilled=[...touchpad?.group.querySelectorAll('path,rect,ellipse')||[]]
         .filter(p=>!p.classList.contains('glyph')&&getComputedStyle(p).fill!=='none'&&
           Number(getComputedStyle(p).fillOpacity)>.0001);
-      results.push({look:item.look,scene:item.scene,body:notTransparent.length,touchpad:touchpadFilled.length});
+      results.push({look:item.look,scene:item.scene,
+        body:notTransparent.map(p=>({id:p.id,className:p.getAttribute('class'),
+          fill:getComputedStyle(p).fill,alpha:getComputedStyle(p).fillOpacity,
+          style:p.getAttribute('style')?.slice(0,180)})),
+        touchpad:touchpadFilled.map(p=>p.id)});
     }
     return results;
   });
-  if(ghostState.some(r=>r.body||r.touchpad))
+  if(ghostState.some(r=>r.body.length||r.touchpad.length))
     throw Error('Ghost A/B/C must have completely transparent shell and idle touchpad: '+JSON.stringify(ghostState));
   const captureGhost=async(file,element=null)=>{
     const target=element?ghost.locator(element):ghost;
