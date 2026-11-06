@@ -178,22 +178,95 @@ function paintGlyphs(entry,colors,showFaceSymbols){
     paint(glyph,'opacity','1');
   }
 }
-function paintSilhouetteGlow(reference,amount){
-  const outer=reference.svg.querySelector('[id="outline-strong"],[id$="-outline-strong"]');
-  if(!outer)return;
-  const strength=clamp(amount);
-  if(strength===0){outer.style.removeProperty('filter');return;}
-  // A CSS/SVG silhouette filter: no per-frame raster, button bloom or hard
-  // extra outline. Zero removes the filter completely.
-  const near=(1.3+strength*2.2).toFixed(2);
-  const far=(3+strength*5).toFixed(2);
-  const alpha=(strength*.64).toFixed(3),soft=(strength*.34).toFixed(3);
-  paint(outer,'filter',
-    `drop-shadow(0 0 ${near}px rgba(236,246,255,${alpha})) drop-shadow(0 0 ${far}px rgba(212,233,252,${soft}))`);
+// 2D cannot reproduce v25/26's angle-dependent 3D Fresnel shader. Instead,
+// sculpt ONLY the existing source-authored outer silhouette. Light is a soft
+// exterior rim; shadow is composited into the existing line's alpha, never a
+// dark outer halo or a second hard SVG outline. Glyphs and controls are not
+// filtered. Scene weighting keeps the same two user sliders useful everywhere.
+const EDGE_SCENES=Object.freeze({
+  dark:Object.freeze({light:1,shadow:.38,lightColor:'#edf7ff',shadowColor:'#132236'}),
+  light:Object.freeze({light:.36,shadow:1,lightColor:'#ffffff',shadowColor:'#142637'}),
+  mixed:Object.freeze({light:.72,shadow:.82,lightColor:'#f2f9ff',shadowColor:'#142536'})
+});
+export function edgeReliefProfile(mode,scene,edgeLight=0,edgeShadow=0){
+  if(!['solid','ghost'].includes(mode))throw new TypeError('Unknown 2D look');
+  if(!Object.hasOwn(EDGE_SCENES,scene))throw new TypeError('Unknown background');
+  const p=EDGE_SCENES[scene];
+  return {
+    light:mode==='ghost'?clamp(edgeLight)*p.light:0,
+    shadow:mode==='ghost'?clamp(edgeShadow)*p.shadow:0,
+    lightColor:p.lightColor,shadowColor:p.shadowColor
+  };
+}
+function filterNode(name,attrs={}){
+  const node=document.createElementNS(svgNs,name);
+  for(const [key,value] of Object.entries(attrs))node.setAttribute(key,String(value));
+  return node;
+}
+function paintEdgeRelief(reference,mode,scene,edgeLight,edgeShadow){
+  const outline=reference.svg.querySelector('[id="outline-strong"],[id$="-outline-strong"]');
+  if(!outline)return;
+  const p=edgeReliefProfile(mode,scene,edgeLight,edgeShadow);
+  const remove=()=>{
+    outline.style.removeProperty('filter');
+    reference.edgeReliefFilter?.remove();
+    reference.edgeReliefFilter=null;
+    reference.edgeReliefKey=null;
+  };
+  // Absolutely no filter or offscreen intermediate when both sliders are 0.
+  if(p.light===0&&p.shadow===0){remove();return;}
+  const viewWidth=reference.svg.viewBox.baseVal.width||480;
+  const panelWidth=reference.container?.clientWidth||480;
+  const unit=viewWidth/panelWidth;
+  const key=[p.light,p.shadow,p.lightColor,p.shadowColor,unit].join('|');
+  if(reference.edgeReliefKey===key&&reference.edgeReliefFilter?.isConnected)return;
+  let defs=reference.svg.querySelector('defs');
+  if(!defs){defs=filterNode('defs');reference.svg.insertBefore(defs,reference.svg.firstChild);}
+  let filter=reference.edgeReliefFilter;
+  const id=outline.id+'-edge-relief';
+  if(!filter){
+    filter=filterNode('filter',{
+      id,x:'-8%',y:'-8%',width:'116%',height:'116%',
+      filterUnits:'objectBoundingBox',primitiveUnits:'userSpaceOnUse',
+      'color-interpolation-filters':'sRGB',
+      'data-exo-edge-relief':'1'
+    });
+    defs.append(filter);
+    reference.edgeReliefFilter=filter;
+  }
+  const children=[];
+  const parts=[];
+  const add=(name,attrs)=>children.push(filterNode(name,attrs));
+  if(p.light>0){
+    // Exterior-only soft light; SourceAlpha belongs exclusively to the
+    // original outer contour, never to inner face legends or sticks.
+    add('feGaussianBlur',{in:'SourceAlpha',stdDeviation:(unit*(1.2+p.light*1.5)).toFixed(3),result:'light-blur'});
+    add('feOffset',{in:'light-blur',dx:0,dy:(-unit*.55).toFixed(3),result:'light-offset'});
+    add('feComposite',{in:'light-offset',in2:'SourceAlpha',operator:'out',result:'light-exterior'});
+    add('feFlood',{'flood-color':p.lightColor,'flood-opacity':(p.light*.82).toFixed(3),result:'light-tint'});
+    add('feComposite',{in:'light-tint',in2:'light-exterior',operator:'in',result:'edge-light'});
+    parts.push('edge-light');
+  }
+  if(p.shadow>0){
+    // Dark counter-edge lives WITHIN the original line. Unlike another
+    // drop-shadow it never creates a duplicate dark outside silhouette.
+    add('feGaussianBlur',{in:'SourceAlpha',stdDeviation:(unit*(.55+p.shadow*.95)).toFixed(3),result:'shadow-blur'});
+    add('feOffset',{in:'shadow-blur',dx:0,dy:(unit*(.45+p.shadow*.6)).toFixed(3),result:'shadow-offset'});
+    add('feComposite',{in:'shadow-offset',in2:'SourceAlpha',operator:'in',result:'shadow-on-edge'});
+    add('feFlood',{'flood-color':p.shadowColor,'flood-opacity':(p.shadow*.78).toFixed(3),result:'shadow-tint'});
+    add('feComposite',{in:'shadow-tint',in2:'shadow-on-edge',operator:'in',result:'edge-shadow'});
+  }
+  const merge=filterNode('feMerge');
+  for(const part of parts)merge.append(filterNode('feMergeNode',{in:part}));
+  merge.append(filterNode('feMergeNode',{in:'SourceGraphic'}));
+  if(p.shadow>0)merge.append(filterNode('feMergeNode',{in:'edge-shadow'}));
+  filter.replaceChildren(...children,merge);
+  paint(outline,'filter','url(#'+id+')');
+  reference.edgeReliefKey=key;
 }
 export function paintPolished2D(reference,mode,scene,{
   values=new Map(),left=null,right=null,colorway='auto',
-  stickFeedback='ring',showFaceSymbols=true,glow=0
+  stickFeedback='ring',showFaceSymbols=true,edgeLight=0,edgeShadow=0
 }={}){
   if(!reference?.svg)return;
   const colors=lookPalette(reference.layout.id,mode,scene,colorway);
@@ -260,5 +333,5 @@ export function paintPolished2D(reference,mode,scene,{
     }
     paintGlyphs(entry,colors,showFaceSymbols);
   }
-  paintSilhouetteGlow(reference,glow);
+  paintEdgeRelief(reference,mode,scene,edgeLight,edgeShadow);
 }
