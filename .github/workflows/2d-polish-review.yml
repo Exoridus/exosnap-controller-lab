@@ -23,10 +23,14 @@ jobs:
         run: |
           node download-assets.mjs
           node tools/verify-licensed-assets.mjs
-      - name: Install real Chromium browser
+      - name: Prepare real Chrome browser for PR screenshots
         run: |
           npm install --no-save --package-lock=false --ignore-scripts playwright@1.64.1
-          npx playwright install --with-deps chromium
+          if command -v google-chrome >/dev/null || command -v google-chrome-stable >/dev/null; then
+            echo "EXO_BROWSER_CHANNEL=chrome" >> "$GITHUB_ENV"
+          else
+            npx playwright install --with-deps chromium
+          fi
       - name: Start actual browser lab
         run: |
           nohup node server.mjs > "$RUNNER_TEMP/exosnap-http.log" 2>&1 &
