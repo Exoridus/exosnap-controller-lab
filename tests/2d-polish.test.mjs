@@ -14,7 +14,7 @@ test('2D white is continuous for radial sticks and triggers, clicks independent'
   assert.equal(mixColor('#000000','#ffffff',.5),'#808080');
   const entry={stickSide:'left',control:'ls',layer:{role:'stick'}};
   assert.equal(controlLevel(entry,new Map(),{left:{x:0,y:0}}),0);
-  assert.equal(controlLevel(entry,new Map([['ls',1]]),{left:{x:0,y:0}}),1);
+  assert.equal(controlLevel(entry,new Map([['ls',1]]),{left:{x:0,y:0}}),0); // independent white center marker on click
   assert.equal(controlLevel(entry,new Map(),{left:{x:1,y:0}}),1);
   const trigger={stickSide:null,control:'l2',layer:{role:'trigger'}};
   assert.equal(controlLevel(trigger,new Map([['l2',.25]])),.25);
@@ -27,12 +27,19 @@ test('ghost keeps a single subdued edge and distinct dualsense materials',()=>{
   assert.ok(ghost.shellAlpha<.25);
   assert.ok(ghost.lineAlpha<.8);
   assert.notEqual(ghost.shell,ghost.core);
+  assert.equal(lookPalette('dualshock4','solid','dark').shell,'#e5e9ee');
+  assert.equal(lookPalette('xbox_series','solid','dark').shell,'#313a44');
+  assert.equal(lookPalette('xbox_series','solid','dark','light').shell,'#e3e8ed');
 });
 test('review page is a true SVG binding comparison, not a fake native screenshot',async()=>{
   const html=await readFile(new URL('../polish-2d.html',import.meta.url),'utf8');
   const js=await readFile(new URL('../polish-2d-lab.js',import.meta.url),'utf8');
   assert.match(html,/Qt|Browser-Look|Browser/);
   assert.match(html,/id="live"/);
+  assert.match(html,/id="colorway"/);
+  const code=await readFile(new URL('../polish-2d-style.js',import.meta.url),'utf8');
+  assert.ok(!code.includes('data-exo-polish-core'));
+  assert.match(code,/data-exo-stick-click/);
   assert.match(js,/new ControllerReference/);
   assert.match(js,/readStandardGamepad/);
   assert.match(js,/paintPolished2D/);

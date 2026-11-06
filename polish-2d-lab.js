@@ -55,7 +55,7 @@ function inputState(){
 }
 function paint(){
   const inputs=inputState();
-  for(const entry of refs)paintPolished2D(entry.reference,entry.mode,entry.scene,inputs);
+  for(const entry of refs)paintPolished2D(entry.reference,entry.mode,entry.scene,{...inputs,colorway:$('colorway').value});
   if(!selected)return;
   const ready=refs.every(entry=>Boolean(entry.reference.svg));
   document.body.dataset.polishReady=ready?'ready':'incomplete';
@@ -84,7 +84,7 @@ $('size').addEventListener('change',()=>{resize();address();paint();});
 for(const id of ['stick','trigger']){
   $(id).addEventListener('input',()=>{$(id+'Value').textContent=$(id).value+' %';paint();});
 }
-for(const id of ['faces','clicks','live'])$(id).addEventListener('change',paint);
+for(const id of ['faces','clicks','live','colorway'])$(id).addEventListener('change',paint);
 function liveTick(now){
   if($('live').checked&&now-lastFrame>=33){
     const data=inputState(),signature=JSON.stringify([data.source,[...data.values],data.left,data.right]);

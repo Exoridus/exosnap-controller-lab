@@ -34,9 +34,10 @@ hr{border:0;border-top:1px solid #2c3e50;margin:19px 0}
 <header>
 <div class="kicker">ExoSnap Controller Lab · Visual Review</div>
 <h1>2D Solid / Ghost – Weißer Press-State</h1>
-<p class="subtitle">Direkter Live-Vergleich mit den vorhandenen Controller-SVGs und Bindings. Die Varianten zeigen bewusst einfache Materialfarben statt Fototexturen, eine dezente Ghost-Kontur und stufenlose weiße Stick-/Trigger-Aktivierung.</p>
+<p class="subtitle">Direkter Live-Vergleich mit den vorhandenen Controller-SVGs und Bindings. Die Varianten verwenden einfache Vorschau-Materialfarben statt Fototexturen. Standardfarben sind modellabhängig (DualShock 4 hell, Xbox Series dunkel); Gehäusefarbtöne lassen sich vergleichen. Bei L3/R3 leuchtet nur die Stick-Mitte weiß.</p>
 <div class="toolbar">
 <label>Controller<select id="layout" aria-label="Controller"></select></label>
+<label>Farbvariante<select id="colorway" aria-label="Gehäusefarbton"><option value="default">Modellstandard</option><option value="light">Hell</option><option value="dark">Dunkel</option></select></label>
 <label>Overlaygröße<select id="size"><option value="240">240 × 160</option><option value="320" selected>320 × 214</option><option value="480">480 × 320</option></select></label>
 <label>Stick-Ausschlag <output id="stickValue">0 %</output><input id="stick" type="range" min="0" max="100" step="1" value="0"></label>
 <label>Trigger L2/R2 <output id="triggerValue">0 %</output><input id="trigger" type="range" min="0" max="100" step="1" value="0"></label>
@@ -48,6 +49,6 @@ hr{border:0;border-top:1px solid #2c3e50;margin:19px 0}
 <p><a href="./pbr-lab.html">3D-Lab öffnen</a> · <a href="./gallery-2d.html">Ursprüngliche SVG-Diagnose</a></p>
 </header>
 <main id="comparisons"></main>
-<p class="note">Experimenteller Browser-Look, keine native ExoSnap-Preview und keine Windows-/D3D11-Freigabe. Im Ghost-Modus werden keine künstlichen Doppelkonturen erzeugt. Einzelne SVGs sind quellbedingt nur als Kontur vorhanden; deren Solid-Füllung bleibt visuell zu prüfen. Keine neuen Drittanbieter-Assets.</p>
+<p class="note">Experimenteller Browser-Look, keine native ExoSnap-Preview und keine Windows-/D3D11-Freigabe. Im Ghost-Modus werden keine künstlichen Doppelkonturen erzeugt. Der zuvor frei erfundene DualSense-Mittelbereich ist entfernt. Farbvarianten sind visuelle Presets, keine fotorealistischen Herstellerfarben. Einzelne SVGs sind quellbedingt nur als Kontur vorhanden; deren Solid-Füllung bleibt visuell zu prüfen. Keine neuen Drittanbieter-Assets.</p>
 <script type="module" src="./polish-2d-lab.js"></script>
 </body></html>
