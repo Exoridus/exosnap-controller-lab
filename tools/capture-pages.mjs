@@ -225,7 +225,10 @@ try{
       ringMask:ring.getAttribute('mask'),
       faceGlyphDisplay:face?.group.querySelector('.glyph')?.style.display||'',
       systemGlyphDisplay:system?.group.querySelector('.glyph')?.style.display||'',
-      glow:outline?getComputedStyle(outline).filter:null,
+      edgeFilter:outline?getComputedStyle(outline).filter:null,
+      edgeFilterCount:entry.reference.svg.querySelectorAll('filter[data-exo-edge-relief]').length,
+      edgeGlyphFilter:face?.group.querySelector('.glyph')?
+        getComputedStyle(face.group.querySelector('.glyph')).filter:null,
       input:[...window.__exo2DPolish.inputState().values],
       bodySocketFill:getFill(entry.reference.bodyShape.querySelector('path')),
       layout:document.querySelectorAll('.stage').length,
@@ -252,7 +255,8 @@ try{
   const initial=await visual2D();
   assert2D(initial.layout,6,'2D panel count');
   assert2D(initial.grid.join(','),'solid:dark,solid:light,solid:mixed,ghost:dark,ghost:light,ghost:mixed','2x3 look grid');
-  assert2D(initial.glow,'none','0% contour glow');
+  if(initial.edgeFilter==='none'||initial.edgeFilterCount!==1)
+    throw Error('Default Ghost relief must be active on authored outline');
   if(initial.ringMask!==null)throw Error('Stick rim has an unexpected mask or clipped geometry');
   const sizes=[[240,160],[320,214],[480,320]];
   for(const [width,height] of sizes){
@@ -303,43 +307,27 @@ try{
 
   await range2D('trigger',0);
   await check2D('clicks',true);
-  const clickedA=await visual2D();
-  assert2D(clickedA.ring,'rgb(255, 255, 255)','A full motion ring');
-  assert2D(clickedA.center,'rgb(255, 255, 255)','A L3 click center');
-  await capturePolish('2d-dualsense-stick-ring.png','dualsense','A 100% motion + L3/R3');
-  await select2D('stickFeedback','center');
-  const clickedB=await visual2D();
-  assert2D(clickedB.ring,'rgb(255, 255, 255)','B L3 click ring');
-  assert2D(clickedB.center,'rgb(255, 255, 255)','B full motion center');
-  await capturePolish('2d-dualsense-stick-center.png','dualsense','B 100% motion + L3/R3');
-  // At movement=100% AND L3 click=on both variants intentionally light both
-  // parts. Movement-only and click-only states MUST still differ.
+  const both=await visual2D();
+  assert2D(both.ring,'rgb(255, 255, 255)','Full motion must activate moving rim');
+  assert2D(both.center,'rgb(255, 255, 255)','L3/R3 must activate moving center');
+  await capturePolish('2d-dualsense-stick-ring.png','dualsense','100% motion + L3/R3');
   await check2D('clicks',false);
-  const motionB=await visual2D();
-  assert2D(motionB.center,'rgb(255, 255, 255)','B movement-only center');
-  assert2D(motionB.ring,initial.ring,'B movement must leave the rim neutral');
-  await capturePolish('2d-dualsense-motion-center.png','dualsense','B 100% movement; no L3/R3');
-  await select2D('stickFeedback','ring');
-  const motionA=await visual2D();
-  assert2D(motionA.ring,'rgb(255, 255, 255)','A movement-only ring');
-  assert2D(motionA.center,initial.center,'A movement must leave the center neutral');
-  await capturePolish('2d-dualsense-motion-ring.png','dualsense','A 100% movement; no L3/R3');
-  if(images.at(-1).sha256===images.at(-2).sha256)
-    throw Error('Movement-only feedback variants produced identical screenshots');
+  const motion=await visual2D();
+  assert2D(motion.ring,'rgb(255, 255, 255)','Movement-only ring stays white');
+  assert2D(motion.center,initial.center,'Movement-only must not click center');
+  await capturePolish('2d-dualsense-motion-ring.png','dualsense','100% movement without click');
   await range2D('stick',0);
   await check2D('clicks',true);
-  const clickOnlyA=await visual2D();
-  assert2D(clickOnlyA.center,'rgb(255, 255, 255)','A click-only center');
-  assert2D(clickOnlyA.ring,initial.ring,'A click must not move the ring');
-  await select2D('stickFeedback','center');
-  const clickOnlyB=await visual2D();
-  assert2D(clickOnlyB.ring,'rgb(255, 255, 255)','B click-only ring');
-  assert2D(clickOnlyB.center,initial.center,'B click must not move the center');
+  const clickOnly=await visual2D();
+  assert2D(clickOnly.ring,initial.ring,'Click-only leaves ring neutral');
+  assert2D(clickOnly.center,'rgb(255, 255, 255)','Click-only center is white');
+  await capturePolish('2d-dualsense-stick-click.png','dualsense','L3/R3 click with zero stick movement');
+  if(images.at(-1).sha256===images.at(-2).sha256)
+    throw Error('Independent movement and click created identical SVG screenshots');
   await check2D('clicks',false);
-  await range2D('stick',0);
-  const neutralB=await visual2D();
-  assert2D(neutralB.ring,initial.ring,'Neutral cap ring after click release');
-  assert2D(neutralB.center,initial.center,'Neutral cap center after click release');
+  const neutral=await visual2D();
+  assert2D(neutral.ring,initial.ring,'Neutral rim after releasing click');
+  assert2D(neutral.center,initial.center,'Neutral center after releasing click');
   await check2D('faces',true);
   await check2D('faceSymbols',true);
   const symbolsOn=await visual2D();
@@ -355,8 +343,6 @@ try{
     throw Error('Face-symbol toggle had no visible browser effect');
   await check2D('faceSymbols',true);
   await check2D('faces',false);
-  await select2D('stickFeedback','ring');
-
   await select2D('layout','xbox_series');
   await select2D('colorway','auto');
   await capturePolish('2d-xbox-series-auto.png','xbox_series','Auto dark');
@@ -374,15 +360,59 @@ try{
 
   await select2D('layout','dualsense');
   await select2D('colorway','auto');
-  for(const pct of [0,50,100]){
-    await range2D('glow',pct);
-    const s=await visual2D();
-    if((pct===0)!==(s.glow==='none'))throw Error('Contour glow zero/nonzero mismatch at '+pct+'%: '+s.glow);
-    await capturePolish('2d-ghost-glow-'+pct+'.png','dualsense',
-      'Ghost mixed backdrop; glow '+pct+'%', '.stage[data-look="ghost"][data-scene="mixed"]');
+  await range2D('stick',0);
+  await range2D('trigger',0);
+  await check2D('clicks',false);
+  await check2D('faces',false);
+  await check2D('faceSymbols',true);
+  // Four genuinely rendered edge states on each of the three backgrounds.
+  // A changed slider label cannot satisfy the stage-only PNG hash checks.
+  const edgeCases=[['off',0,0],['light',100,0],['shadow',0,100],['combined',65,65]];
+  for(const scene of ['dark','light','mixed']){
+    const hashes=[];
+    for(const [mode,light,shadow] of edgeCases){
+      await range2D('edgeLight',light);
+      await range2D('edgeShadow',shadow);
+      const state=await polish.evaluate(scene=>{
+        const refs=window.__exo2DPolish.refs;
+        const ghost=refs.find(x=>x.mode==='ghost'&&x.scene===scene);
+        const solid=refs.find(x=>x.mode==='solid'&&x.scene===scene);
+        const outline=ghost.reference.svg.querySelector('[id$="-outline-strong"]');
+        const edge=ghost.reference.svg.querySelector('filter[data-exo-edge-relief]');
+        const solidOutline=solid.reference.svg.querySelector('[id$="-outline-strong"]');
+        const face=ghost.reference.controls.find(x=>x.control==='b1');
+        return {
+          filter: getComputedStyle(outline).filter,
+          activeFilters: ghost.reference.svg.querySelectorAll('filter[data-exo-edge-relief]').length,
+          hasLight: Boolean(edge?.querySelector('[result="edge-light"]')),
+          hasShadow: Boolean(edge?.querySelector('[result="edge-shadow"]')),
+          glyphFilter: getComputedStyle(face.group.querySelector('.glyph')).filter,
+          solidFilter: getComputedStyle(solidOutline).filter,
+          clipped: edge?.getAttribute('width'),
+          geometryCopies: ghost.reference.svg.querySelectorAll('[data-exo-stick-click],[data-exo-polish-ring-mask]').length,
+        };
+      },scene);
+      const expectLight=light>0,expectShadow=shadow>0;
+      assert2D(state.filter==='none',!(expectLight||expectShadow),'Ghost edge filter active');
+      assert2D(state.activeFilters,expectLight||expectShadow?1:0,'No residual filter at zero');
+      assert2D(state.hasLight,expectLight,'Light channel only when requested');
+      assert2D(state.hasShadow,expectShadow,'Shadow channel only when requested');
+      assert2D(state.glyphFilter,'none','No per-glyph glow/edge pass');
+      assert2D(state.solidFilter,'none','Solid baseline remains unfiltered');
+      assert2D(state.geometryCopies,0,'No synthetic stick geometry');
+      if(state.clipped&&state.clipped!=='116%')
+        throw Error('Unexpected edge filter bounds: '+state.clipped);
+      const file='2d-edge-'+scene+'-'+mode+'.png';
+      await capturePolish(file,'dualsense',
+        scene+' Ghost edge light '+light+'% / shadow '+shadow+'%',
+        '.stage[data-look="ghost"][data-scene="'+scene+'"]');
+      hashes.push(images.at(-1).sha256);
+    }
+    if(new Set(hashes).size!==4)
+      throw Error('Light, shadow and combined edge states are not distinguishable in Chromium pixels on '+scene);
   }
-  if(new Set(images.slice(-3).map(x=>x.sha256)).size!==3)
-    throw Error('0/50/100 glow captures did not change the actual browser pixels');
+  await range2D('edgeLight',38);
+  await range2D('edgeShadow',45);
   if(polishErrors.length)throw Error('2D polish browser errors: '+polishErrors.join('; '));
   await polish.close();
 
