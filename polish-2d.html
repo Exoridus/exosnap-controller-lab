@@ -4,51 +4,63 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ExoSnap · 2D Solid & Ghost Polish</title>
 <style>
-:root{color-scheme:dark;font:14px/1.45 system-ui,Segoe UI,sans-serif;background:#0b121b;color:#e7eff6}
-*{box-sizing:border-box}body{margin:0;padding:19px clamp(16px,3vw,42px) 44px}
-a{color:#9dd5f7}h1{font-size:clamp(19px,2vw,26px);margin:6px 0}h2{font-size:15px;margin:0 0 10px}
-header,main{max-width:1500px;margin:auto}
-.kicker{letter-spacing:.1em;text-transform:uppercase;color:#87afcb;font-size:11px;font-weight:700}
-.subtitle{margin:4px 0 18px;color:#b1c5d7;max-width:980px}
-.toolbar{display:flex;align-items:end;gap:12px;flex-wrap:wrap;background:#162332;border:1px solid #31485d;padding:15px;border-radius:14px}
-label{display:grid;gap:5px;font-size:12px;color:#c2d6e6}
-select,input[type=range]{accent-color:#f4f8fb}
-select{background:#233649;border:1px solid #59728a;border-radius:7px;padding:7px 9px;color:#edf6ff;font:inherit;min-width:118px}
-input[type=range]{width:128px}
-.control-check{display:flex;align-items:center;gap:6px;padding-bottom:8px}
+:root{color-scheme:dark;font:13px/1.35 system-ui,Segoe UI,sans-serif;background:#0b121b;color:#e7eff6;--panel-width:480px;--panel-height:320px;--controller-zoom:1}
+*{box-sizing:border-box}
+body{margin:0;padding:12px clamp(12px,2vw,28px) 20px}
+a{color:#9dd5f7}
+header,main,.footer{max-width:1540px;margin-inline:auto}
+.kicker{letter-spacing:.08em;text-transform:uppercase;color:#87afcb;font-size:10px;font-weight:700}
+h1{font-size:clamp(18px,1.7vw,24px);margin:2px 0 4px}
+.subtitle{margin:0 0 10px;color:#afc3d2;font-size:12px}
+.toolbar{display:flex;align-items:end;gap:8px 12px;flex-wrap:wrap;background:#162332;border:1px solid #31485d;padding:10px 12px;border-radius:10px}
+label{display:grid;gap:3px;font-size:11px;color:#c2d6e6;white-space:nowrap}
+select,input[type=range],input[type=checkbox]{accent-color:#f4f8fb}
+select{background:#233649;border:1px solid #59728a;border-radius:6px;padding:5px 8px;color:#edf6ff;font:inherit;min-width:90px;height:31px}
+#layout{min-width:165px}#stickFeedback{min-width:178px}
+input[type=range]{width:112px;height:20px}
+.control-check{display:flex;align-items:center;gap:5px;padding-bottom:7px}
+.control-check input{margin:0}
 output{font-variant-numeric:tabular-nums;color:#fff}
-#status{font-size:12px;color:#9fd6ec;min-height:21px;margin:12px 0}
-.scene{margin:15px 0 25px}.scene-title{display:flex;align-items:baseline;gap:12px;margin-bottom:8px}
-.scene-title span{color:#91aabc;font-size:12px}
-.panels{display:flex;gap:14px;overflow-x:auto;padding:0 0 7px}
-figure{margin:0;flex:none}.caption{font-size:12px;margin-bottom:8px;color:#c6d9e6;font-weight:600}
-.stage{position:relative;isolation:isolate;width:var(--panel-width);height:var(--panel-height);border-radius:8px;overflow:hidden;outline:1px solid #385369;background-size:cover;background-position:center}
-.stage[data-scene=dark]{background-color:#07101c;background-image:linear-gradient(#040914ac,#040914ac),url('./backgrounds/arena.svg')}
-.stage[data-scene=light]{background:#f0f2f4}
-.stage[data-scene=mixed]{background-image:url('./backgrounds/racing.svg');background-color:#537b91}
-.stage>svg{position:relative;display:block;width:100%;height:100%;overflow:visible}
-.note{color:#a4b9c9;margin-top:22px;max-width:1060px;font-size:12px}
-hr{border:0;border-top:1px solid #2c3e50;margin:19px 0}
+.status-row{display:flex;gap:12px;justify-content:space-between;align-items:baseline;flex-wrap:wrap;margin:7px 0 8px}
+#status{font-size:11px;color:#9fd6ec;min-height:16px;margin:0}
+.links{font-size:11px;white-space:nowrap}
+.grid-scroll{overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;padding:6px 8px 12px;margin:-6px -8px 0}
+.comparison-grid{display:grid;grid-template-columns:repeat(3,var(--panel-width));grid-template-rows:repeat(2,max-content);gap:11px 13px;width:max-content;min-width:100%}
+figure{margin:0;min-width:0}
+figcaption{font-size:11px;margin-bottom:6px;color:#cbdce9;font-weight:650}
+.stage{position:relative;isolation:isolate;width:var(--panel-width);height:var(--panel-height);border-radius:8px;outline:1px solid #385369;overflow:visible}
+.stage::before{content:"";position:absolute;inset:0;border-radius:inherit;background-size:cover;background-position:center;pointer-events:none}
+.stage[data-scene=dark]::before{background-color:#07101c;background-image:linear-gradient(#040914ac,#040914ac),url('./backgrounds/arena.svg')}
+.stage[data-scene=light]::before{background:#f0f2f4}
+.stage[data-scene=mixed]::before{background-image:url('./backgrounds/racing.svg');background-color:#537b91}
+.stage>svg{position:relative;display:block;width:100%;height:100%;overflow:visible;transform:scale(var(--controller-zoom));transform-origin:center;pointer-events:auto}
+.stage:focus-visible{outline:2px solid #d5ebfb;outline-offset:3px}
+.note{color:#9fb4c6;font-size:11px;margin:9px 0 0;max-width:1340px}
+@media(max-height:900px){body{padding-top:8px}.toolbar{padding:7px 10px}.subtitle{margin-bottom:7px}.comparison-grid{row-gap:7px}}
 </style></head>
 <body>
 <header>
-<div class="kicker">ExoSnap Controller Lab · Visual Review</div>
-<h1>2D Solid / Ghost – Weißer Press-State</h1>
-<p class="subtitle">Direkter Live-Vergleich mit den vorhandenen Controller-SVGs und Bindings. Die Varianten verwenden einfache Vorschau-Materialfarben statt Fototexturen. Standardfarben sind modellabhängig (DualShock 4 hell, Xbox Series dunkel); Gehäusefarbtöne lassen sich vergleichen. Bei L3/R3 leuchtet nur die Stick-Mitte weiß.</p>
+<div class="kicker">ExoSnap Controller Lab · 2D Visual Review</div>
+<h1>2D Solid / Ghost – direkter 2 × 3 Vergleich</h1>
+<p class="subtitle">Spalten: Dunkel, Hell und Gemischt. Zeilen: Solid, Ghost. Alle sechs Ansichten nutzen dieselben SVG-Bindings, Eingaben und denselben Zoom.</p>
 <div class="toolbar">
 <label>Controller<select id="layout" aria-label="Controller"></select></label>
-<label>Farbvariante<select id="colorway" aria-label="Gehäusefarbton"><option value="default">Modellstandard</option><option value="light">Hell</option><option value="dark">Dunkel</option></select></label>
-<label>Overlaygröße<select id="size"><option value="240">240 × 160</option><option value="320" selected>320 × 214</option><option value="480">480 × 320</option></select></label>
+<label>Farbvariante<select id="colorway" aria-label="Farbvariante"><option value="auto" selected>Auto</option><option value="light">Hell</option><option value="dark">Dunkel</option></select></label>
+<label>Größe<select id="size" aria-label="Vorschaugröße"><option value="240">240 × 160</option><option value="320">320 × 214</option><option value="480" selected>480 × 320</option></select></label>
+<label>Stick-Feedback<select id="stickFeedback" aria-label="Stick-Feedback"><option value="ring" selected>Ring bei Bewegung</option><option value="center">Mitte bei Bewegung</option></select></label>
 <label>Stick-Ausschlag <output id="stickValue">0 %</output><input id="stick" type="range" min="0" max="100" step="1" value="0"></label>
 <label>Trigger L2/R2 <output id="triggerValue">0 %</output><input id="trigger" type="range" min="0" max="100" step="1" value="0"></label>
+<label>Konturschein <output id="glowValue">0 %</output><input id="glow" type="range" min="0" max="100" step="1" value="0"></label>
+<label class="control-check"><input type="checkbox" id="faceSymbols" checked> Face-Symbole anzeigen</label>
 <label class="control-check"><input type="checkbox" id="faces"> Face/D-Pad drücken</label>
 <label class="control-check"><input type="checkbox" id="clicks"> L3/R3 drücken</label>
 <label class="control-check"><input type="checkbox" id="live"> Live-Gamepad</label>
 </div>
-<p id="status" role="status">Lade SVG-Quellen ...</p>
-<p><a href="./pbr-lab.html">3D-Lab öffnen</a> · <a href="./gallery-2d.html">Ursprüngliche SVG-Diagnose</a></p>
+<div class="status-row"><p id="status" role="status">Lade SVG-Quellen …</p><div class="links"><a href="./pbr-lab.html">3D-Lab</a> · <a href="./gallery-2d.html">SVG-Diagnose</a> · Mausrad über Vorschau: synchroner Zoom</div></div>
 </header>
-<main id="comparisons"></main>
-<p class="note">Experimenteller Browser-Look, keine native ExoSnap-Preview und keine Windows-/D3D11-Freigabe. Im Ghost-Modus werden keine künstlichen Doppelkonturen erzeugt. Der zuvor frei erfundene DualSense-Mittelbereich ist entfernt. Farbvarianten sind visuelle Presets, keine fotorealistischen Herstellerfarben. Einzelne SVGs sind quellbedingt nur als Kontur vorhanden; deren Solid-Füllung bleibt visuell zu prüfen. Keine neuen Drittanbieter-Assets.</p>
+<main id="comparisons" class="grid-scroll" aria-label="Sechs synchronisierte Controller-Vorschauen">
+  <div id="comparisonGrid" class="comparison-grid" aria-label="Solid und Ghost auf dunklem, hellem und gemischtem Hintergrund"></div>
+</main>
+<p class="footer note">Experimenteller Browser-Look zur visuellen 2D-Abnahme, keine native ExoSnap- oder D3D11-Freigabe. Der Konturschein verwendet die vorhandene SVG-Silhouette, keine neuen Assets. Ghost bleibt der bevorzugte, noch nicht freigegebene Kandidat.</p>
 <script type="module" src="./polish-2d-lab.js"></script>
 </body></html>
