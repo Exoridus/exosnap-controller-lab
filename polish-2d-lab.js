@@ -65,14 +65,17 @@ function inputState(){
 function paint(){
   const inputs=inputState();
   const options={...inputs,colorway:$('colorway').value,
-    stickFeedback:$('stickFeedback').value,
-    showFaceSymbols:$('faceSymbols').checked,glow:Number($('glow').value)/100};
+    stickFeedback:'ring',
+    showFaceSymbols:$('faceSymbols').checked,
+    edgeLight:Number($('edgeLight').value)/100,
+    edgeShadow:Number($('edgeShadow').value)/100};
   for(const entry of refs)paintPolished2D(entry.reference,entry.mode,entry.scene,options);
   if(!selected)return;
   const ready=refs.every(entry=>Boolean(entry.reference.svg));
   document.body.dataset.polishReady=ready?'ready':'incomplete';
   setStatus(selected.name+' · '+refs.filter(e=>e.reference.svg).length+'/6 SVG-Ansichten · '+inputs.source+
-    ' · Stick '+$('stick').value+' % · Trigger '+$('trigger').value+' % · Konturschein '+$('glow').value+' %');
+    ' · Stick '+$('stick').value+' % · Trigger '+$('trigger').value+
+    ' % · Kantenlicht '+$('edgeLight').value+' % · Kantenschatten '+$('edgeShadow').value+' %');
 }
 async function load(id){
   const token=++serial;
@@ -90,16 +93,16 @@ async function load(id){
 }
 function address(){
   const q=new URLSearchParams({id:selected?.id||'dualsense',size:$('size').value,
-    colorway:$('colorway').value,feedback:$('stickFeedback').value});
+    colorway:$('colorway').value});
   history.replaceState(null,'',location.pathname+'?'+q.toString());
 }
 $('layout').addEventListener('change',event=>{void load(event.target.value).then(address);});
 $('size').addEventListener('change',()=>{resize();address();paint();});
-for(const id of ['stick','trigger','glow']){
+for(const id of ['stick','trigger','edgeLight','edgeShadow']){
   $(id).addEventListener('input',()=>{$(id+'Value').textContent=$(id).value+' %';paint();});
 }
 for(const id of ['faces','clicks','live','faceSymbols'])$(id).addEventListener('change',paint);
-for(const id of ['colorway','stickFeedback'])$(id).addEventListener('change',()=>{paint();address();});
+$('colorway').addEventListener('change',()=>{paint();address();});
 function liveTick(now){
   if($('live').checked&&now-lastFrame>=33){
     const data=inputState();
@@ -110,8 +113,7 @@ function liveTick(now){
   requestAnimationFrame(liveTick);
 }
 for(const [id,key,choices] of [['size','size',['240','320','480']],
-  ['colorway','colorway',['auto','light','dark']],
-  ['stickFeedback','feedback',['ring','center']]]){
+  ['colorway','colorway',['auto','light','dark']]]){
   if(choices.includes(params.get(key)))$(id).value=params.get(key);
 }
 resize();

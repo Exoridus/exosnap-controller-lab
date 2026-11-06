@@ -16,7 +16,7 @@ h1{font-size:clamp(18px,1.7vw,24px);margin:2px 0 4px}
 label{display:grid;gap:3px;font-size:11px;color:#c2d6e6;white-space:nowrap}
 select,input[type=range],input[type=checkbox]{accent-color:#f4f8fb}
 select{background:#233649;border:1px solid #59728a;border-radius:6px;padding:5px 8px;color:#edf6ff;font:inherit;min-width:90px;height:31px}
-#layout{min-width:165px}#stickFeedback{min-width:178px}
+#layout{min-width:165px}
 input[type=range]{width:112px;height:20px}
 .control-check{display:flex;align-items:center;gap:5px;padding-bottom:7px}
 .control-check input{margin:0}
@@ -42,15 +42,16 @@ figcaption{font-size:11px;margin-bottom:6px;color:#cbdce9;font-weight:650}
 <header>
 <div class="kicker">ExoSnap Controller Lab · 2D Visual Review</div>
 <h1>2D Solid / Ghost – direkter 2 × 3 Vergleich</h1>
-<p class="subtitle">Spalten: Dunkel, Hell und Gemischt. Zeilen: Solid, Ghost. Alle sechs Ansichten nutzen dieselben SVG-Bindings, Eingaben und denselben Zoom.</p>
+<p class="subtitle">Solid und Ghost auf Dunkel / Hell / Gemischt. Kantenlicht und Kantenschatten modellieren nur die Ghost-Silhouette; Ring = Stickbewegung, Mitte = L3/R3.</p>
 <div class="toolbar">
 <label>Controller<select id="layout" aria-label="Controller"></select></label>
 <label>Farbvariante<select id="colorway" aria-label="Farbvariante"><option value="auto" selected>Auto</option><option value="light">Hell</option><option value="dark">Dunkel</option></select></label>
 <label>Größe<select id="size" aria-label="Vorschaugröße"><option value="240">240 × 160</option><option value="320">320 × 214</option><option value="480" selected>480 × 320</option></select></label>
-<label>Stick-Feedback<select id="stickFeedback" aria-label="Stick-Feedback"><option value="ring" selected>Ring bei Bewegung</option><option value="center">Mitte bei Bewegung</option></select></label>
+
 <label>Stick-Ausschlag <output id="stickValue">0 %</output><input id="stick" type="range" min="0" max="100" step="1" value="0"></label>
 <label>Trigger L2/R2 <output id="triggerValue">0 %</output><input id="trigger" type="range" min="0" max="100" step="1" value="0"></label>
-<label>Konturschein <output id="glowValue">0 %</output><input id="glow" type="range" min="0" max="100" step="1" value="0"></label>
+<label>Kantenlicht <output id="edgeLightValue">38 %</output><input id="edgeLight" type="range" min="0" max="100" step="1" value="38" aria-label="Kantenlicht"></label>
+<label>Kantenschatten <output id="edgeShadowValue">45 %</output><input id="edgeShadow" type="range" min="0" max="100" step="1" value="45" aria-label="Kantenschatten"></label>
 <label class="control-check"><input type="checkbox" id="faceSymbols" checked> Face-Symbole anzeigen</label>
 <label class="control-check"><input type="checkbox" id="faces"> Face/D-Pad drücken</label>
 <label class="control-check"><input type="checkbox" id="clicks"> L3/R3 drücken</label>
@@ -61,6 +62,6 @@ figcaption{font-size:11px;margin-bottom:6px;color:#cbdce9;font-weight:650}
 <main id="comparisons" class="grid-scroll" aria-label="Sechs synchronisierte Controller-Vorschauen">
   <div id="comparisonGrid" class="comparison-grid" aria-label="Solid und Ghost auf dunklem, hellem und gemischtem Hintergrund"></div>
 </main>
-<p class="footer note">Experimenteller Browser-Look zur visuellen 2D-Abnahme, keine native ExoSnap- oder D3D11-Freigabe. Der Konturschein verwendet die vorhandene SVG-Silhouette, keine neuen Assets. Ghost bleibt der bevorzugte, noch nicht freigegebene Kandidat.</p>
+<p class="footer note">Experimenteller Browser-Look zur visuellen 2D-Abnahme, keine native ExoSnap- oder D3D11-Freigabe. Kantenlicht und Kantenschatten wirken ausschließlich entlang der vorhandenen SVG-Außenkontur; keine neuen Assets oder zusätzliche Controller-Geometrie. Ghost bleibt der bevorzugte, noch nicht freigegebene Kandidat.</p>
 <script type="module" src="./polish-2d-lab.js"></script>
 </body></html>

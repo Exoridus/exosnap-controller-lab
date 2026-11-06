@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {LAYOUTS} from '../controller-catalog.js';
-import {analogStickLevel,controlLevel,lookPalette,mixColor,PRESS_WHITE,stickFeedbackLevels} from '../polish-2d-style.js';
+import {analogStickLevel,controlLevel,lookPalette,mixColor,PRESS_WHITE,stickFeedbackLevels,edgeReliefProfile} from '../polish-2d-style.js';
 
 const file=path=>readFile(new URL('../'+path,import.meta.url),'utf8');
 const close=(a,b)=>assert.ok(Math.abs(a-b)<1e-10,`${a} != ${b}`);
@@ -87,8 +87,9 @@ test('every tested stick uses authored moving outline + center; no synthetic cli
   assert.doesNotMatch(code,/ensureStickRingMask|polish-ring-mask|cloneNode\(false\)/);
   assert.match(code,/group\.querySelector\('\[id\$="-outline"\]'\)/);
   assert.match(code,/group\.querySelector\('\[id\$="-top"\]'\)/);
-  assert.match(code,/paintSilhouetteGlow/);
-  assert.match(code,/strength===0.*removeProperty\('filter'\)/);
+  assert.match(code,/paintEdgeRelief/);
+  assert.match(code,/if\(p\.light===0&&p\.shadow===0\)\{remove\(\);return;\}/);
+  assert.ok(!code.includes('drop-shadow('),'no generic per-element halo');
   assert.match(code,/paintGlyphs/);
   assert.ok(!code.includes('CanvasTexture('));
 });
@@ -96,8 +97,8 @@ test('every tested stick uses authored moving outline + center; no synthetic cli
 test('page contract: row-first 2 x 3 real SVG viewers, correct toolbar and zoom',async()=>{
   const html=await file('polish-2d.html');
   const js=await file('polish-2d-lab.js');
-  for(const id of ['layout','colorway','size','stickFeedback','stick','trigger',
-    'glow','faceSymbols','faces','clicks','live'])assert.ok(html.includes('id="'+id+'"'),id);
+  for(const id of ['layout','colorway','size','stick','trigger',
+    'edgeLight','edgeShadow','faceSymbols','faces','clicks','live'])assert.ok(html.includes('id="'+id+'"'),id);
   assert.match(html,/grid-template-columns:repeat\(3,var\(--panel-width\)\)/);
   assert.match(html,/grid-template-rows:repeat\(2,max-content\)/);
   assert.match(html,/<option value="480" selected>/);
@@ -111,24 +112,26 @@ test('page contract: row-first 2 x 3 real SVG viewers, correct toolbar and zoom'
   assert.match(js,/passive:false/);
   assert.match(js,/paintPolished2D/);
   assert.match(js,/showFaceSymbols:\$\('faceSymbols'\).checked/);
-  assert.match(js,/glow:Number\(\$\('glow'\).value\)\/100/);
+  assert.match(js,/edgeLight:Number\(\$\('edgeLight'\).value\)\/100/);
+  assert.match(js,/edgeShadow:Number\(\$\('edgeShadow'\).value\)\/100/);
+  assert.doesNotMatch(html,/id="glow"|id="stickFeedback"/);
   assert.ok(!js.includes('CanvasTexture('));
 });
 
 test('browser release will capture all specified 2D review states',async()=>{
   const capture=await file('tools/capture-pages.mjs');
   const names=['2d-dualsense-neutral-480.png','2d-dualsense-stick-ring.png',
-    '2d-dualsense-stick-center.png','2d-dualsense-face-symbols-on.png',
-    '2d-dualsense-face-symbols-off.png','2d-xbox-series-auto.png',
-    '2d-xbox-series-light.png','2d-dualshock4-auto.png',
-    '2d-dualshock4-dark.png','2d-ghost-glow-0.png','2d-ghost-glow-50.png',
-    '2d-ghost-glow-100.png'];
-  for(const name of [...names.filter(n=>!n.startsWith('2d-ghost-glow-')),
-    '2d-dualsense-trigger-neutral.png','2d-dualsense-trigger-100.png'])
-    assert.ok(capture.includes(name),name);
-  assert.match(capture,/for\(const pct of \[0,50,100\]\)/);
-  assert.match(capture,/2d-ghost-glow-/);
-  assert.match(capture,/capturePolish\('2d-ghost-glow-'\+pct\+'\.png'/);
+    '2d-dualsense-stick-click.png','2d-dualsense-motion-ring.png',
+    '2d-dualsense-face-symbols-on.png','2d-dualsense-face-symbols-off.png',
+    '2d-xbox-series-auto.png','2d-xbox-series-light.png',
+    '2d-dualshock4-auto.png','2d-dualshock4-dark.png',
+    '2d-dualsense-trigger-neutral.png','2d-dualsense-trigger-100.png'];
+  for(const name of names)assert.ok(capture.includes(name),name);
+  for(const scene of ['dark','light','mixed'])
+    for(const mode of ['off','light','shadow','combined'])
+      assert.ok(capture.includes("'2d-edge-'+scene+'-'+mode+'.png'"),
+        'Edge capture matrix missing '+scene+'/'+mode);
+  assert.doesNotMatch(capture,/2d-ghost-glow-|2d-dualsense-stick-center\.png/);
 });
 
 test('authored trigger pressure is painted, with its own source outline above it',async()=>{
@@ -137,4 +140,40 @@ test('authored trigger pressure is painted, with its own source outline above it
   assert.match(code,/paint\(pressure,'fill',mixColor\(base,PRESS_WHITE,level\)\)/);
   assert.match(code,/paint\(face,'fill','none'\)/);
   assert.doesNotMatch(code,/data-exo-stick-click|polish-ring-mask/);
+});
+
+test('edge relief has independent, weighted light/shadow; Solid remains unchanged',()=>{
+  const sceneValues={dark:{light:1,shadow:.38},light:{light:.36,shadow:1},mixed:{light:.72,shadow:.82}};
+  for(const [scene,weights] of Object.entries(sceneValues)){
+    const zero=edgeReliefProfile('ghost',scene,0,0);
+    assert.deepEqual([zero.light,zero.shadow],[0,0]);
+    const light=edgeReliefProfile('ghost',scene,1,0);
+    const shadow=edgeReliefProfile('ghost',scene,0,1);
+    const both=edgeReliefProfile('ghost',scene,1,1);
+    close(light.light,weights.light);close(light.shadow,0);
+    close(shadow.light,0);close(shadow.shadow,weights.shadow);
+    close(both.light,weights.light);close(both.shadow,weights.shadow);
+    assert.equal(edgeReliefProfile('solid',scene,1,1).light,0);
+    assert.equal(edgeReliefProfile('solid',scene,1,1).shadow,0);
+  }
+  assert.ok(edgeReliefProfile('ghost','dark',1,1).light>
+    edgeReliefProfile('ghost','light',1,1).light);
+  assert.ok(edgeReliefProfile('ghost','light',1,1).shadow>
+    edgeReliefProfile('ghost','dark',1,1).shadow);
+  assert.throws(()=>edgeReliefProfile('ghost','underwater',1,1),TypeError);
+  assert.throws(()=>edgeReliefProfile('glass','dark',1,1),TypeError);
+  assert.equal(edgeReliefProfile('ghost','dark',-10,200).light,0);
+});
+
+test('relief filter is silhouette-only; zero removes it and does not touch glyphs or sticks',async()=>{
+  const code=await file('polish-2d-style.js');
+  assert.match(code,/querySelector\('\[id="outline-strong"\],\[id\$="-outline-strong"\]'\)/);
+  assert.match(code,/feComposite'.*operator:'out'/);
+  assert.match(code,/feComposite'.*operator:'in'/);
+  assert.match(code,/in:'SourceAlpha'/);
+  assert.match(code,/reference\.edgeReliefFilter\?\.remove\(\)/);
+  assert.match(code,/outline\.style\.removeProperty\('filter'\)/);
+  assert.match(code,/filter\.replaceChildren/);
+  assert.doesNotMatch(code,/data-exo-stick-click|polish-ring-mask|CanvasTexture\(/);
+  assert.doesNotMatch(code,/filter\(glyph|paint\(glyph,'filter'/);
 });
