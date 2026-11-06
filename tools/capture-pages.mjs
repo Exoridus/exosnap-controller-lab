@@ -168,41 +168,176 @@ try{
     coreSmoke.push({id,threeViewports:proof.sampleCount,svgViewports:proof.flatCount,
       rendered:true,webgl:proof.webglVersion});
   }
-  // Verify actual authored SVGs, unlike native Qt/D3D whose acceptance remains open.
+  // Browser-only visual acceptance matrix: genuine Chromium renderings of
+  // the same authored SVGs. Fail the release for missing shapes or bad states.
   const polishErrors=[];
-  const polish=await browser.newPage({viewport:{width:1500,height:1250},deviceScaleFactor:1,reducedMotion:'reduce'});
+  const polish=await browser.newPage({viewport:{width:1640,height:1120},deviceScaleFactor:1,reducedMotion:'reduce'});
   polish.on('pageerror',error=>polishErrors.push(error.message));
   polish.on('response',response=>{
     if(response.status()>=400&&!/\/favicon\.ico(?:\?|$)/.test(response.url()))
       polishErrors.push('HTTP '+response.status()+' '+response.url());
   });
+  polish.on('requestfailed',request=>polishErrors.push(
+    'request failed: '+request.url()+' '+request.failure()?.errorText));
   await polish.goto(new URL('polish-2d.html',base).href,{waitUntil:'domcontentloaded',timeout:60000});
-  await polish.waitForFunction(()=>
-    document.body.dataset.polishReady==='ready'&&document.querySelectorAll('.stage svg').length===6,
-    null,{timeout:60000});
-  const capturePolish=async(file,activated)=>{
-    const bytes=await polish.screenshot({path:path.join(output,file),fullPage:true,animations:'disabled',timeout:60000});
-    if(bytes.length<40000||bytes.subarray(0,8).toString('hex')!=='89504e470d0a1a0a')
-      throw Error('Invalid 2D polish screenshot: '+file);
-    images.push({file,modelId:'DualSense2D',pressed:activated,bytes:bytes.length,
-      sha256:createHash('sha256').update(bytes).digest('hex'),source:'Browser SVG; not native Qt'});
+  const ready2D=async(modelId)=>{
+    await polish.waitForFunction(id=>{
+      const refs=window.__exo2DPolish?.refs||[];
+      return document.body.dataset.polishReady==='ready'&&refs.length===6&&
+        refs.every(x=>x.reference.svg&&x.reference.layout.id===id)&&
+        document.querySelectorAll('.stage svg').length===6;
+    },modelId,{timeout:60000});
+    await polish.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
   };
-  await capturePolish('2d-polish-neutral.png',false);
-  for(const [id,value] of [['stick','100'],['trigger','50']]){
-    await polish.locator('#'+id).evaluate((element,value)=>{
-      element.value=value;element.dispatchEvent(new Event('input',{bubbles:true}));
+  const select2D=async(id,value)=>{
+    await polish.locator('#'+id).selectOption(value);
+    if(id==='layout')await ready2D(value);
+  };
+  const range2D=async(id,value)=>{
+    await polish.locator('#'+id).evaluate((element,val)=>{
+      element.value=String(val);element.dispatchEvent(new Event('input',{bubbles:true}));
     },value);
-  }
-  await polish.locator('#faces').check();
-  const activeColor=await polish.evaluate(()=>{
-    const node=document.querySelector('.stage[data-scene="dark"] [id$="-stick-l-cap-top"]');
-    return node?getComputedStyle(node).fill:null;
+  };
+  const check2D=async(id,enabled)=>{
+    if(enabled)await polish.locator('#'+id).check();
+    else await polish.locator('#'+id).uncheck();
+  };
+  const visual2D=()=>polish.evaluate(()=>{
+    const entry=window.__exo2DPolish.refs.find(e=>e.mode==='ghost'&&e.scene==='light');
+    const stick=entry.reference.controls.find(c=>c.stickSide==='left');
+    const group=stick.group;
+    const ring=group.querySelector('[id$="-outline"]');
+    const center=group.querySelector('[id$="-top"]');
+    const face=entry.reference.controls.find(c=>c.control==='b1');
+    const system=entry.reference.controls.find(c=>c.layer.id==='btn-view');
+    const outline=entry.reference.svg.querySelector('[id$="-outline-strong"]');
+    const getFill=node=>node?getComputedStyle(node).fill:null;
+    return {
+      ring:getFill(ring),center:getFill(center),ringStroke:getComputedStyle(ring).stroke,
+      ringMask:ring.getAttribute('mask'),
+      faceGlyphDisplay:face?.group.querySelector('.glyph')?.style.display||'',
+      systemGlyphDisplay:system?.group.querySelector('.glyph')?.style.display||'',
+      glow:outline?getComputedStyle(outline).filter:null,
+      input:[...window.__exo2DPolish.inputState().values],
+      bodySocketFill:getFill(entry.reference.bodyShape.querySelector('path')),
+      layout:document.querySelectorAll('.stage').length,
+      grid:[...document.querySelectorAll('.stage')].map(e=>e.dataset.look+':'+e.dataset.scene),
+    };
   });
-  if(activeColor!=='rgb(255, 255, 255)')
-    throw Error('Full 2D stick is not white: '+activeColor);
-  await capturePolish('2d-polish-active.png',true);
+  const assert2D=(actual,expected,message)=>{
+    if(actual!==expected)throw Error(message+': expected '+expected+', got '+actual);
+  };
+  const capturePolish=async(file,modelId,variant,element=null)=>{
+    await ready2D(modelId);
+    if(polishErrors.length)throw Error('2D polish browser errors: '+polishErrors.join('; '));
+    const options={path:path.join(output,file),animations:'disabled',timeout:60000};
+    const bytes=element
+      ?await polish.locator(element).screenshot(options)
+      :await polish.screenshot({...options,fullPage:true});
+    if(bytes.length<8000||bytes.subarray(0,8).toString('hex')!=='89504e470d0a1a0a')
+      throw Error('Invalid REAL Chromium 2D screenshot: '+file);
+    images.push({file,modelId,variant,bytes:bytes.length,
+      sha256:createHash('sha256').update(bytes).digest('hex'),
+      source:'Chromium authored SVG; not native Qt/D3D11'});
+  };
+  await ready2D('dualsense');
+  const initial=await visual2D();
+  assert2D(initial.layout,6,'2D panel count');
+  assert2D(initial.grid.join(','),'solid:dark,solid:light,solid:mixed,ghost:dark,ghost:light,ghost:mixed','2x3 look grid');
+  assert2D(initial.glow,'none','0% contour glow');
+  if(initial.ringMask===null)throw Error('Source-authored stick ring was not composited separately');
+  const sizes=[[240,160],[320,214],[480,320]];
+  for(const [width,height] of sizes){
+    await select2D('size',String(width));
+    const dims=await polish.evaluate(()=>[...document.querySelectorAll('.stage')].map(n=>[
+      Math.round(n.getBoundingClientRect().width),Math.round(n.getBoundingClientRect().height)]));
+    if(dims.some(d=>d[0]!==width||d[1]!==height))
+      throw Error('Mismatch across six 2D sizes: '+JSON.stringify(dims));
+  }
+  await capturePolish('2d-dualsense-neutral-480.png','dualsense','solid+ghost neutral');
+  // The wheel MUST zoom all six SVGs, not scroll the document.
+  const beforeWheel=await polish.evaluate(()=>({scroll:window.scrollY,zoom:window.__exo2DPolish.zoom}));
+  await polish.locator('.stage[data-look="ghost"][data-scene="dark"]').hover();
+  await polish.mouse.wheel(0,-240);
+  const afterWheel=await polish.evaluate(()=>({scroll:window.scrollY,zoom:window.__exo2DPolish.zoom}));
+  if(afterWheel.zoom<=beforeWheel.zoom||afterWheel.scroll!==beforeWheel.scroll)
+    throw Error('Viewer wheel did not synchronously zoom without document scrolling');
+  await polish.locator('.stage[data-look="ghost"][data-scene="dark"]').dblclick();
+
+  // Verify true 0/25/50/100 continuous stick+trigger intensities.
+  const sample=[];
+  for(const pct of [0,25,50,100]){
+    await range2D('stick',pct);await range2D('trigger',pct);
+    const s=await visual2D();sample.push({pct,ring:s.ring,center:s.center});
+  }
+  if(sample[0].ring===sample[1].ring||sample[1].ring===sample[2].ring||
+      sample[2].ring===sample[3].ring)
+    throw Error('Stick ring lost intermediate 25/50/100% interpolation');
+  assert2D(sample[3].ring,'rgb(255, 255, 255)','100% motion ring');
+  assert2D(sample[0].center,sample[3].center,'Movement must not click the stick');
+
+  await range2D('trigger',0);
+  await check2D('clicks',true);
+  const clickedA=await visual2D();
+  assert2D(clickedA.ring,'rgb(255, 255, 255)','A full motion ring');
+  assert2D(clickedA.center,'rgb(255, 255, 255)','A L3 click center');
+  await capturePolish('2d-dualsense-stick-ring.png','dualsense','A 100% motion + L3/R3');
+  await select2D('stickFeedback','center');
+  const clickedB=await visual2D();
+  assert2D(clickedB.ring,'rgb(255, 255, 255)','B L3 click ring');
+  assert2D(clickedB.center,'rgb(255, 255, 255)','B full motion center');
+  await capturePolish('2d-dualsense-stick-center.png','dualsense','B 100% motion + L3/R3');
   if(images.at(-1).sha256===images.at(-2).sha256)
-    throw Error('2D neutral and analog screenshots are identical');
+    throw Error('Stick feedback A and B produced identical screenshots');
+
+  await check2D('clicks',false);
+  await range2D('stick',0);
+  const neutralB=await visual2D();
+  assert2D(neutralB.ring,initial.ring,'Neutral cap ring after click release');
+  assert2D(neutralB.center,initial.center,'Neutral cap center after click release');
+  await check2D('faces',true);
+  await check2D('faceSymbols',true);
+  const symbolsOn=await visual2D();
+  const inputBefore=JSON.stringify(symbolsOn.input);
+  await capturePolish('2d-dualsense-face-symbols-on.png','dualsense','face symbols on; faces pressed');
+  await check2D('faceSymbols',false);
+  const symbolsOff=await visual2D();
+  assert2D(symbolsOff.faceGlyphDisplay,'none','Face symbols hidden');
+  if(symbolsOff.systemGlyphDisplay==='none')throw Error('System glyph incorrectly hidden');
+  assert2D(JSON.stringify(symbolsOff.input),inputBefore,'Face glyph toggle changed button mapping');
+  await capturePolish('2d-dualsense-face-symbols-off.png','dualsense','face symbols off; faces pressed');
+  if(images.at(-1).sha256===images.at(-2).sha256)
+    throw Error('Face-symbol toggle had no visible browser effect');
+  await check2D('faceSymbols',true);
+  await check2D('faces',false);
+  await select2D('stickFeedback','ring');
+
+  await select2D('layout','xbox_series');
+  await select2D('colorway','auto');
+  await capturePolish('2d-xbox-series-auto.png','xbox_series','Auto dark');
+  await select2D('colorway','light');
+  await capturePolish('2d-xbox-series-light.png','xbox_series','Light');
+  if(images.at(-1).sha256===images.at(-2).sha256)
+    throw Error('Xbox Series light and Auto screenshots identical');
+  await select2D('layout','dualshock4');
+  await select2D('colorway','auto');
+  await capturePolish('2d-dualshock4-auto.png','dualshock4','Auto light');
+  await select2D('colorway','dark');
+  await capturePolish('2d-dualshock4-dark.png','dualshock4','Dark');
+  if(images.at(-1).sha256===images.at(-2).sha256)
+    throw Error('DualShock 4 Auto and dark screenshots identical');
+
+  await select2D('layout','dualsense');
+  await select2D('colorway','auto');
+  for(const pct of [0,50,100]){
+    await range2D('glow',pct);
+    const s=await visual2D();
+    if((pct===0)!==(s.glow==='none'))throw Error('Contour glow zero/nonzero mismatch at '+pct+'%: '+s.glow);
+    await capturePolish('2d-ghost-glow-'+pct+'.png','dualsense',
+      'Ghost mixed backdrop; glow '+pct+'%', '.stage[data-look="ghost"][data-scene="mixed"]');
+  }
+  if(new Set(images.slice(-3).map(x=>x.sha256)).size!==3)
+    throw Error('0/50/100 glow captures did not change the actual browser pixels');
   if(polishErrors.length)throw Error('2D polish browser errors: '+polishErrors.join('; '));
   await polish.close();
 
