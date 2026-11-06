@@ -249,7 +249,13 @@ export function paintPolished2D(reference,mode,scene,{
       continue;
     }
     const group=entry.group;
-    const face=group.querySelector('[id$="-face"]')||entry.surface;
+    // Trigger/bumper mappings often bind an invisible "-pressure" path,
+    // while the REAL visible authored face is the following sibling.
+    const pressure=entry.surface?.id.endsWith('-pressure')?entry.surface:null;
+    const face=group.querySelector('[id$="-face"],[id$="-outline"]')||
+      (pressure?[...group.children].find(node=>
+        ['path','ellipse','rect'].includes(node.localName)&&node!==pressure&&
+        !node.classList.contains('glyph')):null)||entry.surface;
     if(!face)continue;
     if(entry.surface&&entry.surface!==face&&entry.surface.id.endsWith('-pressure')){
       paint(entry.surface,'fill','none');paint(entry.surface,'stroke','none');
