@@ -416,6 +416,67 @@ try{
   if(polishErrors.length)throw Error('2D polish browser errors: '+polishErrors.join('; '));
   await polish.close();
 
+  // A/B/C zero-shell review, compared on identical original 2D SVGs.
+  // Browser QA only; the native ExoSnap path is not exercised here.
+  const ghostErrors=[];
+  const ghost=await browser.newPage({viewport:{width:1210,height:1120},deviceScaleFactor:1,reducedMotion:'reduce'});
+  ghost.on('pageerror',error=>ghostErrors.push(error.message));
+  ghost.on('response',response=>{
+    if(response.status()>=400&&!/\/favicon\.ico(?:\?|$)/.test(response.url()))
+      ghostErrors.push('HTTP '+response.status()+' '+response.url());
+  });
+  await ghost.goto(new URL('polish-2d-review.html',base).href,{waitUntil:'domcontentloaded',timeout:60000});
+  const waitGhost=()=>ghost.waitForFunction(()=>
+    document.body.dataset.ghostReviewReady==='ready'&&
+    document.querySelectorAll('.stage svg').length===9&&
+    ['pure','soft','shadow'].every(k=>document.querySelector('.review-row[data-look="'+k+'"]')),
+    null,{timeout:60000});
+  await waitGhost();
+  const ghostState=await ghost.evaluate(()=>{
+    const state=window.__exoGhostReview;
+    const results=[];
+    for(const item of state.items){
+      const paths=[...item.reference.bodyShape?.children||[]].filter(node=>
+        ['path','ellipse','rect'].includes(node.localName)&&
+        node.id!=='outline-strong'&&!node.id.endsWith('-outline-strong'));
+      const notTransparent=paths.filter(p=>{
+        const st=getComputedStyle(p);
+        return st.fill!=='none'&&Number(st.fillOpacity)>.0001;
+      });
+      const touchpad=item.reference.controls.find(c=>c.layer.id==='btn-touchpad');
+      const touchpadFilled=[...touchpad?.group.querySelectorAll('path,rect,ellipse')||[]]
+        .filter(p=>!p.classList.contains('glyph')&&getComputedStyle(p).fill!=='none'&&
+          Number(getComputedStyle(p).fillOpacity)>.0001);
+      results.push({look:item.look,scene:item.scene,body:notTransparent.length,touchpad:touchpadFilled.length});
+    }
+    return results;
+  });
+  if(ghostState.some(r=>r.body||r.touchpad))
+    throw Error('Ghost A/B/C must have completely transparent shell and idle touchpad: '+JSON.stringify(ghostState));
+  const captureGhost=async(file,element=null)=>{
+    const target=element?ghost.locator(element):ghost;
+    const bytes=await target.screenshot({path:path.join(output,file),fullPage:!element,animations:'disabled',timeout:60000});
+    if(bytes.length<25000||bytes.subarray(0,8).toString('hex')!=='89504e470d0a1a0a')
+      throw Error('Missing browser Ghost review image: '+file);
+    images.push({file,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),
+      source:'Real browser SVG Ghost A/B/C, not native Qt/ExoSnap'});
+  };
+  await captureGhost('2d-ghost-review-neutral.png');
+  for(const key of ['pure','soft','shadow'])
+    await captureGhost('2d-ghost-review-'+key+'.png','.review-row[data-look="'+key+'"]');
+  for(const [id,value] of [['stick','100'],['trigger','50']]){
+    await ghost.locator('#'+id).evaluate((element,n)=>{
+      element.value=String(n);element.dispatchEvent(new Event('input',{bubbles:true}));
+    },value);
+  }
+  await ghost.locator('#clicks').check();
+  await ghost.locator('#faces').check();
+  await captureGhost('2d-ghost-review-active.png');
+  if(images.at(-1).sha256===images.find(x=>x.file==='2d-ghost-review-neutral.png').sha256)
+    throw Error('Ghost review input activity produced identical pixels');
+  if(ghostErrors.length)throw Error('Ghost A/B/C browser errors: '+ghostErrors.join('; '));
+  await ghost.close();
+
   const manifest={revision,capturedAt:new Date().toISOString(),url:new URL('pbr-lab.html',base).href,
     content:'Real Three.js/WebGL2 + original controller OBJ + authored SVG',looks:['solid','ghost','outline','identity'],
     viewports:['3D dark','3D light','3D mixed','2D dark','2D light','2D mixed'],images,
