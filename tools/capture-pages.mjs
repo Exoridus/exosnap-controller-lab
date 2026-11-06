@@ -18,7 +18,7 @@ let browser;
 const runtimeErrors=[];
 try{
   browser=await playwright.chromium.launch({
-    headless:true,channel:'chromium',
+    headless:true,channel:process.env.EXO_BROWSER_CHANNEL||'chromium',
     args:['--use-gl=angle','--use-angle=swiftshader-webgl','--enable-unsafe-swiftshader','--disable-dev-shm-usage'],
     timeout:60000
   });
