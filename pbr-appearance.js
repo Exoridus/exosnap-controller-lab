@@ -9,7 +9,6 @@ import {EXO_PALETTE} from './palette.js';
 const pressedBlue=new THREE.Color(EXO_PALETTE.pressedBlue);
 const ghostColor=new THREE.Color();
 const idleColor=new THREE.Color();
-const motionColor=new THREE.Color(EXO_PALETTE.movingControl);
 const neutralStickColor=new THREE.Color(EXO_PALETTE.neutralStick);
 const neutralSocketColor=new THREE.Color(EXO_PALETTE.neutralStickSocket);
 const neutralTriggerColor=new THREE.Color(EXO_PALETTE.neutralTrigger);
@@ -65,8 +64,8 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
       // Neutral: light cap, dark physical socket/shaft; NO colored ring or glow.
       // Movement tints only the cap toward light blue. Click is a separate input.
       if(mesh.userData.role==='stick-cap'){
-        m.color.copy(neutralStickColor).lerp(motionColor,state.moving);
-        m.opacity=Math.min(.88,Math.max(spec.opacity,.73)+state.moving*.10);
+        m.color.copy(neutralStickColor).lerp(pressedBlue,state.moving);
+        m.opacity=Math.min(1,Math.max(spec.opacity,.52)+(1-Math.max(spec.opacity,.52))*state.moving);
       }else{
         m.color.copy(neutralSocketColor);
         m.opacity=Math.max(spec.opacity,.52);

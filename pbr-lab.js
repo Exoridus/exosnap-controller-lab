@@ -33,7 +33,7 @@ const sampleNodes=[];
 const flatSampleNodes=[];
 let flatLoadSerial=0;
 const flatReferences=new Map();
-const activeColors=new ActiveColorState();
+const activeColors=new ActiveColorState({color2D:'#ffffff',color3D:'#ffffff'});
 function recipeFor3D(variantKey){return activeColors.overrideRecipe(resolveVariant(variantKey,state.mix),'3d');}
 function recipeFor2D(variantKey){return activeColors.overrideRecipe(resolveVariant(variantKey,state.mix),'2d');}
 function makeGallery(){
