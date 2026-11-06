@@ -49,4 +49,5 @@ jobs:
           name: 2d-polish-pr-browser-captures
           path: .capture/
           retention-days: 30
-          if-no-files-found: ignore
+          if-no-files-found: error
+          include-hidden-files: true
