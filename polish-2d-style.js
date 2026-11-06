@@ -329,6 +329,10 @@ export function paintPolished2D(reference,mode,scene,{
     }
   }
   for(const entry of reference.controls){
+    // The mapping also contains the body layer for source provenance.
+    // It is NOT an interactive control; recoloring its first path as a
+    // button was the source of the unwanted filled "Ghost shell".
+    if(entry.layer.role==='body')continue;
     if(entry.stickSide){
       paintStick(reference,entry,colors,values,{left,right},stickFeedback);
       paintGlyphs(entry,colors,showFaceSymbols);
