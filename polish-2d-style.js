@@ -179,6 +179,24 @@ function paintStick(reference,entry,colors,values,axes,variant){
     // become pure white. No dark halo, cloned geometry or knockout mask.
     paint(center,'stroke',colors.reviewLook&&level<1?colors.line:colors.pressedOutline);
     paint(center,'stroke-opacity',String(Math.max(colors.lineAlpha,.88)));
+    if(colors.reviewLook){
+      // Authored cap lines are often <1 screen pixel at 320px (DualSense:
+      // ~1 SVG unit over a 545-unit viewBox). Keep the SAME physical edge,
+      // but guarantee it remains readable against a white background when
+      // L3/R3 turns the center fully white.
+      const attr='data-exo-authored-stroke-width';
+      if(!center.hasAttribute(attr)){
+        const original=parseFloat(center.style.getPropertyValue('stroke-width')||
+          center.getAttribute('stroke-width')||'1');
+        center.setAttribute(attr,String(Number.isFinite(original)&&original>0?original:1));
+      }
+      const original=Number(center.getAttribute(attr));
+      const viewWidth=reference.svg.viewBox.baseVal.width||480;
+      const stageWidth=reference.container?.clientWidth||320;
+      const unit=viewWidth/stageWidth;
+      const minPx=level>.8?1.30:.90;
+      paint(center,'stroke-width',String(Math.max(original,unit*minPx)));
+    }
   }
 }
 function paintDpad(entry,colors,values){
