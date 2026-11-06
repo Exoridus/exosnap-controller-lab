@@ -18,7 +18,12 @@ export async function archiveSnapshots(captureDir,archiveDir,repository,commit){
     if(!genericFiles.every(name=>manifest.images.some(image=>image.file===name)))throw Error('Incomplete Generic Pro capture pair');
     targets.push(...genericFiles);
   }
-  if(targets.some(name=>!manifest.images.some(x=>x.file===name&&x.bytes>=40000)))throw Error('Both verified screenshots are required');
+  // Save the complete 2D review matrix alongside each immutable SHA, not only
+  // the 3D headline images. Every file is verified against its capture hash.
+  targets.push(...manifest.images.filter(x=>/^2d-[a-z0-9-]+\.png$/.test(x.file)).map(x=>x.file));
+  if(targets.some(name=>!manifest.images.some(x=>x.file===name&&
+       x.bytes>=(name.startsWith('2d-')?8000:40000))))
+    throw Error('Required verified screenshots are missing');
   for(const name of targets){
     const record=manifest.images.find(x=>x.file===name);
     const bytes=await readFile(path.join(captureDir,name));
@@ -39,6 +44,8 @@ export async function archiveSnapshots(captureDir,archiveDir,repository,commit){
     record.genericUrl=root+'generic-neutral.png';
     record.genericPressedUrl=root+'generic-pressed.png';
   }
+  record.twoDScreenshots=targets.filter(name=>name.startsWith('2d-'))
+    .map(name=>({name,url:root+name}));
   index=[record,...index.filter(x=>x.sha!==commit)].sort((a,b)=>b.capturedAt.localeCompare(a.capturedAt));
   await writeFile(path.join(archiveDir,'index.json'),JSON.stringify(index,null,2)+'\n');
   return record;

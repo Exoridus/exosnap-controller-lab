@@ -1,0 +1,53 @@
+name: 2D polish · pull request browser QA
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  review:
+    name: Node tests and real Chromium 2D/3D captures
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Run entire regression suite (including 2D polish)
+        run: npm run verify
+      - name: Verify existing licensed 3D assets
+        run: |
+          node download-assets.mjs
+          node tools/verify-licensed-assets.mjs
+      - name: Install real Chromium browser
+        run: |
+          npm install --no-save --package-lock=false --ignore-scripts playwright@1.64.1
+          npx playwright install --with-deps chromium
+      - name: Start actual browser lab
+        run: |
+          nohup node server.mjs > "$RUNNER_TEMP/exosnap-http.log" 2>&1 &
+          for i in $(seq 1 45); do
+            if curl --fail --silent --output /dev/null http://127.0.0.1:8792/polish-2d.html; then exit 0; fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/exosnap-http.log"
+          exit 1
+      - name: Capture and assert genuine 2D acceptance matrix and 3D smoke
+        env:
+          CAPTURE_COMMIT_SHA: ${{ github.sha }}
+        run: node tools/capture-pages.mjs --out .capture
+      - name: Ensure static Pages export preserves 3D gallery and all 2D screenshots
+        run: node tools/build-pages.mjs --out dist --capture .capture
+      - name: Publish real browser evidence as PR artifact (no deployment)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 2d-polish-pr-browser-captures
+          path: .capture/
+          retention-days: 30
+          if-no-files-found: error
+          include-hidden-files: true
