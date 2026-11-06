@@ -122,5 +122,9 @@ test('browser release will capture all specified 2D review states',async()=>{
     '2d-xbox-series-light.png','2d-dualshock4-auto.png',
     '2d-dualshock4-dark.png','2d-ghost-glow-0.png','2d-ghost-glow-50.png',
     '2d-ghost-glow-100.png'];
-  for(const name of names)assert.ok(capture.includes(name),name);
+  for(const name of names.filter(n=>!n.startsWith('2d-ghost-glow-')))
+    assert.ok(capture.includes(name),name);
+  assert.match(capture,/for\(const pct of \[0,50,100\]\)/);
+  assert.match(capture,/2d-ghost-glow-/);
+  assert.match(capture,/capturePolish\('2d-ghost-glow-'\+pct\+'\.png'/);
 });
