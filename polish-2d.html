@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ExoSnap · 2D Solid & Ghost Polish</title>
+<style>
+:root{color-scheme:dark;font:14px/1.45 system-ui,Segoe UI,sans-serif;background:#0b121b;color:#e7eff6}
+*{box-sizing:border-box}body{margin:0;padding:19px clamp(16px,3vw,42px) 44px}
+a{color:#9dd5f7}h1{font-size:clamp(19px,2vw,26px);margin:6px 0}h2{font-size:15px;margin:0 0 10px}
+header,main{max-width:1500px;margin:auto}
+.kicker{letter-spacing:.1em;text-transform:uppercase;color:#87afcb;font-size:11px;font-weight:700}
+.subtitle{margin:4px 0 18px;color:#b1c5d7;max-width:980px}
+.toolbar{display:flex;align-items:end;gap:12px;flex-wrap:wrap;background:#162332;border:1px solid #31485d;padding:15px;border-radius:14px}
+label{display:grid;gap:5px;font-size:12px;color:#c2d6e6}
+select,input[type=range]{accent-color:#f4f8fb}
+select{background:#233649;border:1px solid #59728a;border-radius:7px;padding:7px 9px;color:#edf6ff;font:inherit;min-width:118px}
+input[type=range]{width:128px}
+.control-check{display:flex;align-items:center;gap:6px;padding-bottom:8px}
+output{font-variant-numeric:tabular-nums;color:#fff}
+#status{font-size:12px;color:#9fd6ec;min-height:21px;margin:12px 0}
+.scene{margin:15px 0 25px}.scene-title{display:flex;align-items:baseline;gap:12px;margin-bottom:8px}
+.scene-title span{color:#91aabc;font-size:12px}
+.panels{display:flex;gap:14px;overflow-x:auto;padding:0 0 7px}
+figure{margin:0;flex:none}.caption{font-size:12px;margin-bottom:8px;color:#c6d9e6;font-weight:600}
+.stage{position:relative;isolation:isolate;width:var(--panel-width);height:var(--panel-height);border-radius:8px;overflow:hidden;outline:1px solid #385369;background-size:cover;background-position:center}
+.stage[data-scene=dark]{background-color:#07101c;background-image:linear-gradient(#040914ac,#040914ac),url('./backgrounds/arena.svg')}
+.stage[data-scene=light]{background:#f0f2f4}
+.stage[data-scene=mixed]{background-image:url('./backgrounds/racing.svg');background-color:#537b91}
+.stage>svg{position:relative;display:block;width:100%;height:100%;overflow:visible}
+.note{color:#a4b9c9;margin-top:22px;max-width:1060px;font-size:12px}
+hr{border:0;border-top:1px solid #2c3e50;margin:19px 0}
+</style></head>
+<body>
+<header>
+<div class="kicker">ExoSnap Controller Lab · Visual Review</div>
+<h1>2D Solid / Ghost – Weißer Press-State</h1>
+<p class="subtitle">Direkter Live-Vergleich mit den vorhandenen Controller-SVGs und Bindings. Die Varianten zeigen bewusst einfache Materialfarben statt Fototexturen, eine dezente Ghost-Kontur und stufenlose weiße Stick-/Trigger-Aktivierung.</p>
+<div class="toolbar">
+<label>Controller<select id="layout" aria-label="Controller"></select></label>
+<label>Overlaygröße<select id="size"><option value="240">240 × 160</option><option value="320" selected>320 × 214</option><option value="480">480 × 320</option></select></label>
+<label>Stick-Ausschlag <output id="stickValue">0 %</output><input id="stick" type="range" min="0" max="100" step="1" value="0"></label>
+<label>Trigger L2/R2 <output id="triggerValue">0 %</output><input id="trigger" type="range" min="0" max="100" step="1" value="0"></label>
+<label class="control-check"><input type="checkbox" id="faces"> Face/D-Pad drücken</label>
+<label class="control-check"><input type="checkbox" id="clicks"> L3/R3 drücken</label>
+<label class="control-check"><input type="checkbox" id="live"> Live-Gamepad</label>
+</div>
+<p id="status" role="status">Lade SVG-Quellen ...</p>
+<p><a href="./pbr-lab.html">3D-Lab öffnen</a> · <a href="./gallery-2d.html">Ursprüngliche SVG-Diagnose</a></p>
+</header>
+<main id="comparisons"></main>
+<p class="note">Experimenteller Browser-Look, keine native ExoSnap-Preview und keine Windows-/D3D11-Freigabe. Im Ghost-Modus werden keine künstlichen Doppelkonturen erzeugt. Einzelne SVGs sind quellbedingt nur als Kontur vorhanden; deren Solid-Füllung bleibt visuell zu prüfen. Keine neuen Drittanbieter-Assets.</p>
+<script type="module" src="./polish-2d-lab.js"></script>
+</body></html>
