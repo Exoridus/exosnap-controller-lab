@@ -209,11 +209,13 @@ try{
     const ring=group.querySelector('[id$="-outline"]');
     const center=group.querySelector('[id$="-top"]');
     const face=entry.reference.controls.find(c=>c.control==='b1');
+    const trigger=entry.reference.controls.find(c=>c.control==='l2');
     const system=entry.reference.controls.find(c=>c.layer.id==='btn-view');
     const outline=entry.reference.svg.querySelector('[id$="-outline-strong"]');
     const getFill=node=>node?getComputedStyle(node).fill:null;
     return {
       ring:getFill(ring),center:getFill(center),ringStroke:getComputedStyle(ring).stroke,
+      triggerFill:getFill(trigger?.group.querySelector('[id$="-face"]')||trigger?.surface),
       ringMask:ring.getAttribute('mask'),
       faceGlyphDisplay:face?.group.querySelector('.glyph')?.style.display||'',
       systemGlyphDisplay:system?.group.querySelector('.glyph')?.style.display||'',
@@ -268,12 +270,16 @@ try{
   const sample=[];
   for(const pct of [0,25,50,100]){
     await range2D('stick',pct);await range2D('trigger',pct);
-    const s=await visual2D();sample.push({pct,ring:s.ring,center:s.center});
+    const s=await visual2D();sample.push({pct,ring:s.ring,center:s.center,trigger:s.triggerFill});
   }
   if(sample[0].ring===sample[1].ring||sample[1].ring===sample[2].ring||
       sample[2].ring===sample[3].ring)
     throw Error('Stick ring lost intermediate 25/50/100% interpolation');
   assert2D(sample[3].ring,'rgb(255, 255, 255)','100% motion ring');
+  assert2D(sample[3].trigger,'rgb(255, 255, 255)','100% analog trigger');
+  if(sample[0].trigger===sample[1].trigger||sample[1].trigger===sample[2].trigger||
+      sample[2].trigger===sample[3].trigger)
+    throw Error('Analog trigger lost intermediate 25/50/100% interpolation');
   assert2D(sample[0].center,sample[3].center,'Movement must not click the stick');
 
   await range2D('trigger',0);
@@ -287,9 +293,29 @@ try{
   assert2D(clickedB.ring,'rgb(255, 255, 255)','B L3 click ring');
   assert2D(clickedB.center,'rgb(255, 255, 255)','B full motion center');
   await capturePolish('2d-dualsense-stick-center.png','dualsense','B 100% motion + L3/R3');
+  // At movement=100% AND L3 click=on both variants intentionally light both
+  // parts. Movement-only and click-only states MUST still differ.
+  await check2D('clicks',false);
+  const motionB=await visual2D();
+  assert2D(motionB.center,'rgb(255, 255, 255)','B movement-only center');
+  assert2D(motionB.ring,initial.ring,'B movement must leave the rim neutral');
+  await capturePolish('2d-dualsense-motion-center.png','dualsense','B 100% movement; no L3/R3');
+  await select2D('stickFeedback','ring');
+  const motionA=await visual2D();
+  assert2D(motionA.ring,'rgb(255, 255, 255)','A movement-only ring');
+  assert2D(motionA.center,initial.center,'A movement must leave the center neutral');
+  await capturePolish('2d-dualsense-motion-ring.png','dualsense','A 100% movement; no L3/R3');
   if(images.at(-1).sha256===images.at(-2).sha256)
-    throw Error('Stick feedback A and B produced identical screenshots');
-
+    throw Error('Movement-only feedback variants produced identical screenshots');
+  await range2D('stick',0);
+  await check2D('clicks',true);
+  const clickOnlyA=await visual2D();
+  assert2D(clickOnlyA.center,'rgb(255, 255, 255)','A click-only center');
+  assert2D(clickOnlyA.ring,initial.ring,'A click must not move the ring');
+  await select2D('stickFeedback','center');
+  const clickOnlyB=await visual2D();
+  assert2D(clickOnlyB.ring,'rgb(255, 255, 255)','B click-only ring');
+  assert2D(clickOnlyB.center,initial.center,'B click must not move the center');
   await check2D('clicks',false);
   await range2D('stick',0);
   const neutralB=await visual2D();
