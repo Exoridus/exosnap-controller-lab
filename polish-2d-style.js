@@ -1,8 +1,10 @@
-// Visual 2D-polish experiment for the browser lab. The SVG source files,
-// bindings, cutouts and moving stick transforms are not rewritten.
+// Browser-only 2D visual polish. All rendered surfaces and glyphs originate
+// in the existing authored SVGs; input mapping and moving transforms stay owned
+// by ControllerReference.
 export const PRESS_WHITE='#ffffff';
-const clamp=(n)=>Math.max(0,Math.min(1,Number.isFinite(Number(n))?Number(n):0));
-const rgb=(hex)=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
+const svgNs='http://www.w3.org/2000/svg';
+const clamp=n=>Math.max(0,Math.min(1,Number.isFinite(Number(n))?Number(n):0));
+const rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
 export function mixColor(a,b,amount){
   const t=clamp(amount),left=rgb(a),right=rgb(b);
   return '#'+left.map((v,i)=>Math.round(v+(right[i]-v)*t).toString(16).padStart(2,'0')).join('');
@@ -10,8 +12,9 @@ export function mixColor(a,b,amount){
 export function analogStickLevel(axes){
   const x=Number.isFinite(axes?.x)?Math.max(-1,Math.min(1,axes.x)):0;
   const y=Number.isFinite(axes?.y)?Math.max(-1,Math.min(1,axes.y)):0;
-  const radius=Math.min(1,Math.hypot(x,y));
-  return radius<=.08?0:(radius-.08)/.92;
+  // The manual slider is an exact percentage; the live gamepad has its own
+  // input deadzone. Never add click pressure to the movement level.
+  return Math.min(1,Math.hypot(x,y));
 }
 export function controlLevel(entry,values,axes){
   const pressed=clamp(values?.get(entry.control)||0);
@@ -19,48 +22,59 @@ export function controlLevel(entry,values,axes){
   if(entry.layer?.role==='trigger')return pressed;
   return pressed>.5?1:0;
 }
-// Deliberately model-specific *preview* palettes. A hardware family is not
-// universally white or black. The selector offers both without touching SVGs.
-const materials={
-  dualsense:{shell:'#f0f2f4',core:'#202630',control:'#a5b0ba',cap:'#596876',trigger:'#c2ccd6'},
-  dualshock4:{shell:'#e5e9ee',core:'#b7c1ca',control:'#a9b5c1',cap:'#5e6b78',trigger:'#bbc6d1'},
-  xbox:{shell:'#313a44',core:'#27313c',control:'#677584',cap:'#424e5b',trigger:'#606c79'},
-  nintendo:{shell:'#444d57',core:'#343e4a',control:'#6f7d8b',cap:'#4f5d6b',trigger:'#75818f'},
-  gamecube:{shell:'#7774a3',core:'#545276',control:'#a4a0c0',cap:'#5e597e',trigger:'#9792b4'},
-  generic:{shell:'#cbd5de',core:'#a9b5c1',control:'#93a2b0',cap:'#596a78',trigger:'#acbac6'},
-  steam:{shell:'#414b57',core:'#323b45',control:'#6d7c89',cap:'#4e5b67',trigger:'#7c8b98'}
+export function stickFeedbackLevels(movement,clicked,variant='ring'){
+  if(!['ring','center'].includes(variant))throw new TypeError('Unknown stick feedback');
+  const amount=clamp(movement),click=Boolean(clicked);
+  return variant==='ring'
+    ?{ring:amount,center:click?1:0}
+    :{ring:click?1:0,center:amount};
+}
+
+// Material distinction stays with the model's actual shell. Controls use the
+// same neutral family for every model and BOTH available colorways.
+const shells={
+  dualsense:{light:['#f0f2f4','#242c36'],dark:['#333c47','#202934']},
+  dualshock4:{light:['#e6ebef','#b8c3cd'],dark:['#353f4a','#252f39']},
+  xbox:{light:['#e4eaf0','#c3ced6'],dark:['#313b47','#28333f']},
+  nintendo:{light:['#d8e0e7','#c4cfd8'],dark:['#444f5b','#353f4b']},
+  gamecube:{light:['#c3bfd7','#a6a0c6'],dark:['#7774a3','#565276']},
+  generic:{light:['#ced9e2','#b5c4d0'],dark:['#404d59','#303e4a']},
+  steam:{light:['#d8e0e6','#b7c4cf'],dark:['#414c58','#303c49']}
 };
-const colorwayAlternates={
-  dualsense:{dark:{shell:'#303841',core:'#20262f',control:'#788795',cap:'#47535e',trigger:'#566371'}},
-  dualshock4:{dark:{shell:'#343a45',core:'#232932',control:'#737f8e',cap:'#3b4551',trigger:'#626f7e'}},
-  xbox:{light:{shell:'#e3e8ed',core:'#c2cad3',control:'#abb9c5',cap:'#5d6975',trigger:'#c3ced8'}},
-  nintendo:{light:{shell:'#d5dce3',core:'#bec9d3',control:'#b2c0cb',cap:'#667482',trigger:'#b5c2ce'}},
-  generic:{dark:{shell:'#404c58',core:'#333d49',control:'#778796',cap:'#455360',trigger:'#697986'}},
-  steam:{light:{shell:'#d4dbe2',core:'#aab5c0',control:'#9eafbf',cap:'#5c6d7a',trigger:'#acbbc7'}}
-};
-const defaultTone={dualsense:'light',dualshock4:'light',xbox:'dark',
-  nintendo:'dark',gamecube:'default',generic:'default',steam:'dark'};
-export function lookPalette(id,mode,scene,colorway='default'){
-  const name=id==='gamecube'?'gamecube':id.startsWith('xbox')?'xbox':
-    id.startsWith('joycon')||id==='switch_pro'?'nintendo':
-    id.startsWith('steam')?'steam':id.startsWith('dualshock')?'dualshock4':
-    id.startsWith('dualsense')?'dualsense':'generic';
-  if(!['default','light','dark'].includes(colorway))throw new TypeError('Unknown preview colorway');
-  const chosen=colorway==='default'?defaultTone[name]:colorway;
-  const base=colorwayAlternates[name]?.[chosen]||materials[name];
+const standard={dualsense:'light',dualshock4:'light',xbox:'dark',
+  nintendo:'dark',gamecube:'dark',generic:'light',steam:'dark'};
+function family(id){
+  if(id==='gamecube')return 'gamecube';
+  if(id.startsWith('xbox'))return 'xbox';
+  if(id.startsWith('joycon')||id==='switch_pro')return 'nintendo';
+  if(id.startsWith('steam'))return 'steam';
+  if(id.startsWith('dualshock'))return 'dualshock4';
+  if(id.startsWith('dualsense'))return 'dualsense';
+  return 'generic';
+}
+export function lookPalette(id,mode,scene,colorway='auto'){
+  if(!['auto','light','dark'].includes(colorway))throw new TypeError('Unknown preview colorway');
+  if(!['solid','ghost'].includes(mode))throw new TypeError('Unknown 2D look');
+  const model=family(id),chosen=colorway==='auto'?standard[model]:colorway;
+  const [shell,core]=shells[model][chosen];
   const ghost=mode==='ghost',light=scene==='light';
+  const control=chosen==='light'?'#abb9c7':'#99a9b7';
   return {
-    ...base,ghost,light,colorway:chosen,
+    shell,core,control,cap:mixColor(control,'#8093a3',.12),
+    trigger:mixColor(control,'#bfcbd5',.09),
+    ghost,light,colorway:chosen,
     shellAlpha:ghost?(light?.14:.12):.99,
     coreAlpha:ghost?(light?.20:.17):.96,
     detailAlpha:ghost?.18:.26,
-    line:ghost?(light?'#526b80':'#b0c8d7'):(light?'#526577':'#657787'),
-    lineAlpha:ghost?(light?.59:.52):.55,
-    controlAlpha:ghost?(light?.42:.38):1,
-    glyph:ghost?(light?'#536b7f':'#c8d8e3'):'#3d4d5b'
+    line:light?'#4b6377':'#bdd0de',
+    lineAlpha:ghost?(light?.70:.65):.83,
+    controlAlpha:ghost?(light?.73:.77):1,
+    // A single stable glyph shade, including Share/Options press. The controls
+    // behind it are deliberately bright enough on both scene types.
+    glyph:'#25394b',
+    pressedOutline:'#405568'
   };
 }
-const svgNs='http://www.w3.org/2000/svg';
 const visibleFill=node=>{
   const value=node.style.getPropertyValue('fill')||node.getAttribute('fill')||'';
   return value.trim().toLowerCase()!=='none'&&value!=='';
@@ -70,16 +84,15 @@ const visibleStroke=node=>{
   return value.trim().toLowerCase()!=='none'&&value!=='';
 };
 function paint(node,name,value){node.style.setProperty(name,String(value),'important');}
-function ensureBaseFill(ref,colors){
-  const body=ref.bodyShape;
+function ensureBaseFill(reference,colors){
+  const body=reference.bodyShape;
   if(!body)return;
-  const drawn=[...body.children].filter(n=>['path','ellipse','rect'].includes(n.localName)&&
-    visibleFill(n)&&!n.classList.contains('detail'));
-  // Most of the 20 authored SVGs are pure contour artwork. In the solid
-  // preview, place a full-path silhouette behind it (never FirstContour).
-  // It is an additive preview layer; no original geometry is discarded.
+  const authored=[...body.children].filter(n=>['path','ellipse','rect'].includes(n.localName)&&
+    visibleFill(n)&&!n.classList.contains('detail')&&!n.hasAttribute('data-exo-polish-silhouette'));
+  // A contour-only SVG can use its OWN existing outline path as the source
+  // for a non-animated background silhouette. No new authored contours.
   let silhouette=body.querySelector('[data-exo-polish-silhouette]');
-  if(!drawn.length&&!silhouette){
+  if(!authored.length&&!silhouette){
     const source=body.querySelector('[id="outline-strong"],[id$="-outline-strong"]');
     if(source?.getAttribute('d')){
       silhouette=document.createElementNS(svgNs,'path');
@@ -96,43 +109,125 @@ function ensureBaseFill(ref,colors){
     paint(silhouette,'stroke','none');
   }
 }
-// L3/R3 have a small independently controlled white center marker.
-// It is derived from the authored stick-top ellipse, never an invented body
-// silhouette, and does not color the fixed socket or the complete cap.
-function paintStickClick(entry,colors,clicked){
-  const group=entry.group;
-  const top=group.querySelector('[id$="-top"]');
-  if(!top||top.localName!=='ellipse')return;
-  let marker=group.querySelector('[data-exo-stick-click]');
-  if(!marker){
-    marker=document.createElementNS(svgNs,'ellipse');
-    for(const attr of ['cx','cy','transform'])if(top.hasAttribute(attr))
-      marker.setAttribute(attr,top.getAttribute(attr));
-    marker.setAttribute('rx',String(Number(top.getAttribute('rx'))*.24));
-    marker.setAttribute('ry',String(Number(top.getAttribute('ry'))*.24));
-    marker.setAttribute('data-exo-stick-click','1');
-    marker.setAttribute('pointer-events','none');
-    group.appendChild(marker);
+// Use the TWO authored, moving stick ellipses. A static body socket never
+// participates. The mask cuts the exact source-authored center out of the
+// source-authored outer ellipse, preventing stacked semi-transparent alphas.
+function ensureStickRingMask(reference,outer,center){
+  if(!outer||!center)return;
+  const id=outer.id+'-polish-ring-mask';
+  if(outer.getAttribute('mask')===`url(#${id})`)return;
+  let defs=reference.svg.querySelector('defs');
+  if(!defs){defs=document.createElementNS(svgNs,'defs');reference.svg.prepend(defs);}
+  if(!defs.querySelector('[id="'+CSS.escape(id)+'"]')){
+    const bounds=outer.getBBox(),pad=Math.max(bounds.width,bounds.height)*.12;
+    const mask=document.createElementNS(svgNs,'mask');
+    for(const [key,value] of Object.entries({
+      id,maskUnits:'userSpaceOnUse',maskContentUnits:'userSpaceOnUse',
+      x:bounds.x-pad,y:bounds.y-pad,
+      width:bounds.width+pad*2,height:bounds.height+pad*2
+    }))mask.setAttribute(key,String(value));
+    const copy=(source,fill)=>{
+      const shape=source.cloneNode(false);
+      shape.removeAttribute('id');shape.removeAttribute('class');
+      shape.removeAttribute('style');shape.removeAttribute('mask');
+      shape.setAttribute('fill',fill);shape.setAttribute('stroke','none');
+      return shape;
+    };
+    mask.append(copy(outer,'white'),copy(center,'black'));
+    defs.append(mask);
   }
-  marker.style.display=clicked?'':'none';
-  if(!clicked)return;
-  paint(marker,'fill',PRESS_WHITE);
-  paint(marker,'fill-opacity','1');
-  paint(marker,'stroke',colors.line);
-  paint(marker,'stroke-opacity',String(colors.lineAlpha*.7));
-  paint(marker,'stroke-width','0.9');
+  outer.setAttribute('mask',`url(#${id})`);
 }
-export function paintPolished2D(reference,mode,scene,{values=new Map(),left=null,right=null,colorway='default'}={}){
+function paintStick(reference,entry,colors,values,axes,variant){
+  const group=entry.group;
+  const outer=group.querySelector('[id$="-outline"]');
+  const center=group.querySelector('[id$="-top"]');
+  const pressure=group.querySelector('[id$="-pressure"]');
+  if(pressure){paint(pressure,'fill','none');paint(pressure,'stroke','none');}
+  if(!outer)return;
+  const movement=analogStickLevel(axes?.[entry.stickSide]);
+  const clicked=clamp(values?.get(entry.control)||0)>.5;
+  const levels=stickFeedbackLevels(movement,clicked,variant);
+  if(center)ensureStickRingMask(reference,outer,center);
+  const setPart=(node,base,intensity)=>{
+    if(!node)return;
+    paint(node,'fill',mixColor(base,PRESS_WHITE,intensity));
+    paint(node,'fill-opacity',colors.controlAlpha+(1-colors.controlAlpha)*intensity);
+    paint(node,'stroke',intensity>=.65?colors.pressedOutline:colors.line);
+    paint(node,'stroke-opacity',intensity>=.65?1:colors.lineAlpha);
+  };
+  setPart(outer,colors.cap,levels.ring);
+  if(center){
+    setPart(center,colors.control,levels.center);
+    // The authored center stroke remains visible when both regions are white.
+  }else{
+    // A few unusual source SVGs (e.g. the GameCube C-stick) do not author a
+    // separate top. Never synthesize one: use the authored rim for feedback.
+    const fallback=Math.max(levels.ring,levels.center);
+    setPart(outer,colors.cap,fallback);
+  }
+  // Nothing touches the unmoving socket in the body group.
+}
+function paintDpad(entry,colors,values){
+  const group=entry.group;
+  const face=group.querySelector('[id$="-cross"],[id$="-surface"],[id$="-face"]')||entry.surface;
+  if(!face)return;
+  const level=Math.max(...['up','down','left','right'].map(key=>clamp(values?.get(key)||0)))>.5?1:0;
+  paint(face,'fill',mixColor(colors.control,PRESS_WHITE,level));
+  paint(face,'fill-opacity',colors.controlAlpha+(1-colors.controlAlpha)*level);
+  paint(face,'stroke',level?colors.pressedOutline:colors.line);
+  paint(face,'stroke-opacity',level?1:colors.lineAlpha);
+  // Keep the original dish distinct from the moving/pressed cross.
+  const dish=group.querySelector('[id$="-dish"]');
+  if(dish){
+    paint(dish,'fill','none');paint(dish,'stroke',colors.line);
+    paint(dish,'stroke-opacity',colors.lineAlpha*.64);
+  }
+}
+function paintGlyphs(entry,colors,showFaceSymbols){
+  const isFace=['b1','b2','b3','b4'].includes(entry.control)&&entry.layer.role==='button';
+  const face=entry.group.querySelector('[id$="-face"]');
+  const glyphs=[...entry.group.querySelectorAll('.glyph')].filter(node=>!node.closest('defs,mask'));
+  // DualSense Share/Options draw their glyph BEFORE the face in the source SVG.
+  // Move only those authored glyph nodes in front; never duplicate a symbol.
+  if(face&&glyphs.some(node=>Boolean(node.compareDocumentPosition(face)&Node.DOCUMENT_POSITION_FOLLOWING)))
+    for(const glyph of glyphs)entry.group.appendChild(glyph);
+  for(const glyph of glyphs){
+    if(isFace){
+      if(showFaceSymbols)glyph.style.removeProperty('display');
+      else paint(glyph,'display','none');
+    }
+    if(visibleFill(glyph))paint(glyph,'fill',colors.glyph);
+    if(visibleStroke(glyph))paint(glyph,'stroke',colors.glyph);
+    paint(glyph,'opacity','1');
+  }
+}
+function paintSilhouetteGlow(reference,amount){
+  const outer=reference.svg.querySelector('[id="outline-strong"],[id$="-outline-strong"]');
+  if(!outer)return;
+  const strength=clamp(amount);
+  if(strength===0){outer.style.removeProperty('filter');return;}
+  // A CSS/SVG silhouette filter: no per-frame raster, button bloom or hard
+  // extra outline. Zero removes the filter completely.
+  const near=(1.3+strength*2.2).toFixed(2);
+  const far=(3+strength*5).toFixed(2);
+  const alpha=(strength*.64).toFixed(3),soft=(strength*.34).toFixed(3);
+  paint(outer,'filter',
+    `drop-shadow(0 0 ${near}px rgba(236,246,255,${alpha})) drop-shadow(0 0 ${far}px rgba(212,233,252,${soft}))`);
+}
+export function paintPolished2D(reference,mode,scene,{
+  values=new Map(),left=null,right=null,colorway='auto',
+  stickFeedback='ring',showFaceSymbols=true,glow=0
+}={}){
   if(!reference?.svg)return;
-  if(mode!=='solid'&&mode!=='ghost')throw new TypeError('Unknown 2D look');
   const colors=lookPalette(reference.layout.id,mode,scene,colorway);
-  // Let the established controller binding code own transforms and cutouts.
+  // Existing binding owns the transform, mask cutouts and live input mapping.
   reference.update(values,{left,right});
   ensureBaseFill(reference,colors);
   for(const child of [...(reference.bodyShape?.children||[])]){
     if(child.hasAttribute('data-exo-polish-silhouette'))continue;
     if(!['path','ellipse','rect'].includes(child.localName))continue;
-    const detail=child.classList.contains('detail')||child.id==='speaker-grille';
+    const detail=child.classList.contains('detail')||child.id.endsWith('speaker-grille');
     if(visibleFill(child)){
       paint(child,'fill',colors.shell);
       paint(child,'fill-opacity',detail?colors.detailAlpha:colors.shellAlpha);
@@ -143,32 +238,32 @@ export function paintPolished2D(reference,mode,scene,{values=new Map(),left=null
     }
   }
   for(const entry of reference.controls){
+    if(entry.stickSide){
+      paintStick(reference,entry,colors,values,{left,right},stickFeedback);
+      paintGlyphs(entry,colors,showFaceSymbols);
+      continue;
+    }
+    if(entry.layer.role==='directional-pad'){
+      paintDpad(entry,colors,values);
+      paintGlyphs(entry,colors,showFaceSymbols);
+      continue;
+    }
     const group=entry.group;
-    const face=entry.stickSide?
-      (group.querySelector('[id$="-top"]')||entry.surface):
-      (group.querySelector('[id$="-face"]')||entry.surface);
+    const face=group.querySelector('[id$="-face"]')||entry.surface;
     if(!face)continue;
-    // A single face is blended in color/alpha. Never stack a translucent
-    // idle tile and a pressed tile, which would cause incorrect alpha.
     if(entry.surface&&entry.surface!==face&&entry.surface.id.endsWith('-pressure')){
       paint(entry.surface,'fill','none');paint(entry.surface,'stroke','none');
     }
     const level=controlLevel(entry,values,{left,right});
-    if(entry.stickSide)paintStickClick(entry,colors,(values.get(entry.control)||0)>.5);
-    const base=entry.stickSide?colors.cap:
-      entry.layer.role==='trigger'?colors.trigger:colors.control;
+    const base=entry.layer.role==='trigger'?colors.trigger:colors.control;
     paint(face,'fill',mixColor(base,PRESS_WHITE,level));
     paint(face,'fill-opacity',colors.controlAlpha+(1-colors.controlAlpha)*level);
-    // Keep one subtle structural edge even at completely white press.
-    if(visibleStroke(face)||entry.stickSide){
-      paint(face,'stroke',colors.line);
-      paint(face,'stroke-opacity',Math.max(colors.lineAlpha,level*.68));
+    // Neutral, contrasting source contours survive even completely white faces.
+    if(visibleStroke(face)||face.id.endsWith('-face')){
+      paint(face,'stroke',level?colors.pressedOutline:colors.line);
+      paint(face,'stroke-opacity',level?1:colors.lineAlpha);
     }
-    for(const glyph of group.querySelectorAll('.glyph')){
-      const color=level>.55?'#344657':colors.glyph;
-      if(visibleFill(glyph))paint(glyph,'fill',color);
-      if(visibleStroke(glyph))paint(glyph,'stroke',color);
-      paint(glyph,'opacity',colors.ghost?.92:1);
-    }
+    paintGlyphs(entry,colors,showFaceSymbols);
   }
+  paintSilhouetteGlow(reference,glow);
 }
