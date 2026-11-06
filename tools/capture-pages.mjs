@@ -210,12 +210,16 @@ try{
     const center=group.querySelector('[id$="-top"]');
     const face=entry.reference.controls.find(c=>c.control==='b1');
     const trigger=entry.reference.controls.find(c=>c.control==='l2');
+    const triggerFace=trigger?.group.querySelector('[id$="-face"],[id$="-outline"]')||
+      [...(trigger?.group.children||[])].find(node=>
+        ['path','ellipse','rect'].includes(node.localName)&&node!==trigger?.surface&&
+        !node.classList.contains('glyph'))||trigger?.surface;
     const system=entry.reference.controls.find(c=>c.layer.id==='btn-view');
     const outline=entry.reference.svg.querySelector('[id$="-outline-strong"]');
     const getFill=node=>node?getComputedStyle(node).fill:null;
     return {
       ring:getFill(ring),center:getFill(center),ringStroke:getComputedStyle(ring).stroke,
-      triggerFill:getFill(trigger?.group.querySelector('[id$="-face"]')||trigger?.surface),
+      triggerFill:getFill(triggerFace),
       ringMask:ring.getAttribute('mask'),
       faceGlyphDisplay:face?.group.querySelector('.glyph')?.style.display||'',
       systemGlyphDisplay:system?.group.querySelector('.glyph')?.style.display||'',
