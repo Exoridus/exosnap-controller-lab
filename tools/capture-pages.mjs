@@ -219,7 +219,9 @@ try{
     const getFill=node=>node?getComputedStyle(node).fill:null;
     return {
       ring:getFill(ring),center:getFill(center),ringStroke:getComputedStyle(ring).stroke,
-      triggerFill:getFill(triggerFace),
+      triggerFill:getFill(trigger?.surface),
+      triggerVisibleFace:getFill(triggerFace),
+      triggerPressureOpacity:trigger?.surface?getComputedStyle(trigger.surface).fillOpacity:null,
       ringMask:ring.getAttribute('mask'),
       faceGlyphDisplay:face?.group.querySelector('.glyph')?.style.display||'',
       systemGlyphDisplay:system?.group.querySelector('.glyph')?.style.display||'',
@@ -251,7 +253,7 @@ try{
   assert2D(initial.layout,6,'2D panel count');
   assert2D(initial.grid.join(','),'solid:dark,solid:light,solid:mixed,ghost:dark,ghost:light,ghost:mixed','2x3 look grid');
   assert2D(initial.glow,'none','0% contour glow');
-  if(initial.ringMask===null)throw Error('Source-authored stick ring was not composited separately');
+  if(initial.ringMask!==null)throw Error('Stick rim has an unexpected mask or clipped geometry');
   const sizes=[[240,160],[320,214],[480,320]];
   for(const [width,height] of sizes){
     await select2D('size',String(width));
@@ -261,6 +263,19 @@ try{
       throw Error('Mismatch across six 2D sizes: '+JSON.stringify(dims));
   }
   await capturePolish('2d-dualsense-neutral-480.png','dualsense','solid+ghost neutral');
+  // Trigger tests compare the actual STAGE pixels: changing only a slider
+  // label or a hidden DOM element cannot pass this screenshot check.
+  await capturePolish('2d-dualsense-trigger-neutral.png','dualsense',
+    'L2/R2 neutral, rendered surface', '.stage[data-look="solid"][data-scene="dark"]');
+  await range2D('trigger',100);
+  const fullTrigger=await visual2D();
+  assert2D(fullTrigger.triggerFill,'rgb(255, 255, 255)','100% trigger authored pressure fill');
+  assert2D(fullTrigger.triggerVisibleFace,'none','Trigger contour does not cover its pressure path');
+  await capturePolish('2d-dualsense-trigger-100.png','dualsense',
+    'L2/R2 100%, rendered surface', '.stage[data-look="solid"][data-scene="dark"]');
+  if(images.at(-1).sha256===images.at(-2).sha256)
+    throw Error('L2/R2 100% pressure produced no visible change in actual Chromium stage pixels');
+  await range2D('trigger',0);
   // The wheel MUST zoom all six SVGs, not scroll the document.
   const beforeWheel=await polish.evaluate(()=>({scroll:window.scrollY,zoom:window.__exo2DPolish.zoom}));
   await polish.locator('.stage[data-look="ghost"][data-scene="dark"]').hover();
