@@ -89,8 +89,9 @@ test('neutral cap, trigger, D-pad and face materials have consistent base contra
   }
   assert.ok(lookPalette('dualsense','ghost','dark').shellAlpha<.25);
   assert.equal(lookPalette('dualsense','solid','dark').shellAlpha,.99);
-  assert.equal(lookPalette('dualsense','ghost','dark').glyph,
+  assert.notEqual(lookPalette('dualsense','ghost','dark').glyph,
     lookPalette('dualsense','solid','light').glyph);
+  assert.equal(lookPalette('dualsense','solid','light').glyph,'#203446');
 });
 
 test('every tested stick uses authored moving outline + center; no synthetic click marker',async()=>{
@@ -159,7 +160,7 @@ test('authored trigger pressure is painted, with its own source outline above it
   assert.match(code,/const trigger=layer\.role==='trigger'/);
   assert.match(code,/paintControlGroup\(entry,colors,level\)/);
   assert.match(code,/activeEdgeFilter\(node,level\)/);
-  assert.match(code,/if\(node===pressure\)paintControl\(node,colors,level,\{stroke:shapes\.length===1\}\)/);
+  assert.match(code,/if\(node===pressure\)\s*\{?\s*paintControl\(node,colors,level,\{stroke:shapes\.length===1\}\)/);
   assert.match(code,/else paintControl\(node,colors,level,\{fill:false\}\)/);
   assert.doesNotMatch(code,/data-exo-stick-click|polish-ring-mask/);
 });

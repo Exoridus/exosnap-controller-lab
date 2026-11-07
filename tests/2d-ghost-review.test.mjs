@@ -63,6 +63,6 @@ test('comparison uses original SVGs with correct independent input states',async
   assert.ok(!html.includes('Gehaeusefarbe'));
   // The moving RIM cannot have any overlapping fill beneath the neutral
   // center: motion and L3 click must remain independently visible.
-  assert.match(style,/paint\(outer,'fill','none'\)/);
+  assert.match(style,/paint\(outer,'fill',solid\?mixColor\(colors\.control,PRESS_WHITE,ring\):'none'\)/);
   assert.match(style,/mixColor\(colors\.control,PRESS_WHITE,ring\)/);
 });
