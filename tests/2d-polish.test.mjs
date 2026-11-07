@@ -55,6 +55,18 @@ test('Auto resolves to each model default; Light and Dark exist for EVERY 2D lay
   assert.equal(lookPalette('dualsense','solid','dark').shell,'#f0f2f4');
 });
 
+test('Solid paints a full authored source silhouette, while Ghost leaves it empty',async()=>{
+  const code=await file('polish-2d-style.js');
+  assert.match(code,/silhouette\.setAttribute\('d',source\.getAttribute\('d'\)\)/);
+  assert.match(code,/silhouette\.setAttribute\('fill-rule','evenodd'\)/);
+  assert.match(code,/if\(colors\.ghost\)/);
+  assert.doesNotMatch(code,/FirstContour|function firstContour/i);
+  for(const id of ['dualsense','dualshock4','switch_pro','xbox_series','gamecube']){
+    const source=await file('references/controllers/'+id+'/source.svg');
+    assert.ok(source.includes('id="outline-strong"'),id+' needs a real authored silhouette');
+  }
+});
+
 test('neutral cap, trigger, D-pad and face materials have consistent base contrast',()=>{
   for(const colorway of ['light','dark']){
     const palettes=['dualsense','dualshock4','xbox_series','switch_pro','gamecube'].map(id=>

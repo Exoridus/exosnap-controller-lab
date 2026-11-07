@@ -194,27 +194,29 @@ function paintControlGroup(entry,colors,level){
 function ensureBaseFill(reference,colors){
   const body=reference.bodyShape;
   if(!body)return;
-  const authored=[...body.children].filter(n=>['path','ellipse','rect'].includes(n.localName)&&
-    visibleFill(n)&&!n.classList.contains('detail')&&!n.hasAttribute('data-exo-polish-silhouette'));
-  // A contour-only SVG can use its OWN existing outline path as the source
-  // for a non-animated background silhouette. No new authored contours.
   let silhouette=body.querySelector('[data-exo-polish-silhouette]');
-  if(!authored.length&&!silhouette){
+  if(colors.ghost){
+    // The same source outline is retained for both looks, but Ghost NEVER
+    // has an opaque housing fallback – only the authored line is rendered.
+    if(silhouette){paint(silhouette,'fill','none');paint(silhouette,'fill-opacity','0');}
+    return;
+  }
+  if(!silhouette){
     const source=body.querySelector('[id="outline-strong"],[id$="-outline-strong"]');
-    if(source?.getAttribute('d')){
-      silhouette=document.createElementNS(svgNs,'path');
-      silhouette.setAttribute('d',source.getAttribute('d'));
-      silhouette.setAttribute('fill-rule','evenodd');
-      silhouette.setAttribute('data-exo-polish-silhouette','1');
-      silhouette.setAttribute('stroke','none');
-      body.insertBefore(silhouette,body.firstChild);
-    }
+    if(!source?.getAttribute('d'))return;
+    silhouette=document.createElementNS(svgNs,'path');
+    // Use every authored subpath, including holes. Earlier FirstContour
+    // truncation lost them. This is a new background paint, not new geometry.
+    silhouette.setAttribute('d',source.getAttribute('d'));
+    silhouette.setAttribute('fill-rule','evenodd');
+    silhouette.setAttribute('data-exo-polish-silhouette','1');
+    silhouette.setAttribute('stroke','none');
+    silhouette.setAttribute('pointer-events','none');
+    body.insertBefore(silhouette,body.firstChild);
   }
-  if(silhouette){
-    paint(silhouette,'fill',colors.shell);
-    paint(silhouette,'fill-opacity',colors.shellAlpha);
-    paint(silhouette,'stroke','none');
-  }
+  paint(silhouette,'fill',colors.shell);
+  paint(silhouette,'fill-opacity',colors.shellAlpha);
+  paint(silhouette,'stroke','none');
 }
 // The source SVG already contains a movable rim and center. Never apply a
 // second ring mask: getBBox() does not include authored ellipse transforms,
