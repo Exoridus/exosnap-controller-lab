@@ -464,6 +464,8 @@ try{
       const pick=id=>groups.find(x=>x.layer.id===id)?.group;
       const nodes={
         l1:pick('btn-l1')?.querySelector('path:not([id$="-pressure"])'),
+        share:pick('btn-view')?.querySelector('[id$="-face"]'),
+        options:pick('btn-menu')?.querySelector('[id$="-face"]'),
         r1:pick('btn-r1')?.querySelector('path:not([id$="-pressure"])'),
         dpad:pick('btn-up')?.querySelector('[id$="-face"]'),
         face:pick('btn-cross')?.querySelector('[id$="-face"]'),
@@ -503,6 +505,60 @@ try{
     if(JSON.stringify(panel.glyph)!==JSON.stringify(first.glyph))
       throw Error('Face glyph changed across backgrounds: '+JSON.stringify(panel));
   }
+
+  // Pixel-level proof of visible control fills. A computed SVG style is
+  // insufficient: the path might be invisible, occluded, or offscreen.
+  // Suppress ONLY the marked physical fill and compare REAL Chromium
+  // screenshot pixels of the same SVG over a hard mixed background.
+  const visibleControlPixelAudit=[];
+  const checkVisibleFill=async(scene,id)=>{
+    const stage='.stage[data-look="pure"][data-scene="'+scene+'"]';
+    const before=await ghost.locator(stage).screenshot({animations:'disabled',timeout:60000});
+    const hidden=await ghost.evaluate(({scene,id})=>{
+      const item=window.__exoGhostReview.items.find(x=>x.look==='pure'&&x.scene===scene);
+      const entry=item.reference.controls.find(x=>x.layer.id===id);
+      if(!entry)throw Error('Missing mapping for pixel audit '+id);
+      const nodes=[...entry.group.querySelectorAll('[data-exo-visible-control-fill="1"]')];
+      if(!nodes.length)throw Error('Missing colored control surface in '+id);
+      for(const node of nodes)node.style.setProperty('fill-opacity','0','important');
+      return nodes.length;
+    },{scene,id});
+    const after=await ghost.locator(stage).screenshot({animations:'disabled',timeout:60000});
+    await ghost.evaluate(({scene,id})=>{
+      const item=window.__exoGhostReview.items.find(x=>x.look==='pure'&&x.scene===scene);
+      const entry=item.reference.controls.find(x=>x.layer.id===id);
+      for(const node of entry.group.querySelectorAll('[data-exo-visible-control-fill="1"]'))
+        node.style.setProperty('fill-opacity','0.26','important');
+    },{scene,id});
+    const diff=await ghost.evaluate(async({before,after})=>{
+      async function rgba(base64){
+        const pic=new Image();
+        pic.src='data:image/png;base64,'+base64;await pic.decode();
+        const can=document.createElement('canvas');can.width=pic.naturalWidth;can.height=pic.naturalHeight;
+        const ctx=can.getContext('2d',{willReadFrequently:true});ctx.drawImage(pic,0,0);
+        return ctx.getImageData(0,0,can.width,can.height).data;
+      }
+      const a=await rgba(before),b=await rgba(after);
+      if(a.length!==b.length)throw Error('Pixel comparison size changed');
+      let changed=0,sum=0,max=0;
+      for(let i=0;i<a.length;i+=4){
+        const value=Math.max(Math.abs(a[i]-b[i]),Math.abs(a[i+1]-b[i+1]),Math.abs(a[i+2]-b[i+2]));
+        if(value>=3){changed++;sum+=value;max=Math.max(max,value);}
+      }
+      return {changed,sum,max};
+    },{before:before.toString('base64'),after:after.toString('base64')});
+    visibleControlPixelAudit.push({scene,id,nodes:hidden,...diff});
+    if(diff.changed<3||diff.sum<35)
+      throw Error('SVG control fill not actually visible in Chromium: '+
+        JSON.stringify({scene,id,nodes:hidden,...diff}));
+  };
+  for(const scene of ['dark','light','mixed']){
+    for(const id of ['btn-l1','btn-r1','btn-home','btn-view','btn-menu',
+      'btn-touchpad','btn-cross','btn-up','stick-l-cap','trigger-l2'])
+      await checkVisibleFill(scene,id);
+  }
+  console.log('Pixel-visible 2D controls verified: '+JSON.stringify(visibleControlPixelAudit));
+
   const captureGhost=async(file,element=null)=>{
     const target=element?ghost.locator(element):ghost;
     const bytes=await target.screenshot({path:path.join(output,file),fullPage:!element,animations:'disabled',timeout:60000});
@@ -522,6 +578,25 @@ try{
   await ghost.locator('#clicks').check();
   await ghost.locator('#faces').check();
   await captureGhost('2d-ghost-review-active.png');
+  await ghost.locator('#allControls').check();
+  await captureGhost('2d-ghost-review-all-controls.png');
+  const pressedControls=await ghost.evaluate(()=>{
+    return window.__exoGhostReview.items.map(item=>{
+      const names=['btn-l1','btn-r1','btn-home','btn-view','btn-menu','btn-touchpad'];
+      const controls=names.map(id=>{
+        const entry=item.reference.controls.find(x=>x.layer.id===id);
+        const p=entry?.group.querySelector('[data-exo-visible-control-fill="1"]');
+        const style=p?getComputedStyle(p):null;
+        return {id,fill:style?.fill,alpha:style?.fillOpacity};
+      });
+      return {look:item.look,scene:item.scene,controls};
+    });
+  });
+  for(const panel of pressedControls)
+    for(const ctl of panel.controls)
+      if(ctl.fill!=='rgb(255, 255, 255)'||Math.abs(Number(ctl.alpha)-.58)>.001)
+        throw Error('Pressed 2D control is not uniformly translucent white: '+JSON.stringify({panel:panel.scene,look:panel.look,...ctl}));
+  await ghost.locator('#allControls').uncheck();
   if(images.at(-1).sha256===images.find(x=>x.file==='2d-ghost-review-neutral.png').sha256)
     throw Error('Ghost review input activity produced identical pixels');
   if(ghostErrors.length)throw Error('Ghost A/B/C browser errors: '+ghostErrors.join('; '));
