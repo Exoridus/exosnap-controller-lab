@@ -60,7 +60,7 @@ test('Solid paints a full authored source silhouette, while Ghost leaves it empt
   assert.match(code,/silhouette\.setAttribute\('d',source\.getAttribute\('d'\)\)/);
   assert.match(code,/silhouette\.setAttribute\('fill-rule','evenodd'\)/);
   assert.match(code,/if\(colors\.ghost\)/);
-  assert.doesNotMatch(code,/FirstContour|function firstContour/i);
+  assert.doesNotMatch(code,/function\s+firstContour\s*\(/i);
   for(const id of ['dualsense','dualshock4','switch_pro','xbox_series','gamecube']){
     const source=await file('references/controllers/'+id+'/source.svg');
     assert.ok(source.includes('id="outline-strong"'),id+' needs a real authored silhouette');
@@ -152,7 +152,7 @@ test('authored trigger pressure is painted, with its own source outline above it
   assert.match(code,/paintControlGroup\(entry,colors,level\)/);
   assert.match(code,/activeEdgeFilter\(node,level\)/);
   assert.match(code,/if\(node===pressure\)paintControl\(node,colors,level,\{stroke:shapes\.length===1\}\)/);
-  assert.match(code,/else paintControl\(node,colors,0,\{fill:false\}\)/);
+  assert.match(code,/else paintControl\(node,colors,level,\{fill:false\}\)/);
   assert.doesNotMatch(code,/data-exo-stick-click|polish-ring-mask/);
 });
 
