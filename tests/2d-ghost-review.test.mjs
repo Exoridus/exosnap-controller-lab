@@ -37,12 +37,17 @@ test('A/B/C only change edge relief and always leave shell 100% transparent',()=
   assert.equal(active.stroke,'#ffffff');
   assert.equal(active.strokeAlpha,CONTROL_PALETTE.activeBorderAlpha);
   assert.ok(active.alpha<=.42);
+  assert.equal(settings[0].line,'#718b9d');
+
   assert.throws(()=>ghostReviewSettings('other','dark'),TypeError);
 });
 test('comparison uses original SVGs with correct independent input states',async()=>{
   const html=await source('polish-2d-review.html');
   const js=await source('polish-2d-review.js');
   const style=await source('polish-2d-style.js');
+  assert.match(style,/feComponentTransfer/);
+  assert.match(style,/type:'linear',slope:2\.5/);
+  assert.match(style,/flood-opacity':'.75'/);
   assert.match(html,/Drei transparente Ghost-Looks/);
   for(const id of ['layout','size','stick','trigger','clicks','faces','allControls','faceSymbols','live'])
     assert.ok(html.includes('id="'+id+'"'),id);

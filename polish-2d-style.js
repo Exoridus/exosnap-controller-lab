@@ -74,7 +74,7 @@ export function lookPalette(id,mode,scene,colorway='auto'){
     shellAlpha:ghost?0:.99,coreAlpha:ghost?0:.96,
     detailAlpha:ghost?0:.26,
     // Only the outside silhouette is background-dependent. Controls are not.
-    line:ghost?'#dceaf3':'#50687b',
+    line:ghost?'#718b9d':'#50687b',
     lineAlpha:ghost?.91:.86,
     controlAlpha:ghost?CONTROL_PALETTE.neutralAlpha:.96,
     activeAlpha:ghost?CONTROL_PALETTE.activeAlpha:.98,
@@ -106,7 +106,7 @@ export function ghostReviewSettings(key,scene){
     controlStroke:CONTROL_PALETTE.border,
     controlStrokeAlpha:CONTROL_PALETTE.borderAlpha,
     shellAlpha:0,coreAlpha:0,detailAlpha:0,
-    line:'#dceaf3',
+    line:'#718b9d',
     lineAlpha:.91,
     glyph:CONTROL_PALETTE.glyph,glyphAlpha:CONTROL_PALETTE.glyphAlpha,
     pressedOutline:CONTROL_PALETTE.border
@@ -164,13 +164,15 @@ function activeEdgeFilter(node,level){
       for(const [k,v] of Object.entries(attributes))result.setAttribute(k,String(v));
       return result;
     };
-    const blur=create('feGaussianBlur',{in:'SourceAlpha',stdDeviation:(Number(unit)*.9).toFixed(3),result:'blur'});
+    const normalized=create('feComponentTransfer',{in:'SourceAlpha',result:'full-alpha'});
+    normalized.append(create('feFuncA',{type:'linear',slope:2.5,intercept:0}));
+    const blur=create('feGaussianBlur',{in:'full-alpha',stdDeviation:(Number(unit)*1.20).toFixed(3),result:'blur'});
     const outside=create('feComposite',{in:'blur',in2:'SourceAlpha',operator:'out',result:'outside'});
-    const ink=create('feFlood',{'flood-color':'#07121d','flood-opacity':'.56',result:'ink'});
+    const ink=create('feFlood',{'flood-color':'#07121d','flood-opacity':'.75',result:'ink'});
     const shade=create('feComposite',{in:'ink',in2:'outside',operator:'in',result:'shade'});
     const merge=create('feMerge',{});
     merge.append(create('feMergeNode',{in:'shade'}),create('feMergeNode',{in:'SourceGraphic'}));
-    filter.replaceChildren(blur,outside,ink,shade,merge);
+    filter.replaceChildren(normalized,blur,outside,ink,shade,merge);
     filter.setAttribute('data-unit',unit);
   }
   paint(node,'filter','url(#'+filterId+')');
