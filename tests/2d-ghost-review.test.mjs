@@ -42,17 +42,20 @@ test('comparison uses original SVGs with correct independent input states',async
   const js=await source('polish-2d-review.js');
   const style=await source('polish-2d-style.js');
   assert.match(html,/Drei transparente Ghost-Looks/);
-  for(const id of ['layout','size','stick','trigger','clicks','faces','faceSymbols','live'])
+  for(const id of ['layout','size','stick','trigger','clicks','faces','allControls','faceSymbols','live'])
     assert.ok(html.includes('id="'+id+'"'),id);
   assert.ok(js.includes('new ControllerReference(stage)'));
   assert.ok(js.includes('isolateReferenceIds('));
   assert.ok(js.includes("stickFeedback:'ring'"));
   assert.ok(js.includes("paintPolished2D(item.reference,'ghost'"));
-  assert.ok(style.includes('paintControl(face,colors,level)'));
+  assert.ok(style.includes('paintControlGroup(entry,colors,level)'));
+  assert.ok(style.includes('data-exo-visible-control-fill'));
+  assert.match(style,/for\(const node of shapes\)/);
+  assert.match(style,/controlGeometry\(group\)/);
   assert.ok(!style.includes("group.id.endsWith('btn-touchpad')"));
   assert.ok(!html.includes('Gehaeusefarbe'));
   // The moving RIM cannot have any overlapping fill beneath the neutral
   // center: motion and L3 click must remain independently visible.
   assert.match(style,/paint\(outer,'fill','none'\)/);
-  assert.match(style,/mixColor\(colors\.controlStroke,PRESS_WHITE,ring\)/);
+  assert.match(style,/mixColor\(colors\.control,PRESS_WHITE,ring\)/);
 });

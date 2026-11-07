@@ -45,6 +45,9 @@ function inputState(){
   if($('clicks').checked){values.set('ls',1);values.set('rs',1);}
   if($('faces').checked)
     for(const id of ['b1','b2','b3','b4','up','down','left','right'])values.set(id,1);
+  if($('allControls').checked)
+    for(const id of ['b1','b2','b3','b4','up','down','left','right',
+      'l1','r1','start','select','home','touchpad','share'])values.set(id,1);
   if(trigger>0){values.set('l2',trigger);values.set('r2',trigger);}
   return {values,left:{x:a,y:-a},right:{x:-a,y:a},source:pad?'Gamepad':'Demo'};
 }
@@ -84,7 +87,7 @@ $('size').addEventListener('change',()=>{resize();paint();changeAddress();});
 for(const key of ['stick','trigger']){
   $(key).addEventListener('input',()=>{$(key+'Value').textContent=$(key).value+' %';paint();});
 }
-for(const id of ['clicks','faces','faceSymbols','live'])$(id).addEventListener('change',paint);
+for(const id of ['clicks','faces','allControls','faceSymbols','live'])$(id).addEventListener('change',paint);
 function liveTick(now){
   if($('live').checked&&now-lastFrame>=30){
     const input=inputState();

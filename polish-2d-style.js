@@ -136,12 +136,62 @@ export function controlSurfaceState(colors,level){
 function paintControl(node,colors,level,{fill=true,stroke=true}={}){
   if(!node)return;
   const state=controlSurfaceState(colors,level);
+  // Explicit render-surface marker for browser pixel-difference tests.
+  // A computed style on a hidden SVG path is NOT a visual proof.
+  if(fill)node.setAttribute('data-exo-visible-control-fill','1');
+  else node.removeAttribute('data-exo-visible-control-fill');
   paint(node,'fill',fill?state.fill:'none');
   paint(node,'fill-opacity',fill?state.alpha:0);
   if(stroke){
     paint(node,'stroke',state.stroke);
     paint(node,'stroke-opacity',String(state.strokeAlpha));
   }else paint(node,'stroke','none');
+}
+// The authored source may contain face paths, visible outlines, and unused
+// pressure placeholders in different nesting arrangements. Pick real filled
+// surfaces semantically, and recolor EVERY other visible non-glyph shape as
+// one consistent structural outline. This must include nested SVG groups.
+function authoredFill(node){
+  const original=node.getAttribute('data-exo-authored-fill');
+  if(original!==null)return original==='true';
+  const inline=node.getAttribute('style')||'';
+  const match=inline.match(/(?:^|;)\s*fill\s*:\s*([^;]+)/i);
+  const paint=match?match[1].trim():(node.getAttribute('fill')||'');
+  const enabled=paint!==''&&paint.toLowerCase()!=='none';
+  node.setAttribute('data-exo-authored-fill',String(enabled));
+  return enabled;
+}
+function controlGeometry(group){
+  return [...group.querySelectorAll('path,ellipse,rect,circle,polygon')].filter(node=>
+    !node.closest('defs,mask,clipPath')&&!node.classList.contains('glyph')&&
+    !node.closest('.glyph'));
+}
+function paintControlGroup(entry,colors,level){
+  const {group,layer}=entry;
+  const shapes=controlGeometry(group);
+  const pressure=shapes.find(node=>node.id.endsWith('-pressure')||
+    node.classList.contains('press-surface'));
+  const trigger=layer.role==='trigger';
+  for(const node of shapes){
+    const pressureNode=node===pressure;
+    if(trigger){
+      if(pressureNode)paintControl(node,colors,level,{stroke:false});
+      else paintControl(node,colors,0,{fill:false});
+      continue;
+    }
+    if(pressureNode&&shapes.length>1){
+      paint(node,'fill','none');paint(node,'stroke','none');
+      node.removeAttribute('data-exo-visible-control-fill');
+      continue;
+    }
+    // Authored filled parts, explicit -face/-surface paths, and the PS
+    // home-logo are control surfaces. Source-only lines remain outlines.
+    const identity=node.id||'';
+    const surface=authoredFill(node) ||
+      /(?:-face|-surface)$/.test(identity) ||
+      identity==='home-logo'||pressureNode;
+    paintControl(node,colors,level,{fill:surface});
+  }
 }
 
 function ensureBaseFill(reference,colors){
@@ -188,7 +238,7 @@ function paintStick(reference,entry,colors,values,axes,variant){
   // Ring = the original moving ellipse STROKE, never an overlapping filled disk.
   paint(outer,'fill','none');
   paint(outer,'fill-opacity','0');
-  paint(outer,'stroke',mixColor(colors.controlStroke,PRESS_WHITE,ring));
+  paint(outer,'stroke',mixColor(colors.control,PRESS_WHITE,ring));
   paint(outer,'stroke-opacity',
     String(colors.controlStrokeAlpha+(CONTROL_PALETTE.activeBorderAlpha-colors.controlStrokeAlpha)*ring));
   if(center){
@@ -374,30 +424,8 @@ export function paintPolished2D(reference,mode,scene,{
       paintGlyphs(entry,colors,showFaceSymbols);
       continue;
     }
-    const group=entry.group;
-    // Trigger/bumper mappings often bind an invisible "-pressure" path,
-    // while the REAL visible authored face is the following sibling.
-    const pressure=entry.surface?.id.endsWith('-pressure')?entry.surface:null;
-    const face=group.querySelector('[id$="-face"],[id$="-outline"]')||
-      (pressure?[...group.children].find(node=>
-        ['path','ellipse','rect'].includes(node.localName)&&node!==pressure&&
-        !node.classList.contains('glyph')):null)||entry.surface;
-    if(!face)continue;
     const level=controlLevel(entry,values,{left,right});
-    if(entry.layer.role==='trigger'&&pressure&&face!==pressure){
-      // Analog source face: visible pressure is the colored material; its
-      // sibling remains an outline, never a second filled surface.
-      paintControl(pressure,colors,level,{stroke:false});
-      paintControl(face,colors,0,{fill:false});
-    }else{
-      if(pressure&&face!==pressure){
-        paint(pressure,'fill','none');paint(pressure,'stroke','none');
-      }
-      // Same neutral/active RGBA for R1/L1, Face, D-pad, Home and Touchpad.
-      // Even elements without authored stroke (DualSense Touchpad/Home)
-      // use the same single structural outline.
-      paintControl(face,colors,level);
-    }
+    paintControlGroup(entry,colors,level);
     paintGlyphs(entry,colors,showFaceSymbols);
   }
   paintEdgeRelief(reference,mode,scene,edgeLight,edgeShadow);
