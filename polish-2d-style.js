@@ -344,10 +344,10 @@ function paintStick(reference,entry,colors,values,axes,variant){
 }
 function paintDpad(entry,colors,values){
   const group=entry.group;
-  const face=group.querySelector('[id$="-cross"],[id$="-surface"],[id$="-face"]')||entry.surface;
-  if(!face)return;
   const level=Math.max(...['up','down','left','right'].map(key=>clamp(values?.get(key)||0)))>.5?1:0;
-  paintControl(face,colors,level);
+  // The authored D-pad may have several filled elements (Switch/Generic),
+  // not just one -surface path. One material across all non-glyph parts.
+  paintControlGroup(entry,colors,level);
   const dish=group.querySelector('[id$="-dish"]');
   if(dish)paintControl(dish,colors,0,{fill:false});
 }

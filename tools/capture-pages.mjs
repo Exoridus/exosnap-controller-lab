@@ -434,6 +434,20 @@ try{
       throw Error('Solid ring is still transparent for '+modelId+': '+JSON.stringify(proof));
     if(proof.ghost&&proof.ghost.fill!=='none')
       throw Error('Ghost ring has unintended fill for '+modelId+': '+JSON.stringify(proof));
+    const dpad=await polish.evaluate(()=>{
+      const solid=window.__exo2DPolish.refs.find(x=>x.mode==='solid'&&x.scene==='dark');
+      const group=solid.reference.controls.find(x=>x.layer.id==='dpad')?.group;
+      if(!group)return {present:false,paints:[]};
+      const paints=[...group.querySelectorAll('path,rect,ellipse')].filter(x=>
+        !x.classList.contains('glyph')&&!x.closest('.glyph,defs,mask'))
+        .map(x=>{const css=getComputedStyle(x);return {id:x.id,fill:css.fill,alpha:Number(css.fillOpacity)};})
+        .filter(x=>x.fill!=='none'&&x.alpha>.01);
+      return {present:true,paints};
+    });
+    if(dpad.present&&(dpad.paints.length<1||
+      dpad.paints.some(x=>x.fill!=='rgb(168, 185, 199)')))
+      throw Error('D-pad must share the neutral control material: '+
+        JSON.stringify({modelId,dpad}));
     await capturePolish(file,
       modelId,'Solid original contours and material-filled moving sticks',
       '.stage[data-look="solid"][data-scene="dark"]');

@@ -58,6 +58,7 @@ test('Auto resolves to each model default; Light and Dark exist for EVERY 2D lay
 test('Solid ring has its own material, Xbox bumpers do not flood the center',async()=>{
   const code=await file('polish-2d-style.js');
   assert.match(code,/const solid=!colors\.ghost/);
+  assert.match(code,/paintControlGroup\(entry,colors,level\)/);
   assert.match(code,/paint\(outer,'fill',solid\?mixColor/);
   assert.match(code,/clip\.setAttribute\('id',pressure\.id\+'-material-clip'\)/);
   assert.match(code,/entry\.layoutId=reference\.layout\.id/);
