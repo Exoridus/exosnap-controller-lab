@@ -6,7 +6,7 @@ export const PRESS_WHITE='#ffffff';
 // controller identity must NEVER change these values in Ghost.
 export const CONTROL_PALETTE=Object.freeze({
   neutralFill:'#a8b9c7',neutralAlpha:.26,
-  activeFill:PRESS_WHITE,activeAlpha:.58,
+  activeFill:PRESS_WHITE,activeAlpha:.45,
   border:'#8198aa',borderAlpha:.87,
   activeBorderAlpha:.9,
   glyph:'#8198a9',glyphAlpha:.9
