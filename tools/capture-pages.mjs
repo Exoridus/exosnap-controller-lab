@@ -617,7 +617,7 @@ try{
   });
   for(const panel of pressedControls)
     for(const ctl of panel.controls)
-      if(ctl.fill!=='rgb(255, 255, 255)'||Math.abs(Number(ctl.alpha)-.45)>.001)
+      if(ctl.fill!=='rgb(255, 255, 255)'||Math.abs(Number(ctl.alpha)-.40)>.001)
         throw Error('Pressed 2D control is not uniformly translucent white: '+JSON.stringify({panel:panel.scene,look:panel.look,...ctl}));
   await ghost.locator('#allControls').uncheck();
   if(images.at(-1).sha256===images.find(x=>x.file==='2d-ghost-review-neutral.png').sha256)
