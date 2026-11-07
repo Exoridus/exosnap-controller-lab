@@ -15,24 +15,23 @@ test('four distinct looks use supported Qt Quick 3D material contracts',()=>{
   assert.ok(recipe.material.controls.idleTint);
  }
 });
-test('idle stick matches control look, moving stick lightens, pressed click is opaque LED',async()=>{
- const rig=await loadNativeRig(CONTROLLERS[0],read),recipe=resolveHeroRecipe('ghost',1);
- const cap=rig.meshes.find(m=>m.userData.sourceFile==='left_cap.obj');
- const well=rig.meshes.find(m=>m.userData.sourceFile==='left_ring.obj');
- try{
-  applyPbrRecipeToRig(rig,recipe,{...poseForStickDemo('neutral'),allPressed:false});
-  const idle=cap.material.color.clone(),idleAlpha=cap.material.opacity;
-  applyPbrRecipeToRig(rig,recipe,{...poseForStickDemo('move'),allPressed:false});
-  const moved=cap.material.color.clone(),moveAlpha=cap.material.opacity;
-  assert.ok(!moved.equals(idle),'movement should shift white cap toward pale blue');
-  assert.equal(idle.getHexString(),'e6eff6');
-  assert.ok(moved.b>moved.r,'motion color remains pale blue');
-  assert.ok(moveAlpha>=idleAlpha);
-  applyPbrRecipeToRig(rig,recipe,{...poseForStickDemo('click'),allPressed:false});
-  assert.ok(cap.material.opacity>moveAlpha);
-  assert.equal(cap.material.opacity,1);
-  assert.ok(cap.material.emissiveIntensity>=.8);
- }finally{disposeNativeRig(rig)}
+test('Ghost stick motion brightens the moving ring and L3 retains shaded, translucent cap',async()=>{
+  const rig=await loadNativeRig(CONTROLLERS[0],read),recipe=resolveHeroRecipe('ghost',1);
+  const cap=rig.meshes.find(m=>m.userData.sourceFile==='left_cap.obj');
+  const ring=rig.meshes.find(m=>m.userData.sourceFile==='left_ring.obj');
+  try{
+    applyPbrRecipeToRig(rig,recipe,{...poseForStickDemo('neutral'),allPressed:false});
+    const idle=cap.material.color.clone(),ringIdle=ring.material.color.clone(),idleAlpha=cap.material.opacity;
+    applyPbrRecipeToRig(rig,recipe,{...poseForStickDemo('move'),allPressed:false});
+    const moved=cap.material.color.clone(),movingRing=ring.material.color.clone(),moveAlpha=cap.material.opacity;
+    assert.ok(moved.equals(idle),'travel must not trigger the L3 center');
+    assert.ok(!movingRing.equals(ringIdle),'only moving ring reacts to analog travel');
+    assert.equal(moveAlpha,idleAlpha);
+    applyPbrRecipeToRig(rig,recipe,{...poseForStickDemo('click'),allPressed:false});
+    assert.ok(cap.material.opacity>moveAlpha);
+    assert.ok(cap.material.opacity<1);
+    assert.ok(cap.material.emissiveIntensity>0&&cap.material.emissiveIntensity<.3);
+  }finally{disposeNativeRig(rig)}
 });
 test('stick tilt poses change real source pivots and return exactly to neutral',async()=>{
  const rig=await loadNativeRig(CONTROLLERS[0],read);

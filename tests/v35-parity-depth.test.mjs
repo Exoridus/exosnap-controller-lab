@@ -60,14 +60,15 @@ test('actual OBJ rig uses physical depth occlusion, does not merely dim rear con
   }finally{disposeNativeRig(rig)}
 });
 
-test('pressed controls emit shared LED blue on opaque surfaces',async()=>{
+test('pressed Ghost controls preserve PBR shading and bounded translucency',async()=>{
   const rig=await loadNativeRig(CONTROLLERS[0],read);
   try{
     const r=resolveHeroRecipe('ghost',.9);
     applyPbrRecipeToRig(rig,r,true);
     const button=rig.meshes.find(m=>m.userData.sourceFile==='x_button.obj');
-    assert.equal(button.material.opacity,1);
-    assert.ok(button.material.emissiveIntensity>=.4);
+    assert.ok(button.material.opacity>=r.material.controls.opacity);
+    assert.ok(button.material.opacity<1);
+    assert.ok(button.material.emissiveIntensity>.15&&button.material.emissiveIntensity<.3);
     assert.equal(r.material.pressEmissive,EXO_PALETTE.pressedEmissive);
     assert.equal(button.material.emissive.getHexString(),EXO_PALETTE.pressedEmissive.slice(1));
     const descriptor=qtQuickDescriptor(r);

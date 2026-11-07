@@ -18,14 +18,14 @@ function nativeOneButton(){
   return {meshes:[mesh],group,parts:[],stickInstances:[]};
 }
 
-test('opaque LED press state is bright and does not borrow the Ghost opacity',()=>{
+test('Ghost press remains shaded, uses shared active color and avoids opaque white sticker',()=>{
   const native=nativeOneButton();
   const recipe=resolveHeroRecipe('ghost',1);
   applyPbrRecipeToRig(native,recipe,{allPressed:true});
   const m=native.meshes[0].material;
-  assert.equal(m.opacity,1);
+  assert.ok(m.opacity>=recipe.material.controls.opacity&&m.opacity<1);
   assert.equal(recipe.material.pressBlue,EXO_PALETTE.pressedSurface);
-  assert.ok(m.emissiveIntensity>=.8,'pressed control requires real emissive intensity');
+  assert.ok(m.emissiveIntensity>.15&&m.emissiveIntensity<.3,'retain lit surface shading');
   const flat=resolve2DPaint(recipe,'light');
   assert.equal(flat.pressedOpacity,1);
   assert.equal(flat.pressedBlue,recipe.material.pressBlue);
