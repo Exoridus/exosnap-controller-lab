@@ -63,12 +63,16 @@ export function resolveHeroRecipe(key,mix){
     fillDirectional:{...original.lights.fillDirectional,intensity:0},
     rimPoint:{...original.lights.rimPoint,intensity:0},
   };
+  const ghostFresnel=['ghost','identity'].includes(key)
+    ?{strength:t*(key==='ghost'?.92:.70),source:'surface-normal v25; native Qt not yet validated'}
+    :{strength:0,source:'disabled'};
   const name=HERO_VARIANTS.find(v=>v.key===key).name;
   return {...original,variant:key,name,
     description:HERO_VARIANTS.find(v=>v.key===key).description,
     strategy:config.outline?'outline-ghost':'environment-ibl',
     lightingMode:config.outline?'unlit':'ibl',
     environmentProbe:HERO_ENVIRONMENT,environmentIntensity:config.env,
+    ghostFresnel,
     material:{...material,pressBlue:EXO_PALETTE.pressedSurface,
       pressEmissive:EXO_PALETTE.pressedEmissive,pressEmissiveIntensity:1.05,pressOpacity:1},
     lights, silhouette:{enabled:config.outline&&t>.02,ink:'#c9dff2',opacity:.65,thickness:1.012},
@@ -116,6 +120,7 @@ export function qtQuickDescriptor(recipe){
     positionUnit:'Three world units, after normalization to 4.05',
     environmentProbe:recipe.environmentProbe||null,environmentIntensity:recipe.environmentIntensity??0,
     silhouette:recipe.silhouette||{enabled:false},
+    ghostFresnel:recipe.ghostFresnel||{strength:0},
     shell:material.shell,controls:material.controls,pressedBlue:material.pressBlue,
     pressEmissive:{color:material.pressEmissive,intensity:material.pressEmissiveIntensity},
     pointKey:lights.keyPoint,fillDirectional:lights.fillDirectional,pointRim:lights.rimPoint,

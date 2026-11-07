@@ -6,6 +6,7 @@ import {normalizeStickInput,stickVisualState} from './stick-activity.js';
 import {updateStickInstances} from './pbr-optimizer.js';
 import {depthPriority,updateGhostRearHints} from './ghost-depth-policy.js';
 import {EXO_PALETTE} from './palette.js';
+import {setGhostFresnel} from './pbr-fresnel.js';
 const pressedBlue=new THREE.Color(EXO_PALETTE.pressedBlue);
 const ghostColor=new THREE.Color();
 const idleColor=new THREE.Color();
@@ -44,6 +45,7 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
     const spec=control?recipe.material.controls:recipe.material.shell;
     m.color.copy(mesh.userData.sourceColor).lerp(ghostColor.set(spec.ghostTint),1-spec.originalColorWeight);
     if(control&&spec.idleTint&&spec.idleTintWeight)m.color.lerp(idleColor.set(spec.idleTint),spec.idleTintWeight);
+    if(!unlit&&!control)setGhostFresnel(m,recipe.ghostFresnel?.strength||0);
     if(!unlit){
       m.roughness=control?Math.min(1,spec.roughness+.06):spec.roughness;
       m.metalness=spec.metalness;
