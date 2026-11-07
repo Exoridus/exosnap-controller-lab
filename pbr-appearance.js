@@ -59,38 +59,61 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
     m.depthWrite=true;
     m.transparent=true;
     if(!unlit){m.emissive.setRGB(0,0,0);m.emissiveIntensity=0;}
+    const hero=Boolean(recipe.environmentProbe);
+    const restAlpha=Math.max(spec.opacity,.52);
+    const litAlpha=Math.max(restAlpha,.72);
+    const gentleEmissive=(amount)=>{
+      if(unlit)return;
+      m.emissive.set(recipe.material.pressEmissive);
+      m.emissiveIntensity=hero?.22*amount:recipe.material.pressEmissiveIntensity*amount;
+    };
     const stickPart=['stick-stem','stick-cap','stick-pivot'].includes(mesh.userData.role);
     const stick=stickPart?pose[relevantStick(mesh.userData.sourceFile)]:null;
     if(stick){
       const state=stickVisualState(stick);
-      // Neutral: light cap, dark physical socket/shaft; NO colored ring or glow.
-      // Movement tints only the cap toward light blue. Click is a separate input.
-      if(mesh.userData.role==='stick-cap'){
-        m.color.copy(neutralStickColor).lerp(pressedBlue,state.moving);
-        m.opacity=Math.min(1,Math.max(spec.opacity,.52)+(1-Math.max(spec.opacity,.52))*state.moving);
+      if(hero){
+        if(mesh.userData.role==='stick-pivot'){
+          // The authored MOVING ring visualizes analog travel.
+          m.color.copy(neutralSocketColor).lerp(pressedBlue,state.moving);
+          m.opacity=restAlpha+(litAlpha-restAlpha)*state.moving;
+          if(state.moving>.01)gentleEmissive(state.moving*.5);
+        }else if(mesh.userData.role==='stick-cap'){
+          // L3/R3 affects ONLY the cap center, independently from motion.
+          m.color.copy(state.click||pose.allPressed?pressedBlue:neutralStickColor);
+          m.opacity=state.click||pose.allPressed?litAlpha:restAlpha;
+          if(state.click||pose.allPressed)gentleEmissive(1);
+        }else{
+          // Shaft/socket never brighten merely because a stick is clicked.
+          m.color.copy(neutralSocketColor);m.opacity=restAlpha;
+        }
       }else{
-        m.color.copy(neutralSocketColor);
-        m.opacity=Math.max(spec.opacity,.52);
-      }
-      if(state.click||pose.allPressed){
-        m.color.copy(pressedBlue);
-        m.opacity=1;
-        if(!unlit){m.roughness=Math.min(m.roughness,.42);m.emissive.set(recipe.material.pressEmissive);m.emissiveIntensity=recipe.material.pressEmissiveIntensity;}
+        // Keep historical A-H experiments unchanged for comparison.
+        if(mesh.userData.role==='stick-cap'){
+          m.color.copy(neutralStickColor).lerp(pressedBlue,state.moving);
+          m.opacity=Math.min(1,Math.max(spec.opacity,.52)+(1-Math.max(spec.opacity,.52))*state.moving);
+        }else{
+          m.color.copy(neutralSocketColor);m.opacity=restAlpha;
+        }
+        if(state.click||pose.allPressed){
+          m.color.copy(pressedBlue);m.opacity=1;
+          if(!unlit){m.roughness=Math.min(m.roughness,.42);gentleEmissive(1);}
+        }
       }
     }else if(mesh.userData.role==='trigger'){
-      // L2/R2: continuous neutral-white -> active-blue based on real pressure.
       const side=relevantStick(mesh.userData.sourceFile);
       const amount=pose.triggers[side]??0;
       m.color.copy(neutralTriggerColor).lerp(pressedBlue,amount);
-      m.opacity=Math.max(spec.opacity,.72)+(1-Math.max(spec.opacity,.72))*amount;
-      if(amount>0&&!unlit){
-        m.emissive.set(recipe.material.pressEmissive);
-        m.emissiveIntensity=recipe.material.pressEmissiveIntensity*amount*.65;
-      }
+      m.opacity=hero?restAlpha+(litAlpha-restAlpha)*amount:
+        Math.max(spec.opacity,.72)+(1-Math.max(spec.opacity,.72))*amount;
+      if(amount>0)gentleEmissive(hero?amount:amount*.65);
     }else if(control&&(pose.allPressed&&mesh.userData.control)){
       m.color.copy(pressedBlue);
-      m.opacity=1;
-      if(!unlit){m.roughness=Math.min(m.roughness,.42);m.emissive.set(recipe.material.pressEmissive);m.emissiveIntensity=recipe.material.pressEmissiveIntensity;}
+      m.opacity=hero?litAlpha:1;
+      if(!unlit){
+        if(hero)m.roughness=Math.max(m.roughness,.55);
+        else m.roughness=Math.min(m.roughness,.42);
+        gentleEmissive(1);
+      }
     }
   }
   updateStickInstances(native,pose);

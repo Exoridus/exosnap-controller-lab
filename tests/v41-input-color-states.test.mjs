@@ -33,30 +33,33 @@ test('visual input states: neutral is unringed, white stick/trigger; blue only m
  assert.equal(twoD.pressedBlue,EXO_PALETTE.pressedSurface);
 });
 
-test('real 3D rig neutral cap has NO lit ring; stick motion and L3 click are distinct',async()=>{
+test('real 3D Ghost ring shows motion, cap shows click, socket stays neutral',async()=>{
  const rig=await loadNativeRig(CONTROLLERS.find(x=>x.id==='DualSenseCompact'),read);
  const recipe=new ActiveColorState().overrideRecipe(resolveHeroRecipe('ghost',.7),'3d');
  try{
   const cap=rig.meshes.find(m=>m.userData.sourceFile==='left_cap.obj');
   const ring=rig.meshes.find(m=>m.userData.sourceFile==='left_ring.obj');
+  const shaft=rig.meshes.find(m=>m.userData.sourceFile==='left_stick.obj');
   const trigger=rig.meshes.find(m=>m.userData.sourceFile==='left_trigger.obj');
-  assert.ok(cap&&ring&&trigger);
+  assert.ok(cap&&ring&&shaft&&trigger);
   applyPbrRecipeToRig(rig,recipe,state());
-  assert.equal(cap.material.color.getHexString(),EXO_PALETTE.neutralStick.slice(1));
-  assert.equal(ring.material.color.getHexString(),EXO_PALETTE.neutralStickSocket.slice(1));
-  assert.equal(ring.material.emissiveIntensity,0);
-  assert.equal(trigger.material.color.getHexString(),EXO_PALETTE.neutralTrigger.slice(1));
-  applyPbrRecipeToRig(rig,recipe,state(normalizeStickInput({x:.6,y:.3})));
-  assert.notEqual(cap.material.color.getHexString(),EXO_PALETTE.neutralStick.slice(1));
+  const idleCap=cap.material.color.clone(),idleRing=ring.material.color.clone(),idleShaft=shaft.material.color.clone();
   assert.equal(cap.material.emissiveIntensity,0);
-  assert.equal(ring.material.emissiveIntensity,0);
+  applyPbrRecipeToRig(rig,recipe,state(normalizeStickInput({x:.6,y:.3})));
+  assert.ok(cap.material.color.equals(idleCap),'movement cannot activate L3 center');
+  assert.ok(!ring.material.color.equals(idleRing),'ring reflects analog travel');
+  assert.ok(shaft.material.color.equals(idleShaft),'fixed socket/shaft stays neutral');
+  assert.ok(cap.material.emissiveIntensity===0);
   applyPbrRecipeToRig(rig,recipe,state(normalizeStickInput({x:.6,y:.3,click:true})));
   assert.equal(cap.material.color.getHexString(),EXO_PALETTE.pressedSurface.slice(1));
-  assert.equal(cap.material.opacity,1);
-  assert.ok(cap.material.emissiveIntensity>=.8);
+  assert.ok(cap.material.opacity<1,'Ghost click stays translucent');
+  assert.ok(cap.material.emissiveIntensity>0&&cap.material.emissiveIntensity<.3,
+    'PBR click retains shape shading rather than flat emission');
+  assert.ok(!ring.material.color.equals(idleRing));
   applyPbrRecipeToRig(rig,recipe,state());
-  assert.equal(cap.material.color.getHexString(),EXO_PALETTE.neutralStick.slice(1));
-  assert.equal(ring.material.emissiveIntensity,0);
+  assert.ok(cap.material.color.equals(idleCap));
+  assert.ok(ring.material.color.equals(idleRing));
+  assert.equal(cap.material.emissiveIntensity,0);
  }finally{disposeNativeRig(rig)}
 });
 
