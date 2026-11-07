@@ -514,7 +514,10 @@ try{
       // Trigger pressure and its source-authored structural border are
       // separate SVG elements. Compare the material, not a deliberately
       // absent duplicate stroke over the pressure texture.
-      const sameBorder=name==='trigger'||(
+      // R1/L1 and triggers have a closed fill-only pressure path plus a
+      // separate authored outline. Compare their REAL fill here and their
+      // structural border via the dedicated pressure-geometry assertion.
+      const sameBorder=['trigger','l1','r1'].includes(name)||(
         actual.stroke===expected.stroke&&
         Math.abs(actual.strokeAlpha-expected.strokeAlpha)<.001);
       if(actual.fill!==expected.fill||Math.abs(actual.alpha-expected.alpha)>.001 ||
