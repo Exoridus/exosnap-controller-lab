@@ -39,6 +39,14 @@ float ring(float radius){
 }
 void main(){
   vec4 src=texture2D(colorTexture,vUv);
+  if(mode==3){
+    // Physical Fresnel is already in the material: NO dilation, ink gain or
+    // background-dependent postprocessing. Only the shared GPU texture blit.
+    gl_FragColor=src;
+    #include <colorspace_fragment>
+    gl_FragColor.rgb*=gl_FragColor.a;
+    return;
+  }
   float coverageHere=coverage(src.a);
   float wide=max(0.,ring(1.65)-coverageHere);
   float narrow=max(0.,ring(.72)-coverageHere);
@@ -77,12 +85,12 @@ export function createContrastCompositeMaterial(texture){
   material.name='ExoSnap background-contrast composition';
   return material;
 }
-export function updateContrastComposite(material,scene,size){
+export function updateContrastComposite(material,scene,size,legacyOutline=true){
   const p=sceneContrastProfile(scene);
   const width=Math.max(1,Number(size.width)||1);
   const height=Math.max(1,Number(size.height)||1);
   material.uniforms.pixelSize.value.set(1/width,1/height);
-  material.uniforms.mode.value=p.mode;
+  material.uniforms.mode.value=legacyOutline?p.mode:3;
   material.uniforms.darkStrength.value=p.darkStrength;
   material.uniforms.lightStrength.value=p.lightStrength;
   material.uniforms.inkGain.value=p.inkGain;

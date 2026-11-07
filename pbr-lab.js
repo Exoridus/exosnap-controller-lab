@@ -250,7 +250,7 @@ function render(){
         renderer.setViewport(r.left,r.bottom,r.width,r.height);
         renderer.setScissor(r.left,r.bottom,r.width,r.height);
         renderer.clear(true,true,true);
-        updateContrastComposite(state.compositeMaterial,scenes[i],target);
+        updateContrastComposite(state.compositeMaterial,scenes[i],target,recipe.variant==='outline');
         renderer.info.reset();
         renderer.render(state.blitScene,state.blitCamera);
         blits.push(drawMetrics(renderer));rendered++;
