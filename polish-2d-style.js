@@ -80,7 +80,10 @@ export function lookPalette(id,mode,scene,colorway='auto'){
     activeAlpha:ghost?CONTROL_PALETTE.activeAlpha:.98,
     controlStroke:CONTROL_PALETTE.border,
     controlStrokeAlpha:CONTROL_PALETTE.borderAlpha,
-    glyph:CONTROL_PALETTE.glyph,glyphAlpha:CONTROL_PALETTE.glyphAlpha,
+    // Solid button legends need high contrast against opaque pale controls.
+    // Ghost retains the existing single neutral palette.
+    glyph:ghost?CONTROL_PALETTE.glyph:'#203446',
+    glyphAlpha:ghost?CONTROL_PALETTE.glyphAlpha:1,
     pressedOutline:CONTROL_PALETTE.border
   };
 }
@@ -209,6 +212,36 @@ function controlGeometry(group){
     !node.closest('defs,mask,clipPath')&&!node.classList.contains('glyph')&&
     !node.closest('.glyph'));
 }
+function getOrCreateXboxBumperClip(entry,pressure){
+  // The authored Xbox L1/R1 pressure paths contain their button lobe AND
+  // thin wiring/rail continuations. Limit painted material to the physical
+  // lobe; the original source strokes stay intact above it.
+  const id=entry.layer?.id;
+  if(!/^xbox_(?:series|one)$/.test(entry.layoutId||'') ||
+      !['btn-l1','btn-r1'].includes(id))return null;
+  const svg=pressure.ownerSVGElement;
+  let defs=svg.querySelector('defs');
+  if(!defs){defs=document.createElementNS(svgNs,'defs');svg.insertBefore(defs,svg.firstChild);}
+  let clip=defs.querySelector('[data-exo-bumper-clip="'+id+'"]');
+  if(!clip){
+    const bbox=pressure.getBBox();
+    const left=id==='btn-l1';
+    const rect=document.createElementNS(svgNs,'rect');
+    const capFraction=.63;
+    const x=left?bbox.x-2:bbox.x+bbox.width*(1-capFraction);
+    rect.setAttribute('x',String(x));
+    rect.setAttribute('y',String(bbox.y-2));
+    rect.setAttribute('width',String(bbox.width*capFraction+2));
+    rect.setAttribute('height',String(bbox.height+4));
+    clip=document.createElementNS(svgNs,'clipPath');
+    clip.setAttribute('clipPathUnits','userSpaceOnUse');
+    clip.setAttribute('id',id+'-material-clip');
+    clip.setAttribute('data-exo-bumper-clip',id);
+    clip.appendChild(rect);
+    defs.appendChild(clip);
+  }
+  return 'url(#'+clip.id+')';
+}
 function paintControlGroup(entry,colors,level){
   const {group,layer}=entry;
   const shapes=controlGeometry(group);
@@ -221,7 +254,11 @@ function paintControlGroup(entry,colors,level){
     // OPEN outline: filling that path creates a wedge while leaving the
     // actual button dark. Always color the authored pressure geometry.
     if(pressure){
-      if(node===pressure)paintControl(node,colors,level,{stroke:shapes.length===1});
+      if(node===pressure){
+        paintControl(node,colors,level,{stroke:shapes.length===1});
+        const clip=getOrCreateXboxBumperClip(entry,node);
+        if(clip)paint(node,'clip-path',clip);
+      }
       else paintControl(node,colors,level,{fill:false});
       continue;
     }
@@ -277,10 +314,14 @@ function paintStick(reference,entry,colors,values,axes,variant){
   const clicked=clamp(values?.get(entry.control)||0)>.5;
   const levels=stickFeedbackLevels(movement,clicked,variant);
   const ring=center?levels.ring:Math.max(levels.ring,levels.center);
-  // Ring = the original moving ellipse STROKE, never an overlapping filled disk.
-  paint(outer,'fill','none');
-  paint(outer,'fill-opacity','0');
-  paint(outer,'stroke',mixColor(colors.control,PRESS_WHITE,ring));
+  // Solid: the moving cap's annulus is a real filled material, never a hole
+  // showing the game. Ghost remains outline-based, with no double alpha layer.
+  // The smaller source-authored center covers the middle in Solid.
+  const solid=!colors.ghost;
+  paint(outer,'fill',solid?mixColor(colors.control,PRESS_WHITE,ring):'none');
+  paint(outer,'fill-opacity',String(solid?
+    colors.controlAlpha+(colors.activeAlpha-colors.controlAlpha)*ring:0));
+  paint(outer,'stroke',mixColor(colors.controlStroke,PRESS_WHITE,ring));
   activeEdgeFilter(outer,ring);
   paint(outer,'stroke-opacity',
     String(colors.controlStrokeAlpha+(CONTROL_PALETTE.activeBorderAlpha-colors.controlStrokeAlpha)*ring));
@@ -447,8 +488,14 @@ export function paintPolished2D(reference,mode,scene,{
       paint(child,'fill-opacity','0');
     }
     if(visibleFill(child)){
-      paint(child,'fill',colors.shell);
-      paint(child,'fill-opacity',detail?colors.detailAlpha:colors.shellAlpha);
+      // Many authored "fills" are thin conversion-to-path linework, NOT
+      // shell surfaces. Painting them as full-opacity shell erased seams and
+      // device material boundaries. The separate silhouette is the ONLY
+      // full-coverage body paint in Solid; source detail stays above it.
+      paint(child,'fill',colors.ghost?colors.shell:colors.line);
+      paint(child,'fill-opacity',colors.ghost?
+        (detail?colors.detailAlpha:colors.shellAlpha):
+        (detail?.38:.67));
     }
     if(visibleStroke(child)){
       paint(child,'stroke',colors.line);
@@ -456,6 +503,7 @@ export function paintPolished2D(reference,mode,scene,{
     }
   }
   for(const entry of reference.controls){
+    entry.layoutId=reference.layout.id;
     // The mapping also contains the body layer for source provenance.
     // It is NOT an interactive control; recoloring its first path as a
     // button was the source of the unwanted filled "Ghost shell".
