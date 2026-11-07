@@ -137,8 +137,8 @@ test('browser release will capture all specified 2D review states',async()=>{
 test('authored trigger pressure is painted, with its own source outline above it',async()=>{
   const code=await file('polish-2d-style.js');
   assert.match(code,/entry\.layer\.role==='trigger'&&pressure&&face!==pressure/);
-  assert.match(code,/paint\(pressure,'fill',mixColor\(base,PRESS_WHITE,level\)\)/);
-  assert.match(code,/paint\(face,'fill','none'\)/);
+  assert.match(code,/paintControl\(pressure,colors,level,\{stroke:false\}\)/);
+  assert.match(code,/paintControl\(face,colors,0,\{fill:false\}\)/);
   assert.doesNotMatch(code,/data-exo-stick-click|polish-ring-mask/);
 });
 

@@ -218,7 +218,7 @@ try{
     const outline=entry.reference.svg.querySelector('[id$="-outline-strong"]');
     const getFill=node=>node?getComputedStyle(node).fill:null;
     return {
-      ring:getFill(ring),center:getFill(center),ringStroke:getComputedStyle(ring).stroke,
+      ring:getComputedStyle(ring).stroke,center:getFill(center),ringStroke:getComputedStyle(ring).stroke,
       triggerFill:getFill(trigger?.surface),
       triggerVisibleFace:getFill(triggerFace),
       triggerPressureOpacity:trigger?.surface?getComputedStyle(trigger.surface).fillOpacity:null,
@@ -489,8 +489,14 @@ try{
   for(const panel of neutralControls){
     for(const [name,actual] of Object.entries(panel.values)){
       const expected=first.values.face;
+      // Trigger pressure and its source-authored structural border are
+      // separate SVG elements. Compare the material, not a deliberately
+      // absent duplicate stroke over the pressure texture.
+      const sameBorder=name==='trigger'||(
+        actual.stroke===expected.stroke&&
+        Math.abs(actual.strokeAlpha-expected.strokeAlpha)<.001);
       if(actual.fill!==expected.fill||Math.abs(actual.alpha-expected.alpha)>.001 ||
-         actual.stroke!==expected.stroke||Math.abs(actual.strokeAlpha-expected.strokeAlpha)>.001)
+         !sameBorder)
         throw Error('Inconsistent neutral '+name+' on '+panel.look+'/'+panel.scene+': '+
           JSON.stringify({actual,expected}));
     }
