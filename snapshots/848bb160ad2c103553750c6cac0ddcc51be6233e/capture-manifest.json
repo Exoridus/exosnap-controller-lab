@@ -1,0 +1,903 @@
+{
+  "revision": "848bb160ad2c103553750c6cac0ddcc51be6233e",
+  "capturedAt": "2026-11-07T01:27:21.262Z",
+  "url": "http://127.0.0.1:8792/pbr-lab.html",
+  "content": "Real Three.js/WebGL2 + original controller OBJ + authored SVG",
+  "looks": [
+    "solid",
+    "ghost",
+    "outline",
+    "identity"
+  ],
+  "viewports": [
+    "3D dark",
+    "3D light",
+    "3D mixed",
+    "2D dark",
+    "2D light",
+    "2D mixed"
+  ],
+  "images": [
+    {
+      "file": "overview-neutral.png",
+      "pressed": false,
+      "bytes": 788946,
+      "sha256": "dc14db44cf79059ca369fade7e23a04337adcf6e3cac365f0a3e878cf1c67a41",
+      "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "revision": 1,
+      "drawStats": {
+        "solid": {
+          "mode": "shared",
+          "calls": 50,
+          "triangles": 7224,
+          "sourceCalls": 47,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 47
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 47
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 47
+            }
+          }
+        },
+        "ghost": {
+          "mode": "shared",
+          "calls": 37,
+          "triangles": 7020,
+          "sourceCalls": 34,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 34
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 34
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 34
+            }
+          }
+        },
+        "outline": {
+          "mode": "shared",
+          "calls": 37,
+          "triangles": 7020,
+          "sourceCalls": 34,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 34
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 34
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 34
+            }
+          }
+        },
+        "identity": {
+          "mode": "shared",
+          "calls": 33,
+          "triangles": 7020,
+          "sourceCalls": 30,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 30
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 30
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 30
+            }
+          }
+        }
+      }
+    },
+    {
+      "file": "overview-pressed.png",
+      "pressed": true,
+      "bytes": 717273,
+      "sha256": "df0435be1338647d842246f0a944e947b18c2bf4ea7a38af40f09156c6a9d25a",
+      "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "revision": 2,
+      "drawStats": {
+        "solid": {
+          "mode": "shared",
+          "calls": 33,
+          "triangles": 7020,
+          "sourceCalls": 30,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 30
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 30
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 30
+            }
+          }
+        },
+        "ghost": {
+          "mode": "shared",
+          "calls": 37,
+          "triangles": 7020,
+          "sourceCalls": 34,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 34
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 34
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 34
+            }
+          }
+        },
+        "outline": {
+          "mode": "shared",
+          "calls": 37,
+          "triangles": 7020,
+          "sourceCalls": 34,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 34
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 34
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 34
+            }
+          }
+        },
+        "identity": {
+          "mode": "shared",
+          "calls": 33,
+          "triangles": 7020,
+          "sourceCalls": 30,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 30
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 30
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 30
+            }
+          }
+        }
+      }
+    },
+    {
+      "file": "gamecube-neutral.png",
+      "modelId": "Gamecube",
+      "pressed": false,
+      "bytes": 873408,
+      "sha256": "9630c7399f4d9b0539ecd92c491711baf969c1bb1b18b8ee2a48e5057f7ecdc2",
+      "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "revision": 4,
+      "drawStats": {
+        "solid": {
+          "mode": "shared",
+          "calls": 30,
+          "triangles": 7224,
+          "sourceCalls": 27,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 27
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 27
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 27
+            }
+          }
+        },
+        "ghost": {
+          "mode": "shared",
+          "calls": 33,
+          "triangles": 7224,
+          "sourceCalls": 30,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 30
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 30
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 30
+            }
+          }
+        },
+        "outline": {
+          "mode": "shared",
+          "calls": 33,
+          "triangles": 7224,
+          "sourceCalls": 30,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 30
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 30
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 30
+            }
+          }
+        },
+        "identity": {
+          "mode": "shared",
+          "calls": 30,
+          "triangles": 7224,
+          "sourceCalls": 27,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 27
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 27
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 27
+            }
+          }
+        }
+      }
+    },
+    {
+      "file": "generic-neutral.png",
+      "modelId": "GenericPro",
+      "pressed": false,
+      "bytes": 750617,
+      "sha256": "c005159223803e26b8ffcbf3b00b3a50425c8947e41ce70b2926dbd5ae45433a",
+      "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "revision": 5,
+      "drawStats": {
+        "solid": {
+          "mode": "shared",
+          "calls": 32,
+          "triangles": 4402,
+          "sourceCalls": 29,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 29
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 29
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 29
+            }
+          }
+        },
+        "ghost": {
+          "mode": "shared",
+          "calls": 36,
+          "triangles": 4402,
+          "sourceCalls": 33,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 33
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 33
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 33
+            }
+          }
+        },
+        "outline": {
+          "mode": "shared",
+          "calls": 36,
+          "triangles": 4402,
+          "sourceCalls": 33,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 33
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 33
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 33
+            }
+          }
+        },
+        "identity": {
+          "mode": "shared",
+          "calls": 32,
+          "triangles": 4402,
+          "sourceCalls": 29,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 29
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 29
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 29
+            }
+          }
+        }
+      }
+    },
+    {
+      "file": "generic-pressed.png",
+      "modelId": "GenericPro",
+      "pressed": true,
+      "bytes": 695422,
+      "sha256": "723ab0d7375671387fbc2b6fe1cc6587936138f32da0a67b366a584d082e59ac",
+      "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "revision": 6,
+      "drawStats": {
+        "solid": {
+          "mode": "shared",
+          "calls": 32,
+          "triangles": 4402,
+          "sourceCalls": 29,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 29
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 29
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 29
+            }
+          }
+        },
+        "ghost": {
+          "mode": "shared",
+          "calls": 36,
+          "triangles": 4402,
+          "sourceCalls": 33,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 33
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 33
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 33
+            }
+          }
+        },
+        "outline": {
+          "mode": "shared",
+          "calls": 36,
+          "triangles": 4402,
+          "sourceCalls": 33,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 33
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 33
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 33
+            }
+          }
+        },
+        "identity": {
+          "mode": "shared",
+          "calls": 32,
+          "triangles": 4402,
+          "sourceCalls": 29,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 29
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 29
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 29
+            }
+          }
+        }
+      }
+    },
+    {
+      "file": "2d-dualsense-neutral-480.png",
+      "modelId": "dualsense",
+      "variant": "solid+ghost neutral",
+      "bytes": 543005,
+      "sha256": "e592f1eedac01dc1eb749173ea88521a273463bf11b45c87f01a234a0a347410",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-dualsense-trigger-neutral.png",
+      "modelId": "dualsense",
+      "variant": "L2/R2 neutral, rendered surface",
+      "bytes": 97652,
+      "sha256": "2088d13cad37d5b71932dd3df55607bff37873dc2d70cbe16054e5cc68dcbfc3",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-dualsense-trigger-100.png",
+      "modelId": "dualsense",
+      "variant": "L2/R2 100%, rendered surface",
+      "bytes": 98159,
+      "sha256": "c81e1827771a76348f6a7b81a6833d337c62e90a0ad7d007250ed5dd5144d983",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-dualsense-stick-ring.png",
+      "modelId": "dualsense",
+      "variant": "100% motion + L3/R3",
+      "bytes": 544958,
+      "sha256": "90bd499e9f8de9ebe2888d499f0c440954221682cf4ec852a11e0dbddac00e76",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-dualsense-motion-ring.png",
+      "modelId": "dualsense",
+      "variant": "100% movement without click",
+      "bytes": 542476,
+      "sha256": "b775041648c9ede54461b04163cf1298b8caddd34f43762d939b69b0adf1273b",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-dualsense-stick-click.png",
+      "modelId": "dualsense",
+      "variant": "L3/R3 click with zero stick movement",
+      "bytes": 545763,
+      "sha256": "f858da39cf70458424e7bdc6c6ab4c402e409f92f848b383722cdcfc235df566",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-dualsense-face-symbols-on.png",
+      "modelId": "dualsense",
+      "variant": "face symbols on; faces pressed",
+      "bytes": 547210,
+      "sha256": "8ce7d35ba5fb355c943bd0e296dc09b431475969b7b836eac7a71d41d3f739c8",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-dualsense-face-symbols-off.png",
+      "modelId": "dualsense",
+      "variant": "face symbols off; faces pressed",
+      "bytes": 539960,
+      "sha256": "c6a0221511860490d9a1b944702179a5fb38cce56f807afa79b60d412af90ef0",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-xbox-series-auto.png",
+      "modelId": "xbox_series",
+      "variant": "Auto dark",
+      "bytes": 437198,
+      "sha256": "94ab720c500d778a91a5ae26040e5fd378f364718f1c305dd347839fc5de18fd",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-xbox-series-light.png",
+      "modelId": "xbox_series",
+      "variant": "Light",
+      "bytes": 436989,
+      "sha256": "0477851f9d6c7573585fe67231a07c09155f26251a28e5aac13b32abe37cbc83",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-dualshock4-auto.png",
+      "modelId": "dualshock4",
+      "variant": "Auto light",
+      "bytes": 563805,
+      "sha256": "750d6d43304217ae0d08f3a69e4c8c9c5135e76e125327b065df17f4e2f361c0",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-dualshock4-dark.png",
+      "modelId": "dualshock4",
+      "variant": "Dark",
+      "bytes": 563717,
+      "sha256": "968aa2af4f9cbd96b6f2fac0133ca1a22d97076c73c68487efb4df3c94c15f88",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-dark-off.png",
+      "modelId": "dualsense",
+      "variant": "dark Ghost edge light 0% / shadow 0%",
+      "bytes": 96668,
+      "sha256": "d975300bd972b8ce88a308f5c4c121ac3fde256c098c4c6f81c0cc29192158b4",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-dark-light.png",
+      "modelId": "dualsense",
+      "variant": "dark Ghost edge light 100% / shadow 0%",
+      "bytes": 106348,
+      "sha256": "53614ccecfcf95440f6d3a5ca8cb9ac9bab8797d7c135e91d11db9777d176257",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-dark-shadow.png",
+      "modelId": "dualsense",
+      "variant": "dark Ghost edge light 0% / shadow 100%",
+      "bytes": 96810,
+      "sha256": "4d692ccf699f21b4cf3308f797f2cf358849065967560a402d5151655bf5bdf9",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-dark-combined.png",
+      "modelId": "dualsense",
+      "variant": "dark Ghost edge light 65% / shadow 65%",
+      "bytes": 105514,
+      "sha256": "d10db9d8261cabb4e26f9554fd1f7e95279b195a6abd069d0f4ffc646ccff7f1",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-light-off.png",
+      "modelId": "dualsense",
+      "variant": "light Ghost edge light 0% / shadow 0%",
+      "bytes": 41934,
+      "sha256": "bbfb674861992be30dacaabc9d48b2cfe8dd8a598f26d43e2d4d5956fb4a3dc6",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-light-light.png",
+      "modelId": "dualsense",
+      "variant": "light Ghost edge light 100% / shadow 0%",
+      "bytes": 42890,
+      "sha256": "af49ec5edcd840fac5e64d3e8c279e8ce342f8dadef5a3a967dd4574f4da1121",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-light-shadow.png",
+      "modelId": "dualsense",
+      "variant": "light Ghost edge light 0% / shadow 100%",
+      "bytes": 42827,
+      "sha256": "49eea27db8d483850b423c3b19bca15b66063fba8e388965954ba95556b47c23",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-light-combined.png",
+      "modelId": "dualsense",
+      "variant": "light Ghost edge light 65% / shadow 65%",
+      "bytes": 43059,
+      "sha256": "1cd2ccdde830ef59cbc7d4dd28702656bd221f3af5d54d0d325d450e3469b591",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-mixed-off.png",
+      "modelId": "dualsense",
+      "variant": "mixed Ghost edge light 0% / shadow 0%",
+      "bytes": 74943,
+      "sha256": "0c5b7dddf085382b155115c45e49befcd8f46452f026700469f17e351764b80a",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-mixed-light.png",
+      "modelId": "dualsense",
+      "variant": "mixed Ghost edge light 100% / shadow 0%",
+      "bytes": 84164,
+      "sha256": "e7e592ed9bac73e03fd6fc8a1963253e816b8c1296b6db0d5f2023a52743c877",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-mixed-shadow.png",
+      "modelId": "dualsense",
+      "variant": "mixed Ghost edge light 0% / shadow 100%",
+      "bytes": 75639,
+      "sha256": "d53657b7f3ffcd0d62dd855acb380dad357eebdebb3059e43ad7bde9f37865cd",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-mixed-combined.png",
+      "modelId": "dualsense",
+      "variant": "mixed Ghost edge light 65% / shadow 65%",
+      "bytes": 83754,
+      "sha256": "d28fbb9621bf9101eebaf57842cd7773c49de993a8b8ce45bcbc8a02a0e6fd03",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-ghost-review-neutral.png",
+      "bytes": 474223,
+      "sha256": "d301411fee73aeb7aa1329fefe76eaee43f46060bc1d29a6c3beacf87c2c497b",
+      "source": "Real browser SVG Ghost A/B/C, not native Qt/ExoSnap"
+    },
+    {
+      "file": "2d-ghost-review-pure.png",
+      "bytes": 132826,
+      "sha256": "eaad8f489848ce5beee40e1cf1f7758e4a4de7b851732a681bf10eeef7126b0e",
+      "source": "Real browser SVG Ghost A/B/C, not native Qt/ExoSnap"
+    },
+    {
+      "file": "2d-ghost-review-soft.png",
+      "bytes": 141279,
+      "sha256": "b11b4c5c96f595b220d89ceccf0474e0d75a65238e78e9db729ca49c61e1b245",
+      "source": "Real browser SVG Ghost A/B/C, not native Qt/ExoSnap"
+    },
+    {
+      "file": "2d-ghost-review-shadow.png",
+      "bytes": 134106,
+      "sha256": "458a47f11e83e5ec5494ebec85e4d1128662efa9f67771e23bfb31f949ebaa0a",
+      "source": "Real browser SVG Ghost A/B/C, not native Qt/ExoSnap"
+    },
+    {
+      "file": "2d-ghost-review-active.png",
+      "bytes": 477410,
+      "sha256": "8863041faa06086e5c4d68fef1c1b798b8774ad65c01f7f7a8d8c3c85fe66aa2",
+      "source": "Real browser SVG Ghost A/B/C, not native Qt/ExoSnap"
+    },
+    {
+      "file": "2d-ghost-review-all-controls.png",
+      "bytes": 476298,
+      "sha256": "8b1706a99fdd293ecdd9ab406e69601f10926738e497774928261f66512a4a6a",
+      "source": "Real browser SVG Ghost A/B/C, not native Qt/ExoSnap"
+    }
+  ],
+  "scenarios": {
+    "A": {
+      "genericModel": "GenericPro",
+      "parts": 23,
+      "neutralAndPressed": true
+    },
+    "B": {
+      "coreSmoke": [
+        {
+          "id": "GenericPro",
+          "threeViewports": 12,
+          "svgViewports": 12,
+          "rendered": true,
+          "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+        },
+        {
+          "id": "DualSenseCompact",
+          "threeViewports": 12,
+          "svgViewports": 12,
+          "rendered": true,
+          "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+        },
+        {
+          "id": "DS4Compact",
+          "threeViewports": 12,
+          "svgViewports": 12,
+          "rendered": true,
+          "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+        },
+        {
+          "id": "XboxOneClean",
+          "threeViewports": 12,
+          "svgViewports": 12,
+          "rendered": true,
+          "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+        },
+        {
+          "id": "SwitchPro",
+          "threeViewports": 12,
+          "svgViewports": 12,
+          "rendered": true,
+          "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+        },
+        {
+          "id": "Gamecube",
+          "threeViewports": 12,
+          "svgViewports": 12,
+          "rendered": true,
+          "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+        },
+        {
+          "id": "JoyconGrip",
+          "threeViewports": 12,
+          "svgViewports": 12,
+          "rendered": true,
+          "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+        },
+        {
+          "id": "JoyconLeft",
+          "threeViewports": 12,
+          "svgViewports": 12,
+          "rendered": true,
+          "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+        },
+        {
+          "id": "JoyconRight",
+          "threeViewports": 12,
+          "svgViewports": 12,
+          "rendered": true,
+          "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+        }
+      ],
+      "notCleared": [
+        "XboxSeries",
+        "SteamController2026"
+      ],
+      "fullTierABComplete": false
+    }
+  },
+  "visualAcceptance": "Pending human inspection; capture proves rendering, not visual quality"
+}
