@@ -346,6 +346,59 @@ try{
   await select2D('layout','xbox_series');
   await select2D('colorway','auto');
   await capturePolish('2d-xbox-series-auto.png','xbox_series','Auto dark');
+  // Pixel-backed Solid regression gate: rendered moving rings must be opaque
+  // material, never holes; Xbox bumper fill must stop at its authored lobe.
+  const xboxSolid=await polish.evaluate(()=>{
+    const views=window.__exo2DPolish.refs;
+    const solid=views.find(x=>x.mode==='solid'&&x.scene==='dark');
+    const ghost=views.find(x=>x.mode==='ghost'&&x.scene==='dark');
+    const inspect=(ref)=>{
+      const svg=ref.reference.svg;
+      const controls=ref.reference.controls;
+      const stick=controls.find(x=>x.layer.id==='stick-l-cap');
+      const outer=stick?.group.querySelector('[id$="-outline"]');
+      return {fill:outer?getComputedStyle(outer).fill:null,
+        alpha:outer?Number(getComputedStyle(outer).fillOpacity):0};
+    };
+    const shoulder=id=>{
+      const entry=solid.reference.controls.find(x=>x.layer.id===id);
+      const pressure=entry.group.querySelector('[id$="-pressure"]');
+      const clipValue=getComputedStyle(pressure).clipPath;
+      const clip=solid.reference.svg.querySelector(
+        '[data-exo-bumper-clip="'+id+'"]');
+      const rect=clip?.querySelector('rect');
+      const box=pressure.getBBox();
+      return {clipValue,clipId:clip?.id,pressureId:pressure.id,
+        originalWidth:box.width,clippedWidth:Number(rect?.getAttribute('width'))};
+    };
+    const firstGlyph=solid.reference.controls.find(x=>x.control==='b1')
+      ?.group.querySelector('.glyph');
+    return {solid:inspect(solid),ghost:inspect(ghost),
+      left:shoulder('btn-l1'),right:shoulder('btn-r1'),
+      glyph:firstGlyph?getComputedStyle(firstGlyph).fill:null};
+  });
+  if(xboxSolid.solid.fill==='none'||xboxSolid.solid.alpha<.9||
+    xboxSolid.ghost.fill!=='none')
+    throw Error('Solid moving ring must be material-filled; Ghost stays thin: '+
+      JSON.stringify(xboxSolid));
+  if([xboxSolid.left,xboxSolid.right].some(x=>
+    !x.clipValue.includes(x.clipId)||!x.clipId.startsWith(x.pressureId)||
+    x.clippedWidth>=x.originalWidth*.68))
+    throw Error('Xbox L1/R1 button fill extends into the central bridge: '+
+      JSON.stringify(xboxSolid));
+  if(xboxSolid.glyph!=='rgb(32, 52, 70)')
+    throw Error('Solid face labels must remain legible on controls: '+
+      JSON.stringify(xboxSolid));
+  await capturePolish('2d-xbox-series-solid-fixed.png','xbox_series',
+    'Original shoulder contours + filled moving ring',
+    '.stage[data-look="solid"][data-scene="dark"]');
+  await range2D('stick',100);
+  await check2D('faces',true);
+  await capturePolish('2d-xbox-series-solid-pressed.png','xbox_series',
+    'White moving annulus + readable labels, bounded shoulder',
+    '.stage[data-look="solid"][data-scene="dark"]');
+  await range2D('stick',0);
+  await check2D('faces',false);
   await select2D('colorway','light');
   await capturePolish('2d-xbox-series-light.png','xbox_series','Light');
   if(images.at(-1).sha256===images.at(-2).sha256)

@@ -235,7 +235,7 @@ function getOrCreateXboxBumperClip(entry,pressure){
     rect.setAttribute('height',String(bbox.height+4));
     clip=document.createElementNS(svgNs,'clipPath');
     clip.setAttribute('clipPathUnits','userSpaceOnUse');
-    clip.setAttribute('id',id+'-material-clip');
+    clip.setAttribute('id',pressure.id+'-material-clip');
     clip.setAttribute('data-exo-bumper-clip',id);
     clip.appendChild(rect);
     defs.appendChild(clip);
