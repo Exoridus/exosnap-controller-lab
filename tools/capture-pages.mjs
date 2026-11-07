@@ -483,10 +483,10 @@ try{
       const groups=item.reference.controls;
       const pick=id=>groups.find(x=>x.layer.id===id)?.group;
       const nodes={
-        l1:pick('btn-l1')?.querySelector('path:not([id$="-pressure"])'),
+        l1:pick('btn-l1')?.querySelector('[id$="-pressure"]'),
         share:pick('btn-view')?.querySelector('[id$="-face"]'),
         options:pick('btn-menu')?.querySelector('[id$="-face"]'),
-        r1:pick('btn-r1')?.querySelector('path:not([id$="-pressure"])'),
+        r1:pick('btn-r1')?.querySelector('[id$="-pressure"]'),
         dpad:pick('btn-up')?.querySelector('[id$="-face"]'),
         face:pick('btn-cross')?.querySelector('[id$="-face"]'),
         ps:pick('btn-home')?.querySelector('path'),
