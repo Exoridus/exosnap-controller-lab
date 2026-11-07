@@ -138,7 +138,7 @@ test('authored trigger pressure is painted, with its own source outline above it
   const code=await file('polish-2d-style.js');
   assert.match(code,/const trigger=layer\.role==='trigger'/);
   assert.match(code,/paintControlGroup\(entry,colors,level\)/);
-  assert.match(code,/if\(pressureNode\)paintControl\(node,colors,level,\{stroke:false\}\)/);
+  assert.match(code,/if\(node===pressure\)paintControl\(node,colors,level,\{stroke:shapes\.length===1\}\)/);
   assert.match(code,/else paintControl\(node,colors,0,\{fill:false\}\)/);
   assert.doesNotMatch(code,/data-exo-stick-click|polish-ring-mask/);
 });

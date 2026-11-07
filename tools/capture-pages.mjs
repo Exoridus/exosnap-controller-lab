@@ -457,6 +457,26 @@ try{
   });
   if(ghostState.some(r=>r.body.length||r.touchpad.length!==1))
     throw Error('Ghost A/B/C: shell must be transparent; Touchpad must be one visible control: '+JSON.stringify(ghostState));
+  // Explicit shape contract: source-authorized R1/L1 surface, not its
+  // decorative open rim, must be the fill that users actually see.
+  const pressureRoles=await ghost.evaluate(()=>{
+    const item=window.__exoGhostReview.items.find(x=>x.look==='pure'&&x.scene==='dark');
+    return ['btn-l1','btn-r1','trigger-l2','trigger-r2'].map(id=>{
+      const group=item.reference.controls.find(x=>x.layer.id===id)?.group;
+      const pressure=group?.querySelector('[id$="-pressure"]');
+      const other=[...group?.querySelectorAll('path')||[]].filter(x=>x!==pressure);
+      return {id,pressure:pressure?{
+        fill:getComputedStyle(pressure).fill,alpha:getComputedStyle(pressure).fillOpacity,
+        visible:pressure.getAttribute('data-exo-visible-control-fill')}:
+        null,other:other.map(x=>getComputedStyle(x).fill)};
+    });
+  });
+  for(const role of pressureRoles){
+    if(role.pressure?.visible!=='1'||role.pressure.fill!=='rgb(168, 185, 199)'||
+      Math.abs(Number(role.pressure.alpha)-.26)>.001||role.other.some(x=>x!=='none'))
+      throw Error('Authored L1/R1/trigger SURFACE must be painted, not open outline: '+
+        JSON.stringify(role));
+  }
   const neutralControls=await ghost.evaluate(()=>{
     const data=[];
     for(const item of window.__exoGhostReview.items){

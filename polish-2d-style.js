@@ -173,23 +173,20 @@ function paintControlGroup(entry,colors,level){
     node.classList.contains('press-surface'));
   const trigger=layer.role==='trigger';
   for(const node of shapes){
-    const pressureNode=node===pressure;
-    if(trigger){
-      if(pressureNode)paintControl(node,colors,level,{stroke:false});
+    // The author-provided -pressure path is the ACTUAL closed control area
+    // for R1/L1/L2/R2. The accompanying path is often ONLY a decorative,
+    // OPEN outline: filling that path creates a wedge while leaving the
+    // actual button dark. Always color the authored pressure geometry.
+    if(pressure){
+      if(node===pressure)paintControl(node,colors,level,{stroke:shapes.length===1});
       else paintControl(node,colors,0,{fill:false});
       continue;
     }
-    if(pressureNode&&shapes.length>1){
-      paint(node,'fill','none');paint(node,'stroke','none');
-      node.removeAttribute('data-exo-visible-control-fill');
-      continue;
-    }
-    // Authored filled parts, explicit -face/-surface paths, and the PS
-    // home-logo are control surfaces. Source-only lines remain outlines.
+    // For controls without pressure geometry (Share/Options/PS), use the
+    // authored face or its real filled source. Preserve outline-only paths.
     const identity=node.id||'';
     const surface=authoredFill(node) ||
-      /(?:-face|-surface)$/.test(identity) ||
-      identity==='home-logo'||pressureNode;
+      /(?:-face|-surface)$/.test(identity) || identity==='home-logo';
     paintControl(node,colors,level,{fill:surface});
   }
 }
