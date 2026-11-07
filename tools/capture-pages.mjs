@@ -719,6 +719,65 @@ try{
   if(ghostErrors.length)throw Error('Ghost A/B/C browser errors: '+ghostErrors.join('; '));
   await ghost.close();
 
+  // Review the ALREADY installed source SVG + mapping, against our two looks.
+  // The alternate ZIP is not silently substituted for repository assets.
+  const sourceReviewErrors=[];
+  const sourceReviewPage=await browser.newPage({viewport:{width:1600,height:920},deviceScaleFactor:1,reducedMotion:'reduce'});
+  sourceReviewPage.on('pageerror',error=>sourceReviewErrors.push(error.message));
+  sourceReviewPage.on('response',response=>{
+    if(response.status()>=400&&!/\/favicon\.ico(?:\?|$)/.test(response.url()))
+      sourceReviewErrors.push('HTTP '+response.status()+' '+response.url());
+  });
+  await sourceReviewPage.goto(new URL('artwork-source-review.html',base).href,
+    {waitUntil:'domcontentloaded',timeout:60000});
+  const checkSourceReview=async(selectedId,actualId=selectedId)=>{
+    await sourceReviewPage.waitForFunction(({selected,actual})=>
+      document.body.dataset.sourceReviewReady==='ready'&&
+      window.__exoSourceReview?.selected===selected&&
+      window.__exoSourceReview?.actual===actual&&
+      document.querySelectorAll('.stage>svg').length===3,
+      {selected:selectedId,actual:actualId},{timeout:60000});
+    const inspected=await sourceReviewPage.evaluate(()=>{
+      const refs=window.__exoSourceReview.refs;
+      return {views:refs.map(item=>item.mode),
+        mappingIds:refs.map(x=>x.reference.mapping.id),
+        stats:document.getElementById('mappingStats').textContent,
+        warning:document.getElementById('licenseWarning').textContent,
+        layouts:document.querySelectorAll('#layout option').length};
+    });
+    if(inspected.layouts!==20||inspected.views.join(',')!=='source,solid,ghost'||
+      inspected.mappingIds.some(id=>id!==actualId)||
+      !/Druckflächen|Stick-Knockouts/.test(inspected.stats))
+      throw Error('Source comparison lacks coherent original mapping: '+JSON.stringify(inspected));
+    return inspected;
+  };
+  const captureSourceReview=async name=>{
+    const bytes=await sourceReviewPage.screenshot({path:path.join(output,name),fullPage:true,
+      animations:'disabled',timeout:60000});
+    if(bytes.length<25000||bytes.subarray(0,8).toString('hex')!=='89504e470d0a1a0a')
+      throw Error('Invalid source-comparison browser PNG '+name);
+    images.push({file:name,modelId:'2DSourceReview',bytes:bytes.length,
+      sha256:createHash('sha256').update(bytes).digest('hex'),
+      source:'Existing repository SVG; not byte-verified alternate ZIP'});
+  };
+  await checkSourceReview('dualsense');
+  const unstyled=await sourceReviewPage.locator('.stage[data-view="source"]').screenshot();
+  const colored=await sourceReviewPage.locator('.stage[data-view="solid"]').screenshot();
+  if(createHash('sha256').update(unstyled).digest('hex')===
+    createHash('sha256').update(colored).digest('hex'))
+    throw Error('Raw SVG and styled Solid have identical pixels');
+  await captureSourceReview('2d-source-solid-ghost-dualsense.png');
+  await sourceReviewPage.locator('#layout').selectOption('xbox_series');
+  await checkSourceReview('xbox_series');
+  await captureSourceReview('2d-source-solid-ghost-xbox-series.png');
+  await sourceReviewPage.locator('#layout').selectOption('steam_controller_2026');
+  const safe=await checkSourceReview('steam_controller_2026','generic');
+  if(!safe.warning.includes('Generic-Fallback'))
+    throw Error('Steam Controller 2026 must use vetted generic fallback');
+  if(sourceReviewErrors.length)
+    throw Error('Source review browser errors: '+sourceReviewErrors.join('; '));
+  await sourceReviewPage.close();
+
   const manifest={revision,capturedAt:new Date().toISOString(),url:new URL('pbr-lab.html',base).href,
     content:'Real Three.js/WebGL2 + original controller OBJ + authored SVG',looks:['solid','ghost','outline','identity'],
     viewports:['3D dark','3D light','3D mixed','2D dark','2D light','2D mixed'],images,
