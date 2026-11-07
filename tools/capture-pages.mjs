@@ -413,7 +413,9 @@ try{
 
   // Keep all authored 2D families in the visual approval matrix. Solid
   // moving rings must be material-filled, without changing Ghost topology.
-  for(const modelId of ['switch_pro','gamecube','generic']){
+  for(const [modelId,file] of [['switch_pro','2d-switch-pro-solid-fixed.png'],
+    ['gamecube','2d-gamecube-solid-fixed.png'],
+    ['generic','2d-generic-solid-fixed.png']]){
     await select2D('layout',modelId);
     await select2D('colorway','auto');
     const proof=await polish.evaluate(()=>{
@@ -432,7 +434,7 @@ try{
       throw Error('Solid ring is still transparent for '+modelId+': '+JSON.stringify(proof));
     if(proof.ghost&&proof.ghost.fill!=='none')
       throw Error('Ghost ring has unintended fill for '+modelId+': '+JSON.stringify(proof));
-    await capturePolish('2d-'+modelId.replaceAll('_','-')+'-solid-fixed.png',
+    await capturePolish(file,
       modelId,'Solid original contours and material-filled moving sticks',
       '.stage[data-look="solid"][data-scene="dark"]');
   }
