@@ -165,10 +165,10 @@ function activeEdgeFilter(node,level){
       return result;
     };
     const normalized=create('feComponentTransfer',{in:'SourceAlpha',result:'full-alpha'});
-    normalized.append(create('feFuncA',{type:'linear',slope:2.5,intercept:0}));
-    const blur=create('feGaussianBlur',{in:'full-alpha',stdDeviation:(Number(unit)*1.20).toFixed(3),result:'blur'});
+    normalized.append(create('feFuncA',{type:'linear',slope:1.70,intercept:0}));
+    const blur=create('feGaussianBlur',{in:'full-alpha',stdDeviation:(Number(unit)*.95).toFixed(3),result:'blur'});
     const outside=create('feComposite',{in:'blur',in2:'SourceAlpha',operator:'out',result:'outside'});
-    const ink=create('feFlood',{'flood-color':'#07121d','flood-opacity':'.75',result:'ink'});
+    const ink=create('feFlood',{'flood-color':'#07121d','flood-opacity':'.58',result:'ink'});
     const shade=create('feComposite',{in:'ink',in2:'outside',operator:'in',result:'shade'});
     const merge=create('feMerge',{});
     merge.append(create('feMergeNode',{in:'shade'}),create('feMergeNode',{in:'SourceGraphic'}));
