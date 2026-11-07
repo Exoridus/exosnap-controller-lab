@@ -411,6 +411,31 @@ try{
   if(images.at(-1).sha256===images.at(-2).sha256)
     throw Error('DualShock 4 Auto and dark screenshots identical');
 
+  // Keep all authored 2D families in the visual approval matrix. Solid
+  // moving rings must be material-filled, without changing Ghost topology.
+  for(const modelId of ['switch_pro','gamecube','generic']){
+    await select2D('layout',modelId);
+    await select2D('colorway','auto');
+    const proof=await polish.evaluate(()=>{
+      const refs=window.__exo2DPolish.refs;
+      const solid=refs.find(x=>x.mode==='solid'&&x.scene==='dark');
+      const ghost=refs.find(x=>x.mode==='ghost'&&x.scene==='dark');
+      const sample=r=>{
+        const group=r.reference.controls.find(x=>x.layer.id==='stick-l-cap')?.group;
+        const outer=group?.querySelector('[id$="-outline"]');
+        return outer?{fill:getComputedStyle(outer).fill,
+          alpha:Number(getComputedStyle(outer).fillOpacity)}:null;
+      };
+      return {solid:sample(solid),ghost:sample(ghost)};
+    });
+    if(proof.solid&&proof.solid.fill==='none')
+      throw Error('Solid ring is still transparent for '+modelId+': '+JSON.stringify(proof));
+    if(proof.ghost&&proof.ghost.fill!=='none')
+      throw Error('Ghost ring has unintended fill for '+modelId+': '+JSON.stringify(proof));
+    await capturePolish('2d-'+modelId.replaceAll('_','-')+'-solid-fixed.png',
+      modelId,'Solid original contours and material-filled moving sticks',
+      '.stage[data-look="solid"][data-scene="dark"]');
+  }
   await select2D('layout','dualsense');
   await select2D('colorway','auto');
   await range2D('stick',0);
