@@ -6,7 +6,7 @@ export const PRESS_WHITE='#ffffff';
 // controller identity must NEVER change these values in Ghost.
 export const CONTROL_PALETTE=Object.freeze({
   neutralFill:'#a8b9c7',neutralAlpha:.26,
-  activeFill:PRESS_WHITE,activeAlpha:.45,
+  activeFill:PRESS_WHITE,activeAlpha:.40,
   border:'#8198aa',borderAlpha:.87,
   activeBorderAlpha:.9,
   glyph:'#8198a9',glyphAlpha:.9
@@ -74,8 +74,8 @@ export function lookPalette(id,mode,scene,colorway='auto'){
     shellAlpha:ghost?0:.99,coreAlpha:ghost?0:.96,
     detailAlpha:ghost?0:.26,
     // Only the outside silhouette is background-dependent. Controls are not.
-    line:scene==='dark'?'#c7d8e5':scene==='light'?'#4b6477':'#9bb7c9',
-    lineAlpha:scene==='mixed'?.95:.86,
+    line:ghost?'#dceaf3':'#50687b',
+    lineAlpha:ghost?.91:.86,
     controlAlpha:ghost?CONTROL_PALETTE.neutralAlpha:.96,
     activeAlpha:ghost?CONTROL_PALETTE.activeAlpha:.98,
     controlStroke:CONTROL_PALETTE.border,
@@ -106,8 +106,8 @@ export function ghostReviewSettings(key,scene){
     controlStroke:CONTROL_PALETTE.border,
     controlStrokeAlpha:CONTROL_PALETTE.borderAlpha,
     shellAlpha:0,coreAlpha:0,detailAlpha:0,
-    line:scene==='dark'?'#c7d8e5':scene==='light'?'#4b6477':'#9bb7c9',
-    lineAlpha:scene==='mixed'?.95:.86,
+    line:'#dceaf3',
+    lineAlpha:.91,
     glyph:CONTROL_PALETTE.glyph,glyphAlpha:CONTROL_PALETTE.glyphAlpha,
     pressedOutline:CONTROL_PALETTE.border
   });
@@ -129,15 +129,55 @@ export function controlSurfaceState(colors,level){
   return {
     fill:mixColor(colors.control,PRESS_WHITE,t),
     alpha:colors.controlAlpha+(colors.activeAlpha-colors.controlAlpha)*t,
-    stroke:colors.controlStroke,
-    strokeAlpha:colors.controlStrokeAlpha
+    stroke:mixColor(colors.controlStroke,PRESS_WHITE,t),
+    strokeAlpha:colors.controlStrokeAlpha+(CONTROL_PALETTE.activeBorderAlpha-colors.controlStrokeAlpha)*t
   };
+}
+// Shared, cached browser-only shadow behind ACTIVE control edges. It is
+// disabled at neutral and does not alter any SVG geometry or control fill.
+function activeEdgeFilter(node,level){
+  if(!node?.ownerSVGElement)return;
+  if(level<=.02){node.style.removeProperty('filter');return;}
+  const svg=node.ownerSVGElement;
+  let defs=svg.querySelector('defs');
+  if(!defs){defs=document.createElementNS(svgNs,'defs');svg.insertBefore(defs,svg.firstChild);}
+  const source=svg.querySelector('[id="outline-strong"],[id$="-outline-strong"]');
+  const filterId=(source?.id||svg.id||'exo-controller')+'-active-edge';
+  let filter=defs.querySelector('[data-exo-active-edge]');
+  const viewWidth=svg.viewBox.baseVal.width||480;
+  const renderedWidth=svg.getBoundingClientRect().width||320;
+  const unit=(viewWidth/renderedWidth).toFixed(4);
+  if(!filter){
+    filter=document.createElementNS(svgNs,'filter');
+    filter.setAttribute('data-exo-active-edge','1');
+    filter.setAttribute('id',filterId);
+    for(const [k,v] of Object.entries({
+      x:'-35%',y:'-35%',width:'170%',height:'170%',
+      filterUnits:'objectBoundingBox',primitiveUnits:'userSpaceOnUse',
+      'color-interpolation-filters':'sRGB'
+    }))filter.setAttribute(k,v);
+    defs.append(filter);
+  }
+  if(filter.getAttribute('data-unit')!==unit){
+    const create=(tag,attributes)=>{
+      const result=document.createElementNS(svgNs,tag);
+      for(const [k,v] of Object.entries(attributes))result.setAttribute(k,String(v));
+      return result;
+    };
+    const blur=create('feGaussianBlur',{in:'SourceAlpha',stdDeviation:(Number(unit)*.9).toFixed(3),result:'blur'});
+    const outside=create('feComposite',{in:'blur',in2:'SourceAlpha',operator:'out',result:'outside'});
+    const ink=create('feFlood',{'flood-color':'#07121d','flood-opacity':'.56',result:'ink'});
+    const shade=create('feComposite',{in:'ink',in2:'outside',operator:'in',result:'shade'});
+    const merge=create('feMerge',{});
+    merge.append(create('feMergeNode',{in:'shade'}),create('feMergeNode',{in:'SourceGraphic'}));
+    filter.replaceChildren(blur,outside,ink,shade,merge);
+    filter.setAttribute('data-unit',unit);
+  }
+  paint(node,'filter','url(#'+filterId+')');
 }
 function paintControl(node,colors,level,{fill=true,stroke=true}={}){
   if(!node)return;
   const state=controlSurfaceState(colors,level);
-  // Explicit render-surface marker for browser pixel-difference tests.
-  // A computed style on a hidden SVG path is NOT a visual proof.
   if(fill)node.setAttribute('data-exo-visible-control-fill','1');
   else node.removeAttribute('data-exo-visible-control-fill');
   paint(node,'fill',fill?state.fill:'none');
@@ -146,6 +186,7 @@ function paintControl(node,colors,level,{fill=true,stroke=true}={}){
     paint(node,'stroke',state.stroke);
     paint(node,'stroke-opacity',String(state.strokeAlpha));
   }else paint(node,'stroke','none');
+  activeEdgeFilter(node,level);
 }
 // The authored source may contain face paths, visible outlines, and unused
 // pressure placeholders in different nesting arrangements. Pick real filled
@@ -179,7 +220,7 @@ function paintControlGroup(entry,colors,level){
     // actual button dark. Always color the authored pressure geometry.
     if(pressure){
       if(node===pressure)paintControl(node,colors,level,{stroke:shapes.length===1});
-      else paintControl(node,colors,0,{fill:false});
+      else paintControl(node,colors,level,{fill:false});
       continue;
     }
     // For controls without pressure geometry (Share/Options/PS), use the
@@ -238,6 +279,7 @@ function paintStick(reference,entry,colors,values,axes,variant){
   paint(outer,'fill','none');
   paint(outer,'fill-opacity','0');
   paint(outer,'stroke',mixColor(colors.control,PRESS_WHITE,ring));
+  activeEdgeFilter(outer,ring);
   paint(outer,'stroke-opacity',
     String(colors.controlStrokeAlpha+(CONTROL_PALETTE.activeBorderAlpha-colors.controlStrokeAlpha)*ring));
   if(center){
@@ -290,10 +332,13 @@ function paintGlyphs(entry,colors,showFaceSymbols){
 // exterior rim; shadow is composited into the existing line's alpha, never a
 // dark outer halo or a second hard SVG outline. Glyphs and controls are not
 // filtered. Scene weighting keeps the same two user sliders useful everywhere.
+// Backgrounds are TEST SCENES, not separate product profiles. In the native
+// compositor the game pixels are unknown; identical settings must survive all.
+const FIXED_EDGE_SCENE=Object.freeze({
+  light:.62,shadow:1,lightColor:'#eaf4fc',shadowColor:'#07121d'
+});
 const EDGE_SCENES=Object.freeze({
-  dark:Object.freeze({light:1,shadow:.38,lightColor:'#edf7ff',shadowColor:'#132236'}),
-  light:Object.freeze({light:.36,shadow:1,lightColor:'#ffffff',shadowColor:'#142637'}),
-  mixed:Object.freeze({light:.72,shadow:.82,lightColor:'#f2f9ff',shadowColor:'#142536'})
+  dark:FIXED_EDGE_SCENE,light:FIXED_EDGE_SCENE,mixed:FIXED_EDGE_SCENE
 });
 export function edgeReliefProfile(mode,scene,edgeLight=0,edgeShadow=0){
   if(!['solid','ghost'].includes(mode))throw new TypeError('Unknown 2D look');
@@ -359,14 +404,14 @@ function paintEdgeRelief(reference,mode,scene,edgeLight,edgeShadow){
     // drop-shadow it never creates a duplicate dark outside silhouette.
     add('feGaussianBlur',{in:'SourceAlpha',stdDeviation:(unit*(.55+p.shadow*.95)).toFixed(3),result:'shadow-blur'});
     add('feOffset',{in:'shadow-blur',dx:0,dy:(unit*(.45+p.shadow*.6)).toFixed(3),result:'shadow-offset'});
-    add('feComposite',{in:'shadow-offset',in2:'SourceAlpha',operator:'in',result:'shadow-on-edge'});
+    add('feComposite',{in:'shadow-offset',in2:'SourceAlpha',operator:'out',result:'shadow-on-edge'});
     add('feFlood',{'flood-color':p.shadowColor,'flood-opacity':(p.shadow*.78).toFixed(3),result:'shadow-tint'});
     add('feComposite',{in:'shadow-tint',in2:'shadow-on-edge',operator:'in',result:'edge-shadow'});
   }
   const merge=filterNode('feMerge');
+  if(p.shadow>0)merge.append(filterNode('feMergeNode',{in:'edge-shadow'}));
   for(const part of parts)merge.append(filterNode('feMergeNode',{in:part}));
   merge.append(filterNode('feMergeNode',{in:'SourceGraphic'}));
-  if(p.shadow>0)merge.append(filterNode('feMergeNode',{in:'edge-shadow'}));
   filter.replaceChildren(...children,merge);
   paint(outline,'filter','url(#'+id+')');
   reference.edgeReliefKey=key;

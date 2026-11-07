@@ -150,34 +150,23 @@ test('authored trigger pressure is painted, with its own source outline above it
   const code=await file('polish-2d-style.js');
   assert.match(code,/const trigger=layer\.role==='trigger'/);
   assert.match(code,/paintControlGroup\(entry,colors,level\)/);
+  assert.match(code,/activeEdgeFilter\(node,level\)/);
   assert.match(code,/if\(node===pressure\)paintControl\(node,colors,level,\{stroke:shapes\.length===1\}\)/);
   assert.match(code,/else paintControl\(node,colors,0,\{fill:false\}\)/);
   assert.doesNotMatch(code,/data-exo-stick-click|polish-ring-mask/);
 });
 
-test('edge relief has independent, weighted light/shadow; Solid remains unchanged',()=>{
-  const sceneValues={dark:{light:1,shadow:.38},light:{light:.36,shadow:1},mixed:{light:.72,shadow:.82}};
-  for(const [scene,weights] of Object.entries(sceneValues)){
-    const zero=edgeReliefProfile('ghost',scene,0,0);
-    assert.deepEqual([zero.light,zero.shadow],[0,0]);
-    const light=edgeReliefProfile('ghost',scene,1,0);
-    const shadow=edgeReliefProfile('ghost',scene,0,1);
-    const both=edgeReliefProfile('ghost',scene,1,1);
-    close(light.light,weights.light);close(light.shadow,0);
-    close(shadow.light,0);close(shadow.shadow,weights.shadow);
-    close(both.light,weights.light);close(both.shadow,weights.shadow);
-    assert.equal(edgeReliefProfile('solid',scene,1,1).light,0);
-    assert.equal(edgeReliefProfile('solid',scene,1,1).shadow,0);
-  }
-  assert.ok(edgeReliefProfile('ghost','dark',1,1).light>
-    edgeReliefProfile('ghost','light',1,1).light);
-  assert.ok(edgeReliefProfile('ghost','light',1,1).shadow>
-    edgeReliefProfile('ghost','dark',1,1).shadow);
+test('one backdrop-independent edge profile; no adaptive scene heuristics',()=>{
+  const samples=['dark','light','mixed'].map(s=>edgeReliefProfile('ghost',s,.65,.45));
+  assert.deepEqual(samples[0],samples[1]);
+  assert.deepEqual(samples[1],samples[2]);
+  assert.equal(edgeReliefProfile('ghost','mixed',0,0).light,0);
+  assert.equal(edgeReliefProfile('ghost','light',0,0).shadow,0);
+  assert.equal(edgeReliefProfile('solid','dark',1,1).light,0);
+  assert.equal(edgeReliefProfile('solid','light',1,1).shadow,0);
   assert.throws(()=>edgeReliefProfile('ghost','underwater',1,1),TypeError);
-  assert.throws(()=>edgeReliefProfile('glass','dark',1,1),TypeError);
-  assert.equal(edgeReliefProfile('ghost','dark',-10,200).light,0);
+  assert.ok(!file.toString().includes('background-pixels'));
 });
-
 test('relief filter is silhouette-only; zero removes it and does not touch glyphs or sticks',async()=>{
   const code=await file('polish-2d-style.js');
   assert.match(code,/querySelector\('\[id="outline-strong"\],\[id\$="-outline-strong"\]'\)/);

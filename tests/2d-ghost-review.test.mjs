@@ -34,7 +34,9 @@ test('A/B/C only change edge relief and always leave shell 100% transparent',()=
   assert.equal(idle.alpha,CONTROL_PALETTE.neutralAlpha);
   assert.equal(active.fill,'#ffffff');
   assert.equal(active.alpha,CONTROL_PALETTE.activeAlpha);
-  assert.ok(active.alpha<.65);
+  assert.equal(active.stroke,'#ffffff');
+  assert.equal(active.strokeAlpha,CONTROL_PALETTE.activeBorderAlpha);
+  assert.ok(active.alpha<=.42);
   assert.throws(()=>ghostReviewSettings('other','dark'),TypeError);
 });
 test('comparison uses original SVGs with correct independent input states',async()=>{
