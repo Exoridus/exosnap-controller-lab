@@ -64,7 +64,7 @@ test('neutral cap, trigger, D-pad and face materials have consistent base contra
     const distance=(a,b)=>Math.max(...hex(a).map((v,i)=>Math.abs(v-hex(b)[i])));
     assert.ok(distance(palette.control,palette.cap)<25);
     assert.ok(distance(palette.control,palette.trigger)<25);
-    assert.ok(palette.controlAlpha>=.7);
+    assert.ok(palette.controlAlpha<=.3);
     assert.ok(palette.lineAlpha>=.6);
   }
   assert.ok(lookPalette('dualsense','ghost','dark').shellAlpha<.25);

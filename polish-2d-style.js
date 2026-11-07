@@ -2,6 +2,15 @@
 // in the existing authored SVGs; input mapping and moving transforms stay owned
 // by ControllerReference.
 export const PRESS_WHITE='#ffffff';
+// One source of truth for all 2D control materials and glyphs. Backdrops and
+// controller identity must NEVER change these values in Ghost.
+export const CONTROL_PALETTE=Object.freeze({
+  neutralFill:'#a8b9c7',neutralAlpha:.26,
+  activeFill:PRESS_WHITE,activeAlpha:.58,
+  border:'#8198aa',borderAlpha:.87,
+  activeBorderAlpha:.9,
+  glyph:'#8198a9',glyphAlpha:.9
+});
 const svgNs='http://www.w3.org/2000/svg';
 const clamp=n=>Math.max(0,Math.min(1,Number.isFinite(Number(n))?Number(n):0));
 const rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
@@ -58,21 +67,21 @@ export function lookPalette(id,mode,scene,colorway='auto'){
   const model=family(id),chosen=colorway==='auto'?standard[model]:colorway;
   const [shell,core]=shells[model][chosen];
   const ghost=mode==='ghost',light=scene==='light';
-  const control=chosen==='light'?'#abb9c7':'#99a9b7';
   return {
-    shell,core,control,cap:mixColor(control,'#8093a3',.12),
-    trigger:mixColor(control,'#bfcbd5',.09),
+    shell,core,control:CONTROL_PALETTE.neutralFill,
+    cap:CONTROL_PALETTE.neutralFill,trigger:CONTROL_PALETTE.neutralFill,
     ghost,light,colorway:chosen,
-    shellAlpha:ghost?(light?.14:.12):.99,
-    coreAlpha:ghost?(light?.20:.17):.96,
-    detailAlpha:ghost?.18:.26,
-    line:light?'#4b6377':'#bdd0de',
-    lineAlpha:ghost?(light?.70:.65):.83,
-    controlAlpha:ghost?(light?.73:.77):1,
-    // A single stable glyph shade, including Share/Options press. The controls
-    // behind it are deliberately bright enough on both scene types.
-    glyph:'#25394b',
-    pressedOutline:'#405568'
+    shellAlpha:ghost?0:.99,coreAlpha:ghost?0:.96,
+    detailAlpha:ghost?0:.26,
+    // Only the outside silhouette is background-dependent. Controls are not.
+    line:scene==='dark'?'#c7d8e5':scene==='light'?'#4b6477':'#9bb7c9',
+    lineAlpha:scene==='mixed'?.95:.86,
+    controlAlpha:ghost?CONTROL_PALETTE.neutralAlpha:.96,
+    activeAlpha:ghost?CONTROL_PALETTE.activeAlpha:.98,
+    controlStroke:CONTROL_PALETTE.border,
+    controlStrokeAlpha:CONTROL_PALETTE.borderAlpha,
+    glyph:CONTROL_PALETTE.glyph,glyphAlpha:CONTROL_PALETTE.glyphAlpha,
+    pressedOutline:CONTROL_PALETTE.border
   };
 }
 // The review compares only silhouette treatments. All three options have
@@ -89,15 +98,18 @@ export function ghostReviewSettings(key,scene){
   if(!['dark','light','mixed'].includes(scene))throw new TypeError('Unknown review background');
   return Object.freeze({
     ...option,reviewLook:key,edgeLight:option.light,edgeShadow:option.shadow,
-    // All neutral controls including R1/L1, D-pad, stick cap and triggers
-    // share exactly the same fill/alpha. Only input activity turns them white.
-    control:'#a8b9c7',cap:'#a8b9c7',trigger:'#a8b9c7',
-    controlAlpha:.23,
+    // Identical, shared materials for every control on every background.
+    control:CONTROL_PALETTE.neutralFill,
+    cap:CONTROL_PALETTE.neutralFill,trigger:CONTROL_PALETTE.neutralFill,
+    controlAlpha:CONTROL_PALETTE.neutralAlpha,
+    activeAlpha:CONTROL_PALETTE.activeAlpha,
+    controlStroke:CONTROL_PALETTE.border,
+    controlStrokeAlpha:CONTROL_PALETTE.borderAlpha,
     shellAlpha:0,coreAlpha:0,detailAlpha:0,
-    line:scene==='dark'?'#b6c8d7':scene==='light'?'#4c6275':'#94a9b9',
-    lineAlpha:scene==='mixed'?.68:.79,
-    glyph:scene==='dark'?'#cbdbe6':scene==='light'?'#425668':'#aec1ce',
-    pressedOutline:'#405568'
+    line:scene==='dark'?'#c7d8e5':scene==='light'?'#4b6477':'#9bb7c9',
+    lineAlpha:scene==='mixed'?.95:.86,
+    glyph:CONTROL_PALETTE.glyph,glyphAlpha:CONTROL_PALETTE.glyphAlpha,
+    pressedOutline:CONTROL_PALETTE.border
   });
 }
 const visibleFill=node=>{
@@ -109,6 +121,29 @@ const visibleStroke=node=>{
   return value.trim().toLowerCase()!=='none'&&value!=='';
 };
 function paint(node,name,value){node.style.setProperty(name,String(value),'important');}
+// Every moving or pressed control goes through this one alpha-safe transition.
+// The selected white stays white in the SVG paint; opacity is intentionally
+// limited to avoid hiding the gameplay underneath the overlay.
+export function controlSurfaceState(colors,level){
+  const t=clamp(level);
+  return {
+    fill:mixColor(colors.control,PRESS_WHITE,t),
+    alpha:colors.controlAlpha+(colors.activeAlpha-colors.controlAlpha)*t,
+    stroke:colors.controlStroke,
+    strokeAlpha:colors.controlStrokeAlpha
+  };
+}
+function paintControl(node,colors,level,{fill=true,stroke=true}={}){
+  if(!node)return;
+  const state=controlSurfaceState(colors,level);
+  paint(node,'fill',fill?state.fill:'none');
+  paint(node,'fill-opacity',fill?state.alpha:0);
+  if(stroke){
+    paint(node,'stroke',state.stroke);
+    paint(node,'stroke-opacity',String(state.strokeAlpha));
+  }else paint(node,'stroke','none');
+}
+
 function ensureBaseFill(reference,colors){
   const body=reference.bodyShape;
   if(!body)return;
@@ -143,60 +178,34 @@ function paintStick(reference,entry,colors,values,axes,variant){
   const outer=group.querySelector('[id$="-outline"]');
   const center=group.querySelector('[id$="-top"]');
   const pressure=group.querySelector('[id$="-pressure"]');
-  // The separate click/pressure shape is NOT the cap material and cannot be
-  // used to fake a third button. It remains invisible in this 2D experiment.
+  // The static socket is part of the body and never becomes an input surface.
   if(pressure){paint(pressure,'fill','none');paint(pressure,'stroke','none');}
   if(!outer)return;
   const movement=analogStickLevel(axes?.[entry.stickSide]);
   const clicked=clamp(values?.get(entry.control)||0)>.5;
   const levels=stickFeedbackLevels(movement,clicked,variant);
   const ring=center?levels.ring:Math.max(levels.ring,levels.center);
-  // The authored outer ellipse IS the moving rim. Its material lies behind
-  // the authored inner top. A subdued idle rim avoids alpha build-up in Ghost;
-  // higher input levels smoothly approach fully opaque white.
-  if(colors.reviewLook){
-    // No filled ellipse under the translucent center. That double alpha
-    // previously made neutral sticks darker than every other control, and
-    // could turn a moved ring into a nearly white center before L3/R3.
-    // Highlight the authored moving RIM stroke only; the static socket
-    // and centered cap fill remain independent.
-    paint(outer,'fill','none');
-    paint(outer,'fill-opacity','0');
-    paint(outer,'stroke',mixColor(colors.line,PRESS_WHITE,ring));
-    paint(outer,'stroke-opacity',String(colors.lineAlpha+(1-colors.lineAlpha)*ring));
-  }else{
-    paint(outer,'fill',mixColor(colors.cap,PRESS_WHITE,ring));
-    const rimAlpha=colors.ghost?(colors.controlAlpha*.52+(1-colors.controlAlpha*.52)*ring):1;
-    paint(outer,'fill-opacity',String(rimAlpha));
-    paint(outer,'stroke',colors.pressedOutline);
-    paint(outer,'stroke-opacity',String(Math.max(colors.lineAlpha,.83)));
-  }
+  // Ring = the original moving ellipse STROKE, never an overlapping filled disk.
+  paint(outer,'fill','none');
+  paint(outer,'fill-opacity','0');
+  paint(outer,'stroke',mixColor(colors.controlStroke,PRESS_WHITE,ring));
+  paint(outer,'stroke-opacity',
+    String(colors.controlStrokeAlpha+(CONTROL_PALETTE.activeBorderAlpha-colors.controlStrokeAlpha)*ring));
   if(center){
     const level=levels.center;
-    paint(center,'fill',mixColor(colors.control,PRESS_WHITE,level));
-    paint(center,'fill-opacity',String(colors.controlAlpha+(1-colors.controlAlpha)*level));
-    // Keep this existing physical boundary distinct even when both parts
-    // become pure white. No dark halo, cloned geometry or knockout mask.
-    paint(center,'stroke',colors.reviewLook&&level<1?colors.line:colors.pressedOutline);
-    paint(center,'stroke-opacity',String(Math.max(colors.lineAlpha,.88)));
-    if(colors.reviewLook){
-      // Authored cap lines are often <1 screen pixel at 320px (DualSense:
-      // ~1 SVG unit over a 545-unit viewBox). Keep the SAME physical edge,
-      // but guarantee it remains readable against a white background when
-      // L3/R3 turns the center fully white.
-      const attr='data-exo-authored-stroke-width';
-      if(!center.hasAttribute(attr)){
-        const original=parseFloat(center.style.getPropertyValue('stroke-width')||
-          center.getAttribute('stroke-width')||'1');
-        center.setAttribute(attr,String(Number.isFinite(original)&&original>0?original:1));
-      }
-      const original=Number(center.getAttribute(attr));
-      const viewWidth=reference.svg.viewBox.baseVal.width||480;
-      const stageWidth=reference.container?.clientWidth||320;
-      const unit=viewWidth/stageWidth;
-      const minPx=level>.8?1.30:.90;
-      paint(center,'stroke-width',String(Math.max(original,unit*minPx)));
+    paintControl(center,colors,level);
+    // Keep the exact source cap boundary visible, including during white L3.
+    const attr='data-exo-authored-stroke-width';
+    if(!center.hasAttribute(attr)){
+      const original=parseFloat(center.style.getPropertyValue('stroke-width')||
+        center.getAttribute('stroke-width')||'1');
+      center.setAttribute(attr,String(Number.isFinite(original)&&original>0?original:1));
     }
+    const original=Number(center.getAttribute(attr));
+    const viewWidth=reference.svg.viewBox.baseVal.width||480;
+    const stageWidth=reference.container?.clientWidth||320;
+    const minPx=level>.8?1.30:.90;
+    paint(center,'stroke-width',String(Math.max(original,(viewWidth/stageWidth)*minPx)));
   }
 }
 function paintDpad(entry,colors,values){
@@ -204,23 +213,15 @@ function paintDpad(entry,colors,values){
   const face=group.querySelector('[id$="-cross"],[id$="-surface"],[id$="-face"]')||entry.surface;
   if(!face)return;
   const level=Math.max(...['up','down','left','right'].map(key=>clamp(values?.get(key)||0)))>.5?1:0;
-  paint(face,'fill',mixColor(colors.control,PRESS_WHITE,level));
-  paint(face,'fill-opacity',colors.controlAlpha+(1-colors.controlAlpha)*level);
-  paint(face,'stroke',level?colors.pressedOutline:colors.line);
-  paint(face,'stroke-opacity',level?1:colors.lineAlpha);
-  // Keep the original dish distinct from the moving/pressed cross.
+  paintControl(face,colors,level);
   const dish=group.querySelector('[id$="-dish"]');
-  if(dish){
-    paint(dish,'fill','none');paint(dish,'stroke',colors.line);
-    paint(dish,'stroke-opacity',colors.lineAlpha*.64);
-  }
+  if(dish)paintControl(dish,colors,0,{fill:false});
 }
 function paintGlyphs(entry,colors,showFaceSymbols){
   const isFace=['b1','b2','b3','b4'].includes(entry.control)&&entry.layer.role==='button';
   const face=entry.group.querySelector('[id$="-face"]');
   const glyphs=[...entry.group.querySelectorAll('.glyph')].filter(node=>!node.closest('defs,mask'));
-  // DualSense Share/Options draw their glyph BEFORE the face in the source SVG.
-  // Move only those authored glyph nodes in front; never duplicate a symbol.
+  // Keep authored Share/Options glyphs ABOVE their surfaces.
   if(face&&glyphs.some(node=>Boolean(node.compareDocumentPosition(face)&Node.DOCUMENT_POSITION_FOLLOWING)))
     for(const glyph of glyphs)entry.group.appendChild(glyph);
   for(const glyph of glyphs){
@@ -228,9 +229,11 @@ function paintGlyphs(entry,colors,showFaceSymbols){
       if(showFaceSymbols)glyph.style.removeProperty('display');
       else paint(glyph,'display','none');
     }
+    // One exact glyph color/alpha for all backgrounds and all input states.
+    // Never invert or darken the symbol just because its control is pressed.
     if(visibleFill(glyph))paint(glyph,'fill',colors.glyph);
     if(visibleStroke(glyph))paint(glyph,'stroke',colors.glyph);
-    paint(glyph,'opacity','1');
+    paint(glyph,'opacity',String(colors.glyphAlpha));
   }
 }
 // 2D cannot reproduce v25/26's angle-dependent 3D Fresnel shader. Instead,
@@ -381,37 +384,19 @@ export function paintPolished2D(reference,mode,scene,{
         !node.classList.contains('glyph')):null)||entry.surface;
     if(!face)continue;
     const level=controlLevel(entry,values,{left,right});
-    const base=entry.layer.role==='trigger'?colors.trigger:colors.control;
     if(entry.layer.role==='trigger'&&pressure&&face!==pressure){
-      // The binding's authored -pressure path is the real analog activation
-      // surface. The sibling outline is a structural border, not a second
-      // opaque face that may occlude that pressure path.
-      paint(pressure,'fill',mixColor(base,PRESS_WHITE,level));
-      paint(pressure,'fill-opacity',colors.controlAlpha+(1-colors.controlAlpha)*level);
-      paint(pressure,'stroke','none');
-      paint(face,'fill','none');
-      if(visibleStroke(face)){
-        paint(face,'stroke',colors.line);
-        paint(face,'stroke-opacity',String(colors.lineAlpha));
-      }
+      // Analog source face: visible pressure is the colored material; its
+      // sibling remains an outline, never a second filled surface.
+      paintControl(pressure,colors,level,{stroke:false});
+      paintControl(face,colors,0,{fill:false});
     }else{
       if(pressure&&face!==pressure){
         paint(pressure,'fill','none');paint(pressure,'stroke','none');
       }
-      paint(face,'fill',mixColor(base,PRESS_WHITE,level));
-      paint(face,'fill-opacity',colors.controlAlpha+(1-colors.controlAlpha)*level);
-      if(visibleStroke(face)||face.id.endsWith('-face')){
-        paint(face,'stroke',level?colors.pressedOutline:colors.line);
-        paint(face,'stroke-opacity',level?1:colors.lineAlpha);
-      }
-    }
-    // Touchpad is a housing-sized surface. At idle it must reveal the
-    // background entirely, rather than becoming a large gray rectangle.
-    // A physical touchpad press remains visible with the normal white input.
-    if(colors.reviewLook&&group.id.endsWith('btn-touchpad')&&level<.01){
-      for(const node of group.querySelectorAll('path,ellipse,rect'))
-        if(!node.classList.contains('glyph')&&!node.closest('defs,mask'))
-          paint(node,'fill-opacity','0');
+      // Same neutral/active RGBA for R1/L1, Face, D-pad, Home and Touchpad.
+      // Even elements without authored stroke (DualSense Touchpad/Home)
+      // use the same single structural outline.
+      paintControl(face,colors,level);
     }
     paintGlyphs(entry,colors,showFaceSymbols);
   }

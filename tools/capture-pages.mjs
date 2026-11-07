@@ -455,8 +455,48 @@ try{
     }
     return results;
   });
-  if(ghostState.some(r=>r.body.length||r.touchpad.length))
-    throw Error('Ghost A/B/C must have completely transparent shell and idle touchpad: '+JSON.stringify(ghostState));
+  if(ghostState.some(r=>r.body.length||r.touchpad.length!==1))
+    throw Error('Ghost A/B/C: shell must be transparent; Touchpad must be one visible control: '+JSON.stringify(ghostState));
+  const neutralControls=await ghost.evaluate(()=>{
+    const data=[];
+    for(const item of window.__exoGhostReview.items){
+      const groups=item.reference.controls;
+      const pick=id=>groups.find(x=>x.layer.id===id)?.group;
+      const nodes={
+        l1:pick('btn-l1')?.querySelector('path:not([id$="-pressure"])'),
+        r1:pick('btn-r1')?.querySelector('path:not([id$="-pressure"])'),
+        dpad:pick('btn-up')?.querySelector('[id$="-face"]'),
+        face:pick('btn-cross')?.querySelector('[id$="-face"]'),
+        ps:pick('btn-home')?.querySelector('path'),
+        touchpad:pick('btn-touchpad')?.querySelector('path'),
+        stick:pick('stick-l-cap')?.querySelector('[id$="-top"]'),
+        trigger:pick('trigger-l2')?.querySelector('[id$="-pressure"]')
+      };
+      const sample={look:item.look,scene:item.scene,values:{},
+        glyph:(()=>{const n=pick('btn-cross')?.querySelector('.glyph');
+          return n?{color:getComputedStyle(n).fill,alpha:getComputedStyle(n).opacity}:null;})()};
+      for(const [key,n] of Object.entries(nodes)){
+        if(!n)throw Error('Missing real SVG control '+key+' on '+item.scene);
+        const css=getComputedStyle(n);
+        sample.values[key]={fill:css.fill,alpha:Number(css.fillOpacity),
+          stroke:css.stroke,strokeAlpha:Number(css.strokeOpacity)};
+      }
+      data.push(sample);
+    }
+    return data;
+  });
+  const first=neutralControls[0];
+  for(const panel of neutralControls){
+    for(const [name,actual] of Object.entries(panel.values)){
+      const expected=first.values.face;
+      if(actual.fill!==expected.fill||Math.abs(actual.alpha-expected.alpha)>.001 ||
+         actual.stroke!==expected.stroke||Math.abs(actual.strokeAlpha-expected.strokeAlpha)>.001)
+        throw Error('Inconsistent neutral '+name+' on '+panel.look+'/'+panel.scene+': '+
+          JSON.stringify({actual,expected}));
+    }
+    if(JSON.stringify(panel.glyph)!==JSON.stringify(first.glyph))
+      throw Error('Face glyph changed across backgrounds: '+JSON.stringify(panel));
+  }
   const captureGhost=async(file,element=null)=>{
     const target=element?ghost.locator(element):ghost;
     const bytes=await target.screenshot({path:path.join(output,file),fullPage:!element,animations:'disabled',timeout:60000});

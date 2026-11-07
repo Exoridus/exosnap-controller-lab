@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {GHOST_REVIEW_LOOKS,ghostReviewSettings} from '../polish-2d-style.js';
+import {GHOST_REVIEW_LOOKS,ghostReviewSettings,CONTROL_PALETTE,controlSurfaceState} from '../polish-2d-style.js';
 
 const source=async name=>readFile(new URL('../'+name,import.meta.url),'utf8');
 test('A/B/C only change edge relief and always leave shell 100% transparent',()=>{
@@ -14,15 +14,27 @@ test('A/B/C only change edge relief and always leave shell 100% transparent',()=
       assert.equal(x.detailAlpha,0);
       assert.equal(x.control,x.cap);
       assert.equal(x.control,x.trigger);
-      assert.equal(x.controlAlpha,.23);
+      assert.equal(x.controlAlpha,CONTROL_PALETTE.neutralAlpha);
+      assert.equal(x.activeAlpha,CONTROL_PALETTE.activeAlpha);
+      assert.equal(x.controlStroke,CONTROL_PALETTE.border);
     }
     assert.equal(a[0].edgeLight,0);
     assert.equal(a[0].edgeShadow,0);
     assert.ok(a[1].edgeLight>a[2].edgeLight);
     assert.ok(a[2].edgeShadow>a[1].edgeShadow);
-    for(const key of ['control','cap','trigger','controlAlpha','line','lineAlpha','glyph'])
+    for(const key of ['control','cap','trigger','controlAlpha','activeAlpha','controlStroke','controlStrokeAlpha','line','lineAlpha','glyph'])
       assert.ok(a.every(x=>x[key]===a[0][key]),key+' differs across review looks');
   }
+  const settings=['dark','light','mixed'].map(scene=>ghostReviewSettings('shadow',scene));
+  for(const key of ['control','cap','trigger','controlAlpha','activeAlpha','controlStroke','controlStrokeAlpha','glyph','glyphAlpha'])
+    assert.ok(settings.every(x=>x[key]===settings[0][key]),'Backdrop must not change '+key);
+  const idle=controlSurfaceState(settings[0],0);
+  const active=controlSurfaceState(settings[0],1);
+  assert.equal(idle.fill,CONTROL_PALETTE.neutralFill);
+  assert.equal(idle.alpha,CONTROL_PALETTE.neutralAlpha);
+  assert.equal(active.fill,'#ffffff');
+  assert.equal(active.alpha,CONTROL_PALETTE.activeAlpha);
+  assert.ok(active.alpha<.65);
   assert.throws(()=>ghostReviewSettings('other','dark'),TypeError);
 });
 test('comparison uses original SVGs with correct independent input states',async()=>{
@@ -36,10 +48,11 @@ test('comparison uses original SVGs with correct independent input states',async
   assert.ok(js.includes('isolateReferenceIds('));
   assert.ok(js.includes("stickFeedback:'ring'"));
   assert.ok(js.includes("paintPolished2D(item.reference,'ghost'"));
-  assert.ok(style.includes("group.id.endsWith('btn-touchpad')"));
+  assert.ok(style.includes('paintControl(face,colors,level)'));
+  assert.ok(!style.includes("group.id.endsWith('btn-touchpad')"));
   assert.ok(!html.includes('Gehaeusefarbe'));
   // The moving RIM cannot have any overlapping fill beneath the neutral
   // center: motion and L3 click must remain independently visible.
   assert.match(style,/paint\(outer,'fill','none'\)/);
-  assert.match(style,/mixColor\(colors\.line,PRESS_WHITE,ring\)/);
+  assert.match(style,/mixColor\(colors\.controlStroke,PRESS_WHITE,ring\)/);
 });
