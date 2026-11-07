@@ -8,6 +8,7 @@ import {createContrastCompositeMaterial,updateContrastComposite} from './silhoue
 import {isHousingRole} from './model-semantics.js';
 import {loadNativeRig,disposeNativeRig} from './pbr-model.js';
 import {applyPbrRecipeToRig,applyStickPoseToRig} from './pbr-appearance.js';
+import {fitControllerRadius} from './pbr-camera-fit.js';
 import {shareIdenticalStickGeometry,optimizeStaticHousing,instantiateStickPairs} from './pbr-optimizer.js';
 import {poseForStickDemo,normalizeStickInput} from './stick-activity.js';
 import {summarizePanelBudget} from './render-budget.js';
@@ -27,7 +28,7 @@ const resolveVariant=resolveHeroRecipe;
 const state={mix:.70,modelId:'DualSenseCompact',selected:'ghost',view:'front',panelWidth:320,
   renderMode:'shared',stickPose:'neutral',triggerPressure:0,
   pressed:false,native:null,renderer:null,renderPending:false,camera:null,scene:null,drawStats:{},
-  yaw:0,pitch:0,radius:7.8,error:null,drag:null,renderTarget:null,blitScene:null,blitCamera:null,
+  yaw:0,pitch:0,radius:7.8,fitRadius:7.8,error:null,drag:null,renderTarget:null,blitScene:null,blitCamera:null,
   environmentMap:null};
 const sampleNodes=[];
 const flatSampleNodes=[];
@@ -124,7 +125,7 @@ async function loadFlatReferences(model){
 }
 function updateFlatReferences(){
   // A wheel over either 3D or 2D changes the common apparent size.
-  const flatZoom=THREE.MathUtils.clamp(7.8/state.radius,.67,1.55);
+  const flatZoom=THREE.MathUtils.clamp(state.fitRadius/state.radius,.67,1.55);
   for(const item of flatSampleNodes)item.stage.style.transform=`scale(${flatZoom.toFixed(4)})`;
   if(!flatReferences.size)return;
   const inputs=state.stickPose==='live'?getLiveStickPose():poseForStickDemo(state.stickPose);
@@ -172,6 +173,7 @@ function setView(view){
   state.view=view;
   const poses={front:[0,0],angled:[.52,.12],profile:[1.5,.04]};
   [state.yaw,state.pitch]=poses[view]||poses.angled;
+  if(state.native){state.fitRadius=fitControllerRadius(new THREE.Box3().setFromObject(state.native.group).getSize(new THREE.Vector3()),{yaw:state.yaw,pitch:state.pitch});state.radius=state.fitRadius;}
   updateCamera();
 }
 function applyLights(_lights,recipe){
@@ -313,6 +315,8 @@ async function loadModel(id){
     prepareSilhouette(next);
     disposeNativeRig(state.native);
     state.native=next;state.modelId=id;
+    state.fitRadius=fitControllerRadius(new THREE.Box3().setFromObject(next.group).getSize(new THREE.Vector3()),{yaw:state.yaw,pitch:state.pitch});
+    state.radius=state.fitRadius;updateCamera();
     if(state.renderer&&state.environmentMap)$('failureBanner').hidden=true;
     state.scene.add(next.group);
     await loadFlatReferences(model);
@@ -391,7 +395,7 @@ function bindUI(){
     e.preventDefault();
     if(e.shiftKey){document.querySelector('main').scrollLeft+=e.deltaY;return;}
     // Browser page scroll never steals wheel zoom while hovering either viewer.
-    state.radius=Math.max(5,Math.min(12,state.radius*(e.deltaY>0?1.06:.94)));
+    state.radius=Math.max(Math.max(3,state.fitRadius*.65),Math.min(Math.max(12,state.fitRadius*2),state.radius*(e.deltaY>0?1.06:.94)));
     updateCamera();
     if(!state.renderer)updateFlatReferences();
   },{passive:false});
