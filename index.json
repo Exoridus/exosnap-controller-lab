@@ -1,5 +1,133 @@
 [
   {
+    "sha": "7e6fe41c9d3a05d03d976f1feefbae2b84112eda",
+    "capturedAt": "2026-11-07T00:47:30.805Z",
+    "neutralUrl": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/overview-neutral.png",
+    "pressedUrl": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/overview-pressed.png",
+    "manifestUrl": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/capture-manifest.json",
+    "gamecubeUrl": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/gamecube-neutral.png",
+    "genericUrl": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/generic-neutral.png",
+    "genericPressedUrl": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/generic-pressed.png",
+    "twoDScreenshots": [
+      {
+        "name": "2d-dualsense-neutral-480.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-dualsense-neutral-480.png"
+      },
+      {
+        "name": "2d-dualsense-trigger-neutral.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-dualsense-trigger-neutral.png"
+      },
+      {
+        "name": "2d-dualsense-trigger-100.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-dualsense-trigger-100.png"
+      },
+      {
+        "name": "2d-dualsense-stick-ring.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-dualsense-stick-ring.png"
+      },
+      {
+        "name": "2d-dualsense-motion-ring.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-dualsense-motion-ring.png"
+      },
+      {
+        "name": "2d-dualsense-stick-click.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-dualsense-stick-click.png"
+      },
+      {
+        "name": "2d-dualsense-face-symbols-on.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-dualsense-face-symbols-on.png"
+      },
+      {
+        "name": "2d-dualsense-face-symbols-off.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-dualsense-face-symbols-off.png"
+      },
+      {
+        "name": "2d-xbox-series-auto.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-xbox-series-auto.png"
+      },
+      {
+        "name": "2d-xbox-series-light.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-xbox-series-light.png"
+      },
+      {
+        "name": "2d-dualshock4-auto.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-dualshock4-auto.png"
+      },
+      {
+        "name": "2d-dualshock4-dark.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-dualshock4-dark.png"
+      },
+      {
+        "name": "2d-edge-dark-off.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-edge-dark-off.png"
+      },
+      {
+        "name": "2d-edge-dark-light.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-edge-dark-light.png"
+      },
+      {
+        "name": "2d-edge-dark-shadow.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-edge-dark-shadow.png"
+      },
+      {
+        "name": "2d-edge-dark-combined.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-edge-dark-combined.png"
+      },
+      {
+        "name": "2d-edge-light-off.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-edge-light-off.png"
+      },
+      {
+        "name": "2d-edge-light-light.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-edge-light-light.png"
+      },
+      {
+        "name": "2d-edge-light-shadow.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-edge-light-shadow.png"
+      },
+      {
+        "name": "2d-edge-light-combined.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-edge-light-combined.png"
+      },
+      {
+        "name": "2d-edge-mixed-off.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-edge-mixed-off.png"
+      },
+      {
+        "name": "2d-edge-mixed-light.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-edge-mixed-light.png"
+      },
+      {
+        "name": "2d-edge-mixed-shadow.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-edge-mixed-shadow.png"
+      },
+      {
+        "name": "2d-edge-mixed-combined.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-edge-mixed-combined.png"
+      },
+      {
+        "name": "2d-ghost-review-neutral.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-ghost-review-neutral.png"
+      },
+      {
+        "name": "2d-ghost-review-pure.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-ghost-review-pure.png"
+      },
+      {
+        "name": "2d-ghost-review-soft.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-ghost-review-soft.png"
+      },
+      {
+        "name": "2d-ghost-review-shadow.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-ghost-review-shadow.png"
+      },
+      {
+        "name": "2d-ghost-review-active.png",
+        "url": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/7e6fe41c9d3a05d03d976f1feefbae2b84112eda/2d-ghost-review-active.png"
+      }
+    ]
+  },
+  {
     "sha": "cfeda380dd9e3884ed6ef947fda778ce7cda63b8",
     "capturedAt": "2026-11-06T23:49:56.560Z",
     "neutralUrl": "https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/cfeda380dd9e3884ed6ef947fda778ce7cda63b8/overview-neutral.png",
