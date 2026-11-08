@@ -12,6 +12,7 @@ import {ledStates} from '../controller-player-leds.js';
 import {createContrastCompositeMaterial,updateContrastComposite} from '../silhouette-composite.js';
 
 const read=p=>readFile(new URL('../'+p.replace(/^\.\//,''),import.meta.url),'utf8');
+const colorDistance=(a,b)=>Math.hypot(a.r-b.r,a.g-b.g,a.b-b.b);
 async function sourceReference(layout){
   const [source,mapText]=await Promise.all([
     read('references/controllers/'+layout+'/source.svg'),
@@ -82,12 +83,12 @@ test('3D Ghost retains a little authored control color but never changes opacity
     for(let i=0;i<controls.length;i++){
       assert.equal(controls[i].material.opacity,alphas[i],controls[i].userData.sourceFile+' Ghost alpha unchanged');
       const expected=original[i].clone().lerp(new THREE.Color('#9ca3aa'),.84);
-      assert.ok(controls[i].material.color.distanceTo(expected)<1e-6,'residual source RGB');
-      assert.ok(controls[i].material.color.distanceTo(grayscale[i])>.0001,'Ghost is less desaturated');
+      assert.ok(colorDistance(controls[i].material.color,expected)<1e-6,'residual source RGB');
+      assert.ok(colorDistance(controls[i].material.color,grayscale[i])>.0001,'Ghost is less desaturated');
     }
     applyPbrRecipeToRig(rig,recipe,{allPressed:true});
     for(const mesh of controls.filter(m=>m.userData.control)){
-      assert.ok(mesh.material.color.distanceTo(new THREE.Color('#ffffff'))<.00001,'white active feedback retained');
+      assert.ok(colorDistance(mesh.material.color,new THREE.Color('#ffffff'))<.00001,'white active feedback retained');
     }
   }finally{disposeNativeRig(rig);}
 });
