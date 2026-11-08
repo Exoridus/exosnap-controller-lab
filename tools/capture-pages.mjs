@@ -212,7 +212,7 @@ try{
   await page.locator('#demoToggle').uncheck();
   await page.locator('#pressAll').uncheck();
   await page.locator('#view').selectOption('front');
-  await page.locator('#materialMix').fill('70');
+  await page.locator('#materialMix').evaluate(el=>{el.value='70';el.dispatchEvent(new Event('input',{bubbles:true}));});
   await page.locator('#outerContour').check();
   for(const [model,expectedCount] of [['SwitchPro',4],['JoyconGrip',8]]){
     await page.locator('#controller').selectOption(model);
@@ -222,8 +222,11 @@ try{
       model,{timeout:60000});
     let prior=null;
     for(const [playerIndex,mask] of [['0',1],['3',15]]){
+      const previousRevision=await page.evaluate(()=>Number(document.body.dataset.renderRevision||0));
       await page.locator('#playerPreview').selectOption(playerIndex);
-      await page.waitForFunction(mask=>window.__exoPbrLab?.playerLedSurface3D?.mask===mask,mask,{timeout:60000});
+      await page.waitForFunction(({mask,previousRevision})=>window.__exoPbrLab?.playerLedSurface3D?.mask===mask&&
+        Number(document.body.dataset.renderRevision||0)>previousRevision,
+        {mask,previousRevision},{timeout:60000});
       await shotProof();
       const rect=await page.locator('.variant[data-variant="white"] .sample[data-scene="light"]')
         .boundingBox();
