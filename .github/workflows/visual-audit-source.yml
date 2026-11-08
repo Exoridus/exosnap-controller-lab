@@ -1,0 +1,29 @@
+name: Visual audit source snapshot
+on:
+  push:
+    branches: [fix/visual-finish-qt-gate]
+    paths: [.github/workflows/visual-audit-source.yml]
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Package exact repository and test dependency
+        run: |
+          git bundle create "$RUNNER_TEMP/visual-audit.bundle" HEAD main
+          tar -czf "$RUNNER_TEMP/visual-audit-deps.tar.gz" node_modules
+      - uses: actions/upload-artifact@v4
+        with:
+          name: visual-audit-source
+          path: |
+            ${{ runner.temp }}/visual-audit.bundle
+            ${{ runner.temp }}/visual-audit-deps.tar.gz
+          retention-days: 7
