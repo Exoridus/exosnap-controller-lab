@@ -55,7 +55,7 @@ test('visual history creates immutable commit-addressed references and rejects c
   }finally{await rm(workspace,{recursive:true,force:true});}
 });
 
-test('visual history archives optional GameCube captures with immutable SHA links',async()=>{
+test('visual history archives optional GameCube and consolidated captures with immutable SHA links',async()=>{
   const {archiveSnapshots}=await import('../tools/archive-snapshots.mjs');
   const {createHash}=await import('node:crypto');
   const {mkdir,writeFile,readFile}=await import('node:fs/promises');
@@ -64,7 +64,7 @@ test('visual history archives optional GameCube captures with immutable SHA link
   try{
     await mkdir(cap,{recursive:true});
     const images=[];
-    for(const file of ['overview-neutral.png','overview-pressed.png','gamecube-neutral.png']){
+    for(const file of ['overview-neutral.png','overview-pressed.png','gamecube-neutral.png','3d-consolidated-hidden-l2.png']){
       const buf=Buffer.alloc(45000,file.length);
       Buffer.from('89504e470d0a1a0a','hex').copy(buf);
       await writeFile(path.join(cap,file),buf);
@@ -75,6 +75,10 @@ test('visual history archives optional GameCube captures with immutable SHA link
     assert.match(entry.gamecubeUrl,/gamecube-neutral\.png$/);
     assert.deepEqual(await readFile(path.join(arc,'snapshots',sha,'gamecube-neutral.png')),
       await readFile(path.join(cap,'gamecube-neutral.png')));
+    assert.deepEqual(await readFile(path.join(arc,'snapshots',sha,'3d-consolidated-hidden-l2.png')),
+      await readFile(path.join(cap,'3d-consolidated-hidden-l2.png')));
+    assert.deepEqual(entry.consolidatedScreenshots,[{name:'3d-consolidated-hidden-l2.png',
+      url:`https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/${sha}/3d-consolidated-hidden-l2.png`}]);
   }finally{await rm(w,{recursive:true,force:true});}
 });
 

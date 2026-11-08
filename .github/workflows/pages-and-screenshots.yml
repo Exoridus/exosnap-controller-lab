@@ -91,6 +91,8 @@ jobs:
         with:
           path: dist
   deploy:
+    # Feature branches produce review artifacts; the protected environment publishes main.
+    if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     environment:
