@@ -1,4 +1,5 @@
 import {CONTROL_NEUTRAL,CONTROL_CONTOURS,SCENE_BACKDROPS,softenedLegendColor} from './controller-visual-policy.js';
+import {NINTENDO_LED_LAYOUTS,ledStates} from './controller-player-leds.js';
 // Browser-only 2D visual polish. All rendered surfaces and glyphs originate
 // in the existing authored SVGs; input mapping and moving transforms stay owned
 // by ControllerReference.
@@ -567,10 +568,28 @@ function paintEdgeRelief(reference,mode,scene,edgeLight,edgeShadow){
   paint(outline,'filter','url(#'+id+')');
   reference.edgeReliefKey=key;
 }
+// Indicator geometry is the existing SVG, not a fabricated input control.
+// Its nested paths must keep an independent foreground/background contrast.
+function paintNintendoPlayerLeds(reference,colors,preview,scene){
+  const banks=NINTENDO_LED_LAYOUTS[reference.layout?.id];
+  if(!banks)return;
+  const states=ledStates(preview?.mask??0);
+  const border=colors.coherentContours?CONTROL_CONTOURS[scene]:colors.line;
+  const lit=scene==='light'?border:'#f7fbff';
+  for(const bank of banks)for(let i=0;i<bank.length;i++){
+    const node=reference.bodyShape?.querySelector('[id$="'+bank[i]+'"]');
+    if(!node)continue;
+    const on=states[i];
+    paint(node,'fill',on?lit:'none');
+    paint(node,'fill-opacity',on?'.94':'0');
+    paint(node,'stroke',border);
+    paint(node,'stroke-opacity',on?'1':'.83');
+  }
+}
 export function paintPolished2D(reference,mode,scene,{
   values=new Map(),left=null,right=null,colorway='auto',
   stickFeedback='ring',showFaceSymbols=true,edgeLight=0,edgeShadow=0,reviewLook=null,activeColor=PRESS_WHITE,
-  coherentContours=false,ringSurface=false,material2D=null,markings=true
+  coherentContours=false,ringSurface=false,material2D=null,markings=true,playerPreview=null
 }={}){
   if(!reference?.svg)return;
   const colors=reviewLook?
@@ -614,12 +633,12 @@ export function paintPolished2D(reference,mode,scene,{
     if(style===null)node.removeAttribute('style');else node.setAttribute('style',style);
   }
   ensureBaseFill(reference,colors);
-  for(const node of reference.svg.querySelectorAll('[data-decorative-marking]')){
-    if(markings)node.style.removeProperty('display');else paint(node,'display','none');
-  }
-  for(const child of [...(reference.bodyShape?.children||[])]){
+  // The authored sources put essential seams and rings into nested groups.
+  // Inspect the original descendants, excluding SVG definitions and the
+  // explicitly state-driven player LED paths, rather than only direct children.
+  for(const child of [...(reference.bodyShape?.querySelectorAll('path,ellipse,rect,circle,polygon')||[])]){
     if(child.hasAttribute('data-exo-polish-silhouette'))continue;
-    if(!['path','ellipse','rect'].includes(child.localName))continue;
+    if(child.closest('defs,mask,clipPath,[id$="body-player-leds"]'))continue;
     const detail=child.classList.contains('detail')||child.id.endsWith('speaker-grille');
     // All body embellishments keep complete, original painted paths. Ghost
     // adapts only interactive marks and the separate outer silhouette.
@@ -695,6 +714,13 @@ export function paintPolished2D(reference,mode,scene,{
     const level=controlLevel(entry,values,{left,right});
     paintControlGroup(entry,colors,level);
     paintGlyphs(entry,colors,showFaceSymbols,level);
+  }
+  // Keep status indicators visible and inactive outlines legible on white.
+  paintNintendoPlayerLeds(reference,colors,playerPreview,scene);
+  // Apply the marking toggle LAST: restoring an authored body style must not
+  // inadvertently re-enable the optional GameCube emblem or other decoration.
+  for(const node of reference.svg.querySelectorAll('[data-decorative-marking]')){
+    if(markings)node.style.removeProperty('display');else paint(node,'display','none');
   }
   paintEdgeRelief(reference,mode,scene,edgeLight,edgeShadow);
 }
