@@ -174,7 +174,7 @@ test('active light-scene controls retain dark authored contours while moving rin
   assert.equal(radius*2,1,'ring counter-edge remains one rendered pixel');
 });
 
-test('current 2D Lab uses matching body/control/glyph ink and no thick mixed filters',async()=>{
+test('current 2D Lab preserves shared body/control contours with independent face ink',async()=>{
   const expected={dark:'#ffffff',light:'#858585',mixed:'#8c98a3'};
   for(const [scene,ink] of Object.entries(expected)){
     const r=await reference();
@@ -184,7 +184,7 @@ test('current 2D Lab uses matching body/control/glyph ink and no thick mixed fil
     const glyph=r.svg.querySelector('[id="btn-cross"]').querySelector('.glyph');
     const outer=r.svg.querySelector('[id="outline-strong"]');
     assert.equal(value(face,'stroke'),ink,scene+' face');
-    assert.equal(value(glyph,'fill'),ink,scene+' glyph');
+    assert.ok(['#25282b','#ffffff','#000000'].includes(value(glyph,'fill')),scene+' surface-aware glyph');
     assert.equal(value(outer,'stroke')||value(outer,'fill'),ink,scene+' shell');
     assert.equal(value(face,'filter'),'','no per-control black filter');
     assert.equal(value(glyph,'filter'),'','no oversized shadow around glyphs');
@@ -210,4 +210,27 @@ test('final 2D uses a filled masked annulus for motion and an independent click 
  for(const glyph of r.svg.querySelectorAll('.glyph'))assert.equal(value(glyph,'display'),'none');
  paintPolished2D(r,'ghost','dark',{...options,markings:true});
  for(const glyph of r.svg.querySelectorAll('.glyph'))assert.notEqual(value(glyph,'display'),'none');
+});
+
+test('current neutral surfaces are gray independently of readable housing contours',async()=>{
+ const r=await reference();
+ paintPolished2D(r,'ghost','dark',{coherentContours:true,material2D:{neutralOpacity:.3,activeOpacity:.96}});
+ const face=r.svg.querySelector('[id="btn-cross-face"]');
+ assert.notEqual(value(face,'fill'),'#ffffff','neutral is not the activation color');
+ assert.equal(value(face,'stroke'),'#ffffff','approved contour stays unchanged');
+ assert.equal(Number(value(face,'fill-opacity')),.3,'70% transparency retained');
+});
+
+test('face legends contrast with the composited surface at every supported alpha and press state',async()=>{
+ const lum=hex=>{const c=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);return c[0]*.2126+c[1]*.7152+c[2]*.0722;};
+ const blend=(a,b,t)=>'#'+[1,3,5].map(i=>Math.round(parseInt(a.slice(i,i+2),16)*(1-t)+parseInt(b.slice(i,i+2),16)*t).toString(16).padStart(2,'0')).join('');
+ const backdrops={dark:'#09111b',light:'#f4f6f9',mixed:'#9baab4'};
+ for(const scene of Object.keys(backdrops))for(const transparency of [0,.3,.7,.9])for(const activeColor of ['#ffffff','#204060'])for(const pressed of [0,1]){
+  const r=await reference();paintPolished2D(r,'ghost',scene,{coherentContours:true,activeColor,material2D:{neutralOpacity:1-transparency,activeOpacity:.96},values:new Map([['b1',pressed]])});
+  const face=r.svg.querySelector('[id="btn-cross-face"]'),glyph=r.svg.querySelector('[id="btn-cross"]').querySelector('.glyph');
+  const surface=lum(blend(backdrops[scene],value(face,'fill'),Number(value(face,'fill-opacity')))),ink=lum(value(glyph,'fill'));
+  assert.ok((Math.max(surface,ink)+.05)/(Math.min(surface,ink)+.05)>=4.5,JSON.stringify({scene,transparency,pressed,activeColor,ink:value(glyph,'fill'),fill:value(face,'fill')}));
+  assert.equal(Number(value(glyph,'opacity')),1,'legend coverage is independent of button opacity');
+  assert.equal(value(glyph,'filter'),'','no additional glyph shadow or plate');
+ }
 });

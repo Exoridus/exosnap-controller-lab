@@ -439,6 +439,22 @@ function paintDpad(entry,colors,values){
   if(dish)paintControl(dish,colors,0,{fill:false});
   return level;
 }
+// Face ink is evaluated against its own composited surface, never coupled to
+// outline ink or surface opacity. Backdrops are fixed Lab profiles, not video
+// readbacks. This scalar policy also maps to QPainter/atlas color preparation.
+export function surfaceGlyphColor(colors,level=0){
+  const state=controlSurfaceState(colors,level);
+  const surface=mixColor(colors.surfaceBackdrop||'#9baab4',state.fill,state.alpha);
+  const luminance=hex=>{
+    const c=rgb(hex).map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);
+    return .2126*c[0]+.7152*c[1]+.0722*c[2];
+  };
+  const l=luminance(surface);
+  const contrast=ink=>{const i=luminance(ink);return (Math.max(l,i)+.05)/(Math.min(l,i)+.05);};
+  const dark='#25282b',light='#ffffff';
+  const best=contrast(dark)>=contrast(light)?dark:light;
+  return contrast(best)>=4.5?best:(contrast('#000000')>contrast(best)?'#000000':best);
+}
 function paintGlyphs(entry,colors,showFaceSymbols,level=0){
   const isFace=['b1','b2','b3','b4'].includes(entry.control)&&entry.layer.role==='button';
   const face=entry.group.querySelector('[id$="-face"]');
@@ -446,14 +462,16 @@ function paintGlyphs(entry,colors,showFaceSymbols,level=0){
   // Keep authored Share/Options glyphs ABOVE their surfaces.
   if(face&&glyphs.some(node=>Boolean(node.compareDocumentPosition(face)&Node.DOCUMENT_POSITION_FOLLOWING)))
     for(const glyph of glyphs)entry.group.appendChild(glyph);
+  const surfaceInk=isFace&&colors.coherentContours;
+  const ink=surfaceInk?surfaceGlyphColor(colors,level):colors.glyph;
   for(const glyph of glyphs){
     if(colors.markingsVisible!==false&&(!isFace||showFaceSymbols))glyph.style.removeProperty('display');
     else paint(glyph,'display','none');
-    // Authored symbols use the same scene ink and contour alpha as inputs.
-    if(visibleFill(glyph))paint(glyph,'fill',colors.glyph);
-    if(visibleStroke(glyph))paint(glyph,'stroke',colors.glyph);
+    // Keep original paths and draw order; only face ink needs surface contrast.
+    if(visibleFill(glyph))paint(glyph,'fill',ink);
+    if(visibleStroke(glyph))paint(glyph,'stroke',ink);
     if(colors.ghost){paint(glyph,'fill-opacity',1);paint(glyph,'stroke-opacity',1);}
-    paint(glyph,'opacity',String(colors.glyphAlpha+(CONTROL_PALETTE.activeBorderAlpha-colors.glyphAlpha)*clamp(level)));
+    paint(glyph,'opacity',surfaceInk?1:String(colors.glyphAlpha+(CONTROL_PALETTE.activeBorderAlpha-colors.glyphAlpha)*clamp(level)));
     if(colors.ghost)controlContrastFilter(glyph,colors,level);
   }
 }
@@ -560,13 +578,13 @@ export function paintPolished2D(reference,mode,scene,{
   colors.markingsVisible=markings;colors.ringSurface=ringSurface;
   if(material2D){colors.controlAlpha=clamp(material2D.neutralOpacity);colors.activeAlpha=clamp(material2D.activeOpacity);}
   if(coherentContours&&mode==='ghost'&&!reviewLook){
-    // A single scene-specific ink shared by the outer housing, interior
-    // paths, shoulders, sticks, face/directional controls and glyphs.
-    // No opaque black and no extra control-specific filter passes.
+    // Preserve the approved shared outline ink, but do not use white ink as
+    // the neutral material or assume the same ink is legible on opaque faces.
     const ink={dark:'#ffffff',light:'#858585',mixed:'#8c98a3'}[scene];
     colors.coherentContours=true;
-    colors.line=colors.control=colors.cap=colors.trigger=colors.controlStroke=
-      colors.glyph=colors.pressedOutline=ink;
+    colors.surfaceBackdrop={dark:'#09111b',light:'#f4f6f9',mixed:'#9baab4'}[scene];
+    colors.control=colors.cap=colors.trigger=scene==='dark'?'#9ca3aa':ink;
+    colors.line=colors.controlStroke=colors.glyph=colors.pressedOutline=ink;
     colors.lineAlpha=.88;colors.controlStrokeAlpha=.88;colors.glyphAlpha=.88;
     colors.detailAlpha=.64;colors.contrastEdge=null;
     edgeLight=0;edgeShadow=0;

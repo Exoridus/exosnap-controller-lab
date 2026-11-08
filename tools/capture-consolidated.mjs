@@ -4,6 +4,29 @@ import {createHash} from 'node:crypto';
 import path from 'node:path';
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 
+// Validate rendered paint rather than the obsolete "glyph === outline" rule.
+export function verifyFlatAudit(item){
+  const rgb=color=>/^#[a-f0-9]{6}$/i.test(color||'')
+    ?[1,3,5].map(i=>parseInt(color.slice(i,i+2),16))
+    :String(color).match(/^rgba?\(([^)]+)\)$/)?.[1].split(/[, /]+/).slice(0,3).map(Number);
+  const expected={dark:'#ffffff',light:'#858585',mixed:'#8c98a3'}[item.scene];
+  const same=(a,b)=>JSON.stringify(rgb(a))===JSON.stringify(rgb(b));
+  if(!expected||!same(item.housing,expected)||!same(item.button,expected))
+    throw Error('2D body/control contour inks diverge: '+JSON.stringify(item));
+  const ink=rgb(item.glyph),surface=rgb(item.surface);
+  const backdrop=rgb({dark:'#09111b',light:'#f4f6f9',mixed:'#9baab4'}[item.scene]);
+  const lum=channels=>channels.map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4)
+    .reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i],0);
+  if(!ink||!surface||![...ink,...surface,item.alpha].every(Number.isFinite)||item.alpha<0||item.alpha>1)
+    throw Error('Invalid surface contrast inputs: '+JSON.stringify(item));
+  const a=lum(ink),b=lum(surface.map((v,i)=>Math.round(v*item.alpha+backdrop[i]*(1-item.alpha))));
+  if((Math.max(a,b)+.05)/(Math.min(a,b)+.05)<4.5)
+    throw Error('2D face legend contrast is insufficient: '+JSON.stringify(item));
+  if(item.glyphOpacity!==1)throw Error('2D face legend coverage follows surface alpha: '+JSON.stringify(item));
+  if(item.filter||item.glyphFilter||item.outerFilter||item.leftMargin<1||item.rightMargin<1)
+    throw Error('2D black plate, double rim or clipped housing: '+JSON.stringify(item));
+}
+
 export async function captureConsolidated(page,{output,images,shotProof}){
   const frame=async action=>{
     const revision=await page.evaluate(()=>Number(document.body.dataset.renderRevision||0));
@@ -47,22 +70,15 @@ export async function captureConsolidated(page,{output,images,shotProof}){
     const fill=node=>node?.style?.getPropertyValue('fill');
     const rect=outer?.getBoundingClientRect(),frame=panel.getBoundingClientRect();
     return {scene:panel.dataset.scene,housing:stroke(outer)==='none'?fill(outer):stroke(outer),
-      button:stroke(button),glyph:fill(glyph),
+      button:stroke(button),glyph:fill(glyph),surface:button?getComputedStyle(button).fill:'',
+      alpha:button?Number(getComputedStyle(button).fillOpacity):NaN,
+      glyphOpacity:glyph?Number(getComputedStyle(glyph).opacity):NaN,
       filter:button?.style?.getPropertyValue('filter')||'',
       glyphFilter:glyph?.style?.getPropertyValue('filter')||'',
       outerFilter:outer?.style?.getPropertyValue('filter')||'',
       leftMargin:rect?rect.left-frame.left:0,rightMargin:rect?frame.right-rect.right:0};
   }));
-  for(const item of flatAudit){
-    const expected={dark:'#ffffff',light:'#858585',mixed:'#8c98a3'}[item.scene];
-    // SVG style serialization can normalize hex colors to rgb() in Chromium.
-    const normalized=hex=>'rgb('+[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)).join(', ')+')';
-    const matches=c=>c===expected||c===normalized(expected);
-    if(!expected||!matches(item.housing)||!matches(item.button)||!matches(item.glyph))
-      throw Error('2D body/control/glyph inks diverge: '+JSON.stringify(item));
-    if(item.filter||item.glyphFilter||item.outerFilter||item.leftMargin<1||item.rightMargin<1)
-      throw Error('2D black plate, double rim or clipped housing: '+JSON.stringify(item));
-  }
+  for(const item of flatAudit)verifyFlatAudit(item);
   await mix(0);
   const neutralFlat=hash(await page.locator('.flat-reference').screenshot());
   const neutral3D=await sourceHash();

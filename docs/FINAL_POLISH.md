@@ -1,5 +1,7 @@
 # Final Controller Lab polish — 2026-11-08
 
+> Ergänzung zum finalen Stand: [gezielte Sockel-/2D-Korrekturen und Qt-Portabilitätsmatrix](VISUAL_FINISH_QT_GATE.md). Die folgenden Mechanik-/Demo-Regeln bleiben bestehen.
+
 ## Source recovery and scope
 
 The current published baseline is `6af4f221f3adecd8b8efde46d788f9dc94c00739`. Implementation was recovered from **artifacts**, not guessed from screenshots:

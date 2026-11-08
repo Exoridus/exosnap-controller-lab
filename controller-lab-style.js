@@ -27,7 +27,7 @@ export function resolveLabRecipe(feedback='white',mix=1){
     // Standard PBR + a shared alpha-edge compositor; no per-material Fresnel patch.
     ghostFresnel:{strength:0,source:'standard PBR'},
     hiddenIndicators:{enabled:true,idleOpacity:.28,activeOpacity:.90,activeFillOpacity:.12},
-    material:{...base.material,shell,controls,supportOpacity:shell.opacity,
+    material:{...base.material,shell,controls,supportOpacity:shell.opacity*(1-.72*t*t*(3-2*t)),supportShellBlend:true,
       pressBlue:'#ffffff',defaultPressBlue:'#ffffff',pressEmissive:'#ffffff',
       pressOpacity:1,pressEmissiveIntensity:.16}
   };
@@ -48,11 +48,11 @@ export function qtLabDescriptor(recipe,{activeColor2D='#ffffff'}={}){
     activeContrast:recipe.activeContrast,
     nativeValidated:false,demoDefault:true,markingsDefault:true,
     markings:{technique:'alpha mask in existing button material',extraDrawCalls:0,floatingMenuLabels:false},
-    stickPolicy:{ring:'analog magnitude',cap:'L3/R3 click only',support:'neutral shell opacity',
+    stickPolicy:{supportModel:'DualSenseCompact',ring:'analog magnitude',cap:'L3/R3 click only',support:'source-to-shell material blend; shell-linked, reduced Ghost opacity',
       pose:'rotate authored parent; cap and stem inherit the same motion'},
     flat2D:{mode:'ghost',independentOf3DMix:true,shellOpacity:0,
       controlOpacity:.30,activeOpacity:.96,activeColor:activeColor2D,
-      contrast:'same grayscale contour ink for shell, controls and glyphs; no black double-edges',
+      contrast:'shared contour ink; separate neutral fill and contrast-selected face ink; no double-edges',
       decoration:'authored paths, no input feedback'},
     hiddenControls:{visibility:'physical-depth',dashed:true,individualInput:true,
       ...recipe.hiddenIndicators,
