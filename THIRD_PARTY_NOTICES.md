@@ -56,3 +56,7 @@ The automatic asset downloader publishes **only** 10 original controller model f
 The Xbox One `info.json` in 3dco+ contains a mismatched external Sketchfab `source` URL. The **24 imported OBJ files**, however, are byte-for-byte identical to the original Larf repository's MIT-model files. The mismatched metadata is not treated as proof of rights to unrelated Sketchfab material.
 
 The 2D artwork has independent terms: in particular, the GameCube reference is noted as GPL-3.0-only and Steam Controller 2026 outlines have outstanding provenance considerations. A valid 3D license does not automatically clear the matching SVG or proprietary names/logos.
+
+## Generic Pro source-profile correction (2026-11-08)
+
+The revised Generic Pro geometry follows the already approved native Generic 2D source profiles (Xelu/Luna CC0 silhouette and MIT control source). It retains the existing independently animated rig. Provenance is MIT AND CC0-1.0, not a claim of a third-party-free mesh. Source and notices: `references/controllers/SOURCE-NOTICE.txt`, `docs/MODEL_ASSET_PROVENANCE.json`, `assets/GenericPro/source-profile.json`. Original authors' notices remain applicable.

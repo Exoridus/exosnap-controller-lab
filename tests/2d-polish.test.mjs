@@ -159,14 +159,13 @@ test('browser release will capture all specified 2D review states',async()=>{
   assert.doesNotMatch(capture,/2d-ghost-glow-|2d-dualsense-stick-center\.png/);
 });
 
-test('authored trigger pressure is painted, with its own source outline above it',async()=>{
-  const code=await file('polish-2d-style.js');
-  assert.match(code,/const trigger=layer\.role==='trigger'/);
-  assert.match(code,/paintControlGroup\(entry,colors,level\)/);
-  assert.match(code,/activeEdgeFilter\(node,level\)/);
-  assert.match(code,/if\(node===pressure\)\s*\{?\s*paintControl\(node,colors,level,\{stroke:shapes\.length===1\}\)/);
-  assert.match(code,/else paintControl\(node,colors,level,\{fill:false\}\)/);
-  assert.doesNotMatch(code,/data-exo-stick-click|polish-ring-mask/);
+test('mapped control surfaces retain pressure priority and independent authored contours',async()=>{
+ const code=await file('polish-2d-style.js');
+ assert.match(code,/const mapped=layer\.pressElement/);
+ assert.match(code,/const surface=pressure\|\|mapped\|\|face/);
+ assert.match(code,/fill:node===surface/);
+ assert.match(code,/stroke:shapes\.length===1\|\|visibleStroke\(node\)/);
+ assert.doesNotMatch(code,/data-exo-stick-click|polish-ring-mask/);
 });
 
 test('one backdrop-independent edge profile; no adaptive scene heuristics',()=>{

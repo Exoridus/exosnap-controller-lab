@@ -122,6 +122,8 @@ export function optimizeStaticHousing(native){
   const groups=new Map();
   for(const m of native.meshes){
     if(!m.visible||!isHousingRole(m.userData.role)||!m.geometry?.attributes.position)continue;
+    // Preserve the one-pass structural-region material instead of dropping its attribute.
+    if(m.material.userData.rimSurface)continue;
     // Keep original source color and semantic role; no dynamic or stick part is batched.
     const key=`${m.userData.role}|${m.userData.sourceColor.getHexString()}`;
     if(!groups.has(key))groups.set(key,[]);

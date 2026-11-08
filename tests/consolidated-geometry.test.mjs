@@ -33,7 +33,9 @@ test('control reuse preserves every authored vertex, normal, UV, hierarchy and m
   try{
    const before=rig.meshes.map(mesh=>({vertices:worldVertices(mesh),parent:mesh.parent,material:mesh.material}));
    const result=optimizer.shareEquivalentControlGeometry(rig);
-   const expected={DualSenseCompact:3,DS4Compact:1,XboxOneClean:0,Xbox360:3,SwitchPro:3,JoyconGrip:3,JoyconLeft:1,JoyconRight:1,Gamecube:0,Wavebird:0,GenericPro:4};
+   // Generic uses distinct approved SVG profiles now; the old four square-pad
+   // matches no longer exist. Near matches must never be silently welded.
+   const expected={DualSenseCompact:3,DS4Compact:1,XboxOneClean:0,Xbox360:3,SwitchPro:3,JoyconGrip:3,JoyconLeft:1,JoyconRight:1,Gamecube:0,Wavebird:0,GenericPro:0};
    assert.equal(result.pairs,expected[model.id],`${model.id} source reuse count`);
    assert.equal(result.savedCalls,0);
    assert.equal(result.savedBytes,result.bytesBefore-result.bytesAfter);

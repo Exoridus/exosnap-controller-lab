@@ -71,3 +71,9 @@ export function shouldShowContour(file,role,style){
   return !/(^|[_-])(bottom[_-]?shell|back[_-]?shell|body[_-]?back|mainbodyback|battery[_-]?door)(\.|_|$)/i.test(file);
 }
 export function isSourceBodyPart(file){return /^(?:bottom[_-]?shell|back[_-]?shell)\.obj$/i.test(file);}
+
+// Source-data exception, not a material exception: Xbox 360 stores its dish
+// and both wells as disconnected components inside the housing OBJ. The
+// common support material applies to these inspected, unchanged components.
+const STRUCTURAL_COMPONENTS=Object.freeze({Xbox360:{'top_shell.obj':[{"min": [-0.52, 0.16, -0.216], "max": [-0.063, 0.321, 0.239], "purpose": "original disconnected D-pad dish"}, {"min": [0.041, 0.154, -0.195], "max": [0.49, 0.303, 0.253], "purpose": "original right stick well"}, {"min": [-0.774, 0.218, -0.523], "max": [-0.358, 0.303, -0.124], "purpose": "original left stick well"}]}});
+export function structuralRegionsForPart(modelId,file){return STRUCTURAL_COMPONENTS[modelId]?.[file]||null;}

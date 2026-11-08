@@ -20,7 +20,7 @@ import {applyControllerArtwork,setControllerMarkings} from './control-glyphs.js'
 import {paintPolished2D} from './polish-2d-style.js';
 import {attachStickDrag} from './stick-drag.js';
 import {readStandardGamepad} from './gamepad-input.js';
-import {ControllerDemo,createControllerState} from './controller-demo.js';
+import {ControllerDemo,createControllerState,stickClickCapabilities,applyStickClickCapabilities} from './controller-demo.js';
 
 const $=id=>document.getElementById(id);
 const scenes=['dark','light','mixed']; // all three share the same THREE.Scene, model and camera.
@@ -158,13 +158,14 @@ async function loadFlatReferences(model){
     stage.replaceChildren(ref.svg);ref.container=stage;
     ref.svg.addEventListener('dblclick',event=>{
       const entry=ref.controls.find(c=>c.stickSide&&c.group.contains(event.target));
-      if(entry){state.manualButtons.set(entry.control,performance.now()+180);scheduleRender();}
+      if(entry?.layer.binding?.clickMask){state.manualButtons.set(entry.control,performance.now()+180);scheduleRender();}
     });
     flatReferences.set(scene,ref);
   }));
   if(serial===flatLoadSerial){
-    updateFlatReferences();
     const reference=[...flatReferences.values()][0];
+    state.stickClicks=stickClickCapabilities(reference?.mapping);
+    updateFlatReferences();
     if(state.native?.model?.id===model.id&&reference?.svg)
       applyControllerArtwork(state.native,reference.svg);
     setControllerMarkings(state.native,state.markings);
@@ -195,7 +196,7 @@ function visualInput(now=performance.now()){
     }
     manualInput.triggers.left=manualInput.triggers.right=state.triggerPressure;
   }
-  return demo.sample(now,{manual:manual?manualInput:null,live:getLiveStickPose()});
+  return applyStickClickCapabilities(demo.sample(now,{manual:manual?manualInput:null,live:getLiveStickPose()}),state.stickClicks);
 }
 function updateFlatReferences(input=state.frameInput){
   // A wheel over either 3D or 2D changes the common apparent size.

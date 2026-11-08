@@ -77,3 +77,15 @@ Geprüft am 2026-11-08; versionierte APIs und tatsächlicher Zielstand haben Vor
 - [PrincipledMaterial](https://doc.qt.io/qt-6/qml-qtquick3d-principledmaterial.html), [Material/Depth](https://doc.qt.io/qt-6/qml-qtquick3d-material.html), [CustomMaterial](https://doc.qt.io/qt-6/qml-qtquick3d-custommaterial.html)
 - [SceneEnvironment/lightProbe](https://doc.qt.io/qt-6/qml-qtquick3d-sceneenvironment.html), [ShaderEffect und Alpha-/QSB-Vertrag](https://doc.qt.io/qt-6/qml-qtquick-shadereffect.html)
 - [User-defined Render Passes](https://doc.qt.io/qt-6/qtquick3d-userpasses.html), [RenderPass](https://doc.qt.io/qt-6/qml-qtquick3d-renderpass.html), [PipelineStateOverride](https://doc.qt.io/qt-6.12/qml-qtquick3d-pipelinestateoverride.html)
+
+
+## Cross-model consistency follow-up
+
+See [MODEL_CONSISTENCY.md](MODEL_CONSISTENCY.md) for the shared semantic palette,
+restored source provenance, geometry-aware support coverage, material-region
+vertex channel and premultiplied nearest-surface target. The added 3D stages
+require explicit Qt CustomMaterial/render-state work; prior API/capability
+probes are **not** a native parity proof for these changes. `nativeValidated`
+remains false. The existing QSvgRenderer/QPainter probe now receives fixtures
+for every selectable paired model. No new runtime rasterization or render pass
+is introduced by this follow-up.

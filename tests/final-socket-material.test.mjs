@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
+import * as THREE from 'three';
+import {CONTROL_NEUTRAL} from '../controller-visual-policy.js';
 import {CONTROLLERS} from '../models.js';
 import {loadNativeRig,disposeNativeRig} from '../pbr-model.js';
 import {applyPbrRecipeToRig,applyControlPoseToRig} from '../pbr-appearance.js';
@@ -27,7 +29,7 @@ test('both original DualSense support domes blend toward shell material without 
     assert.equal(m.material.depthTest,true);assert.equal(m.material.depthWrite,true);
    }
    for(const m of rig.meshes.filter(m=>['stick-pivot','stick-cap'].includes(m.userData.role)))
-    assert.ok(m.material.color.equals(m.userData.sourceColor),'moving lip and cap stay source-authored at rest');
+    assert.ok(m.material.color.equals(m.userData.sourceColor.clone().lerp(new THREE.Color(CONTROL_NEUTRAL),amount)),'source identity blends to the shared neutral control material');
   }
   const recipe=resolveLabRecipe('white',.7);applyPbrRecipeToRig(rig,recipe,{left:{x:.7,y:.3,click:true},right:{x:-.7,y:.3,click:true}});
   for(const m of supports){assert.equal(m.material.emissiveIntensity,0);assert.equal(m.material.opacity,recipe.material.supportOpacity);}
@@ -44,7 +46,7 @@ test('both original DualSense support domes blend toward shell material without 
  }finally{disposeNativeRig(rig);}
 });
 
-test('unreviewed controller families retain authored support colors and the original shell-linked alpha',async()=>{
+test('all families now share the verified support material policy while mix zero retains authored colors',async()=>{
  for(const id of ['JoyconGrip','JoyconLeft','JoyconRight','SwitchPro','XboxOneClean']){
   const model=CONTROLLERS.find(x=>x.id===id);assert.ok(model,id);
   const rig=await loadNativeRig(model,read);
@@ -54,8 +56,8 @@ test('unreviewed controller families retain authored support colors and the orig
     const supports=rig.meshes.filter(m=>['stick-stem','stick-base','stick-well'].includes(m.userData.role));
     assert.ok(supports.length,id+' has original supports');
     for(const mesh of supports){
-     assert.ok(mesh.material.color.equals(mesh.userData.sourceColor),id+' support must not inherit a colored shell');
-     assert.equal(mesh.material.opacity,recipe.material.shell.opacity,id+' retains approved support alpha');
+     if(mix===0)assert.ok(mesh.material.color.equals(mesh.userData.sourceColor),id+' original hardware preserved at mix zero');
+     assert.equal(mesh.material.opacity,recipe.material.supportOpacity,id+' uses common support alpha');
      assert.equal(mesh.material.emissiveIntensity,0);
     }
    }

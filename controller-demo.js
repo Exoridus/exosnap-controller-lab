@@ -75,3 +75,19 @@ export class ControllerDemo{
   return demoStateAt(this.demoTime,this.output);
  }
 }
+
+// Capability data comes from the existing layout, not a controller-name list.
+// Apply once to the shared sample so demo, manual and live inputs agree in 2D/3D.
+export function stickClickCapabilities(mapping){
+ const result={left:false,right:false};
+ for(const layer of mapping?.layers||[])if(layer.role==='stick'&&layer.binding?.clickMask){
+  result[layer.binding.axes?.[0]?.startsWith('left_')?'left':'right']=true;
+ }
+ return result;
+}
+export function applyStickClickCapabilities(input,capabilities){
+ if(!capabilities)return input;
+ if(!capabilities.left){input.left.click=false;input.values.set('ls',0);}
+ if(!capabilities.right){input.right.click=false;input.values.set('rs',0);}
+ return input;
+}

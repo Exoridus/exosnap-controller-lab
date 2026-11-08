@@ -2,9 +2,10 @@
 // synthetic controller silhouettes, duplicated rigs, or vertex regeneration.
 import * as THREE from 'three';
 import {OBJLoader} from 'three/addons/loaders/OBJLoader.js';
-import {modelPartSemantics} from './model-semantics.js';
+import {modelPartSemantics,structuralRegionsForPart} from './model-semantics.js';
 import {controllerPartTransform} from './thumbstick-geometry.js';
 import {frontFaceTransform} from './model-orientation.js';
+import {prepareRimSurface} from './control-surface-material.js';
 import {prepareSurfaceArtwork} from './control-glyphs.js';
 import {disposeSilhouette} from './pbr-silhouette.js';
 
@@ -68,6 +69,7 @@ export async function loadNativeRig(model, readText=httpText){
         transparent:true,opacity:1,depthTest:true,depthWrite:true,side:THREE.FrontSide
       });
       if(role.role==='touch-contact')o.visible=false;
+      prepareRimSurface(o,sourceBounds,{structuralRegions:structuralRegionsForPart(model.id,source.file)},source.text);
       prepareSurfaceArtwork(o,model.source,sourceBounds,model);
       meshes.push(o);
     });
@@ -84,6 +86,31 @@ export async function loadNativeRig(model, readText=httpText){
     }else rotated.add(holder);
   }
   normalized.updateMatrixWorld(true);
+  // Choose the local shell on split-body devices geometrically. Traditional
+  // front/back shells share an X center; two lateral Joy-Con shells do not.
+  // No family-name test and no per-frame search.
+  const front=meshes.find(m=>m.userData.sourceFile==='top_shell.obj');
+  if(front){
+    const frontBox=new THREE.Box3().setFromObject(front),fc=frontBox.getCenter(new THREE.Vector3());
+    const candidates=[front,...meshes.filter(m=>m.userData.sourceFile==='bottom_shell.obj'&&
+      Math.abs(new THREE.Box3().setFromObject(m).getCenter(new THREE.Vector3()).x-fc.x)>
+        frontBox.getSize(new THREE.Vector3()).x*.5)];
+    const centers=candidates.map(m=>new THREE.Box3().setFromObject(m).getCenter(new THREE.Vector3()));
+    for(const mesh of meshes.filter(m=>m.userData.role.startsWith('stick-'))){
+      const center=new THREE.Box3().setFromObject(mesh).getCenter(new THREE.Vector3());
+      let best=0;for(let i=1;i<candidates.length;i++)if(center.distanceToSquared(centers[i])<center.distanceToSquared(centers[best]))best=i;
+      mesh.userData.supportShellColor=candidates[best].userData.sourceColor.clone();
+    }
+  }
+  for(const stem of meshes.filter(m=>m.userData.role==='stick-stem')){
+    const rim=meshes.find(m=>m.userData.role==='stick-pivot'&&m.userData.control===stem.userData.control);
+    if(!rim)continue;
+    const a=new THREE.Box3().setFromObject(stem).getSize(new THREE.Vector3());
+    const b=new THREE.Box3().setFromObject(rim).getSize(new THREE.Vector3());
+    const ratio=Math.sqrt(a.x*a.y/Math.max(1e-12,b.x*b.y));
+    const t=Math.max(0,Math.min(1,(ratio-1.35)/.35));
+    stem.userData.supportCoverage=rim.userData.supportCoverage=t*t*(3-2*t);
+  }
   const bounds=new THREE.Box3().setFromObject(normalized);
   const extent=bounds.getSize(new THREE.Vector3());
   if(!Number.isFinite(extent.length())||extent.length()<.001)throw new Error('Invalid model bounding box');

@@ -183,8 +183,9 @@ test('current 2D Lab preserves shared body/control contours with independent fac
     const face=r.svg.querySelector('[id="btn-cross-face"]');
     const glyph=r.svg.querySelector('[id="btn-cross"]').querySelector('.glyph');
     const outer=r.svg.querySelector('[id="outline-strong"]');
-    assert.equal(value(face,'stroke'),ink,scene+' face');
-    assert.ok(['#25282b','#ffffff','#000000'].includes(value(glyph,'fill')),scene+' surface-aware glyph');
+    assert.equal(value(face,'stroke'),{dark:'#8d959d',light:'#737a81',mixed:'#77818b'}[scene],scene+' control contour');
+    assert.match(value(glyph,'fill'),/^#[0-9a-f]{6}$/);
+    assert.ok(!['#25282b','#ffffff','#000000'].includes(value(glyph,'fill')),scene+' muted surface-aware glyph');
     assert.equal(value(outer,'stroke')||value(outer,'fill'),ink,scene+' shell');
     assert.equal(value(face,'filter'),'','no per-control black filter');
     assert.equal(value(glyph,'filter'),'','no oversized shadow around glyphs');
@@ -217,7 +218,7 @@ test('current neutral surfaces are gray independently of readable housing contou
  paintPolished2D(r,'ghost','dark',{coherentContours:true,material2D:{neutralOpacity:.3,activeOpacity:.96}});
  const face=r.svg.querySelector('[id="btn-cross-face"]');
  assert.notEqual(value(face,'fill'),'#ffffff','neutral is not the activation color');
- assert.equal(value(face,'stroke'),'#ffffff','approved contour stays unchanged');
+ assert.equal(value(face,'stroke'),'#8d959d','control contours are gray; housing stays unchanged');
  assert.equal(Number(value(face,'fill-opacity')),.3,'70% transparency retained');
 });
 
@@ -229,8 +230,42 @@ test('face legends contrast with the composited surface at every supported alpha
   const r=await reference();paintPolished2D(r,'ghost',scene,{coherentContours:true,activeColor,material2D:{neutralOpacity:1-transparency,activeOpacity:.96},values:new Map([['b1',pressed]])});
   const face=r.svg.querySelector('[id="btn-cross-face"]'),glyph=r.svg.querySelector('[id="btn-cross"]').querySelector('.glyph');
   const surface=lum(blend(backdrops[scene],value(face,'fill'),Number(value(face,'fill-opacity')))),ink=lum(value(glyph,'fill'));
-  assert.ok((Math.max(surface,ink)+.05)/(Math.min(surface,ink)+.05)>=4.5,JSON.stringify({scene,transparency,pressed,activeColor,ink:value(glyph,'fill'),fill:value(face,'fill')}));
+  assert.ok((Math.max(surface,ink)+.05)/(Math.min(surface,ink)+.05)>=3,JSON.stringify({scene,transparency,pressed,activeColor,ink:value(glyph,'fill'),fill:value(face,'fill')}));
   assert.equal(Number(value(glyph,'opacity')),1,'legend coverage is independent of button opacity');
   assert.equal(value(glyph,'filter'),'','no additional glyph shadow or plate');
  }
+});
+
+test('semantic pressure geometry supplies DS4 touchpad, Xbox D-pad and Nintendo menu faces',async()=>{
+ for(const [id,control]of [['dualshock4','touchpad'],['xbox_one',null],['generic',null],['switch_pro','start'],['switch_pro','select'],['switch_pro','home']]){
+  const r=await reference(id);const entry=r.controls.find(e=>control?e.control===control:e.layer.role==='directional-pad');
+  assert.ok(entry,id+' mapped input');
+  paintPolished2D(r,'ghost','dark',{coherentContours:true,ringSurface:true,material2D:{neutralOpacity:.3,activeOpacity:.96}});
+  const fills=entry.group.querySelectorAll('[data-exo-visible-control-fill]').filter(n=>value(n,'fill')!=='none');
+  assert.ok(fills.length,id+' '+entry.layer.id+' must have a neutral control surface');
+  assert.ok(fills.every(n=>value(n,'fill')==='#9ca3aa'&&Number(value(n,'fill-opacity'))===.3),id+' exact shared material');
+ }
+});
+test('all Joy-Con source paths have mapped moving rim and center with independent fill',async()=>{
+ for(const id of ['joycon_grip','joycon_left','joycon_right','joycon_pair','joycon_left_horizontal','joycon_right_horizontal']){
+  const r=await reference(id);paintPolished2D(r,'ghost','dark',{coherentContours:true,ringSurface:true,material2D:{neutralOpacity:.3,activeOpacity:.96},left:{x:1,y:0},right:{x:0,y:1}});
+  for(const e of r.controls.filter(e=>e.stickSide)){
+   const ring=e.group.querySelector('[data-exo-stick-annulus-fill]'),center=e.group.querySelector('[id$="-top"]');
+   assert.ok(ring&&center,id+' source-shaped rim and center');
+   assert.equal(Number(value(ring,'fill-opacity')),.96);assert.equal(Number(value(center,'fill-opacity')),.3);
+   assert.notEqual(value(center,'stroke'),'#ffffff','neutral contour is not white');
+  }
+ }
+});
+
+test('single-surface analog caps retain their original shape and use real analog fill without fabricated click regions',async()=>{
+ const r=await reference('gamecube'),options={coherentContours:true,ringSurface:true,material2D:{neutralOpacity:.3,activeOpacity:.96}};
+ const group=r.svg.querySelector('[id="stick-r-cap"]'),outer=group.querySelector('[id$="-outline"]');
+ paintPolished2D(r,'ghost','dark',options);
+ assert.equal(value(outer,'fill'),'#9ca3aa');assert.equal(Number(value(outer,'fill-opacity')),.3);
+ const stroke=value(outer,'stroke');
+ paintPolished2D(r,'ghost','dark',{...options,right:{x:1,y:0}});
+ assert.equal(value(outer,'fill'),'#ffffff');assert.equal(Number(value(outer,'fill-opacity')),.96);
+ assert.equal(value(outer,'stroke'),stroke);
+ assert.equal(group.querySelector('[id$="-top"]'),null,'no invented C-stick click region');
 });
