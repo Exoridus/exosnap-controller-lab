@@ -10,9 +10,6 @@ import {setGhostFresnel} from './pbr-fresnel.js';
 const pressedBlue=new THREE.Color(EXO_PALETTE.pressedBlue);
 const ghostColor=new THREE.Color();
 const idleColor=new THREE.Color();
-const neutralStickColor=new THREE.Color(EXO_PALETTE.neutralStick);
-const neutralSocketColor=new THREE.Color(EXO_PALETTE.neutralStickSocket);
-const neutralTriggerColor=new THREE.Color(EXO_PALETTE.neutralTrigger);
 const tmpEuler=new THREE.Euler();
 const clamp01=x=>Math.max(0,Math.min(1,Number.isFinite(Number(x))?Number(x):0));
 function normalizeVisualInput(input){
@@ -59,6 +56,13 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
     m.depthWrite=true;
     m.transparent=true;
     if(!unlit){m.emissive.setRGB(0,0,0);m.emissiveIntensity=0;}
+    // Author-owned source colors define neutral hardware, not an almost-white
+    // global stick/trigger palette. Applies to Joy-Con, Pro, DualSense etc.
+    const filename=String(mesh.userData.sourceFile||'').toLowerCase();
+    const stickPart=['stick-stem','stick-cap','stick-pivot'].includes(mesh.userData.role);
+    const physicalShoulder=mesh.userData.role==='trigger'||
+      /^(?:left|right)_bumper[.]obj$/.test(filename);
+    if(stickPart||physicalShoulder)m.color.copy(mesh.userData.sourceColor);
     const hero=Boolean(recipe.environmentProbe);
     const restAlpha=Math.max(spec.opacity,.52);
     const litAlpha=Math.max(restAlpha,.72);
@@ -67,29 +71,28 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
       m.emissive.set(recipe.material.pressEmissive);
       m.emissiveIntensity=hero?.22*amount:recipe.material.pressEmissiveIntensity*amount;
     };
-    const stickPart=['stick-stem','stick-cap','stick-pivot'].includes(mesh.userData.role);
     const stick=stickPart?pose[relevantStick(mesh.userData.sourceFile)]:null;
     if(stick){
       const state=stickVisualState(stick);
       if(hero){
         if(mesh.userData.role==='stick-pivot'){
           // The authored MOVING ring visualizes analog travel.
-          m.color.copy(neutralSocketColor).lerp(pressedBlue,state.moving);
+          m.color.copy(mesh.userData.sourceColor).lerp(pressedBlue,state.moving);
           m.opacity=restAlpha+(litAlpha-restAlpha)*state.moving;
           if(state.moving>.01)gentleEmissive(state.moving*.5);
         }else if(mesh.userData.role==='stick-cap'){
           // L3/R3 affects ONLY the cap center, independently from motion.
-          m.color.copy(state.click||pose.allPressed?pressedBlue:neutralStickColor);
+          m.color.copy(state.click||pose.allPressed?pressedBlue:mesh.userData.sourceColor);
           m.opacity=state.click||pose.allPressed?litAlpha:restAlpha;
           if(state.click||pose.allPressed)gentleEmissive(1);
         }else{
           // Shaft/socket never brighten merely because a stick is clicked.
-          m.color.copy(neutralSocketColor);m.opacity=restAlpha;
+          m.color.copy(mesh.userData.sourceColor);m.opacity=restAlpha;
         }
       }else{
         // Keep historical A-H experiments unchanged for comparison.
         if(mesh.userData.role==='stick-cap'){
-          m.color.copy(neutralStickColor).lerp(pressedBlue,state.moving);
+          m.color.copy(mesh.userData.sourceColor).lerp(pressedBlue,state.moving);
           m.opacity=Math.min(1,Math.max(spec.opacity,.52)+(1-Math.max(spec.opacity,.52))*state.moving);
         }else{
           m.color.copy(neutralSocketColor);m.opacity=restAlpha;
@@ -102,7 +105,7 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
     }else if(mesh.userData.role==='trigger'){
       const side=relevantStick(mesh.userData.sourceFile);
       const amount=pose.triggers[side]??0;
-      m.color.copy(neutralTriggerColor).lerp(pressedBlue,amount);
+      m.color.copy(mesh.userData.sourceColor).lerp(pressedBlue,amount);
       m.opacity=hero?restAlpha+(litAlpha-restAlpha)*amount:
         Math.max(spec.opacity,.72)+(1-Math.max(spec.opacity,.72))*amount;
       if(amount>0)gentleEmissive(hero?amount:amount*.65);

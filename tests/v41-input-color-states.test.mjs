@@ -63,7 +63,7 @@ test('real 3D Ghost ring shows motion, cap shows click, socket stays neutral',as
  }finally{disposeNativeRig(rig)}
 });
 
-test('left/right analog trigger independently interpolates idle white to pressed blue',async()=>{
+test('left/right analog triggers interpolate authored neutral material to white press',async()=>{
  const rig=await loadNativeRig(CONTROLLERS.find(x=>x.id==='DualSenseCompact'),read);
  const recipe=new ActiveColorState().overrideRecipe(resolveHeroRecipe('identity',.65),'3d');
  try{
@@ -73,7 +73,7 @@ test('left/right analog trigger independently interpolates idle white to pressed
   applyPbrRecipeToRig(rig,recipe,state(neutral(),neutral(),.5,0));
   assert.notEqual(left.material.color.getHexString(),EXO_PALETTE.neutralTrigger.slice(1));
   assert.notEqual(left.material.color.getHexString(),EXO_PALETTE.pressedSurface.slice(1));
-  assert.equal(right.material.color.getHexString(),EXO_PALETTE.neutralTrigger.slice(1));
+  assert.ok(right.material.color.equals(right.userData.sourceColor));
   assert.equal(right.material.emissiveIntensity,0);
   applyPbrRecipeToRig(rig,recipe,state(neutral(),neutral(),1,1));
   assert.equal(left.material.color.getHexString(),EXO_PALETTE.pressedSurface.slice(1));
