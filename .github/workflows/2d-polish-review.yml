@@ -26,6 +26,7 @@ jobs:
       - name: Prepare real Chrome browser for PR screenshots
         run: |
           npm install --no-save --package-lock=false --ignore-scripts playwright@1.64.1
+          npx playwright install ffmpeg
           if command -v google-chrome >/dev/null || command -v google-chrome-stable >/dev/null; then
             echo "EXO_BROWSER_CHANNEL=chrome" >> "$GITHUB_ENV"
           else
