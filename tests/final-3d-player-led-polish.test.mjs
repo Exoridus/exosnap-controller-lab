@@ -60,6 +60,7 @@ test('source-authored Nintendo LEDs are fully attached to original 3D shell with
       player.target.material.onBeforeCompile(shader,{});
       assert.match(shader.fragmentShader,/playerLedRects\[8\]/);
       assert.match(shader.fragmentShader,/vPlayerLedNormalY/);
+      assert.doesNotMatch(shader.fragmentShader,/\bfloat active\b/,'GLSL reserves active as a keyword');
       assert.match(shader.fragmentShader,/playerLedFrontMinY/);
       assert.match(shader.vertexShader,/vPlayerLedNativePos=position/);
       assert.strictEqual(shader.uniforms.playerLedRects,player.uniforms.rects);
