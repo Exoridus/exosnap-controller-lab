@@ -1,0 +1,24 @@
+name: Source history for controller regression review
+on:
+  push:
+    branches: [fix/final-controller-demo]
+    paths: [.github/workflows/source-review-bundle.yml]
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Package original source history and tests
+        run: |
+          mkdir -p "$RUNNER_TEMP/source-review"
+          git bundle create "$RUNNER_TEMP/source-review/controller-source.bundle" HEAD
+          git archive --format=tar.gz HEAD > "$RUNNER_TEMP/source-review/controller-source.tar.gz"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: controller-source-review
+          path: ${{ runner.temp }}/source-review/
+          retention-days: 3
