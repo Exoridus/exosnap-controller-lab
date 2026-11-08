@@ -43,3 +43,22 @@ test('both original DualSense support domes blend toward shell material without 
   assert.equal(pair.instance.material.opacity,recipe.material.supportOpacity);
  }finally{disposeNativeRig(rig);}
 });
+
+test('unreviewed controller families retain authored support colors and the original shell-linked alpha',async()=>{
+ for(const id of ['JoyconGrip','JoyconLeft','JoyconRight','SwitchPro','XboxOneClean']){
+  const model=CONTROLLERS.find(x=>x.id===id);assert.ok(model,id);
+  const rig=await loadNativeRig(model,read);
+  try{
+   for(const mix of [0,.7,1]){
+    const recipe=resolveLabRecipe('white',mix);applyPbrRecipeToRig(rig,recipe,{});
+    const supports=rig.meshes.filter(m=>['stick-stem','stick-base','stick-well'].includes(m.userData.role));
+    assert.ok(supports.length,id+' has original supports');
+    for(const mesh of supports){
+     assert.ok(mesh.material.color.equals(mesh.userData.sourceColor),id+' support must not inherit a colored shell');
+     assert.equal(mesh.material.opacity,recipe.material.shell.opacity,id+' retains approved support alpha');
+     assert.equal(mesh.material.emissiveIntensity,0);
+    }
+   }
+  }finally{disposeNativeRig(rig);}
+ }
+});

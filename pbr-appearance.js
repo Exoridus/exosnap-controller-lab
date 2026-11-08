@@ -53,7 +53,10 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
   const pose=normalizeVisualInput(input);
   // The broad source shaft/dome looks like a socket behind each cap. Preserve
   // its rig and depth behavior; only its Ghost material blends into the shell.
-  if(recipe.material.supportShellBlend&&!native.supportShellColor){
+  // Opt in only the visually inspected source geometry; a colored Joy-Con
+  // shell must not recolor its deliberately dark hardware.
+  const integrateSupports=recipe.material.supportShellBlend&&native.model?.id==='DualSenseCompact';
+  if(integrateSupports&&!native.supportShellColor){
     const shell=native.meshes.find(m=>m.userData.sourceFile==='top_shell.obj')||
       native.meshes.find(m=>isHousingRole(m.userData.role));
     if(shell)native.supportShellColor=shell.userData.sourceColor.clone();
@@ -96,8 +99,8 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
       const role=mesh.userData.role;
       const support=['stick-stem','stick-base','stick-well'].includes(role);
       m.color.copy(mesh.userData.sourceColor);
-      m.opacity=support?(recipe.material.supportOpacity??recipe.material.shell.opacity):spec.opacity;
-      if(support&&recipe.material.supportShellBlend&&native.supportShellColor){
+      m.opacity=support?(integrateSupports?recipe.material.supportOpacity:recipe.material.shell.opacity):spec.opacity;
+      if(support&&integrateSupports&&native.supportShellColor){
         const t=clamp01(recipe.mix),blend=t*t*(3-2*t);
         m.color.lerp(native.supportShellColor,blend);
         if(!unlit){
