@@ -126,7 +126,10 @@ export function controlSurfaceState(colors,level){
   return {
     fill:mixColor(colors.control,colors.activeColor||PRESS_WHITE,t),
     alpha:colors.controlAlpha+(colors.activeAlpha-colors.controlAlpha)*t,
-    stroke:mixColor(colors.controlStroke,colors.activeColor||PRESS_WHITE,t),
+    // Filled Ghost controls retain a readable structural contour even when
+    // their active white surface sits on a bright scene. Analog ring motion
+    // has its own independently colored source stroke below.
+    stroke:colors.ghost?colors.controlStroke:mixColor(colors.controlStroke,colors.activeColor||PRESS_WHITE,t),
     strokeAlpha:colors.controlStrokeAlpha+(CONTROL_PALETTE.activeBorderAlpha-colors.controlStrokeAlpha)*t
   };
 }
@@ -178,11 +181,11 @@ function activeEdgeFilter(node,level){
 // contours across both bright and dark image regions. Also support a white
 // active surface on a light scene. Filters are shared per authored transform
 // and rendered size; no texture readback or source-path clipping is used.
-function controlContrastFilter(node,colors,level){
+function controlContrastFilter(node,colors,level,movingRing=false){
   if(!colors.ghost){activeEdgeFilter(node,level);return;}
   const svg=node?.ownerSVGElement;
   if(!svg)return;
-  const needsEdge=colors.contrastEdge||colors.light&&level>0;
+  const needsEdge=colors.contrastEdge||colors.light&&level>0&&movingRing;
   if(!needsEdge){node.style.removeProperty('filter');return;}
   // The counter-edge is structural contrast, not another input signal.
   // Keep its alpha fixed so analog travel never accumulates filter variants.
@@ -195,8 +198,9 @@ function controlContrastFilter(node,colors,level){
   const matrix=node.getScreenCTM?.();
   const scaleX=matrix?Math.hypot(matrix.a,matrix.b):0;
   const scaleY=matrix?Math.hypot(matrix.c,matrix.d):0;
-  const radiusX=scaleX>1e-6?.48/scaleX:unit*.48;
-  const radiusY=scaleY>1e-6?.48/scaleY:unit*.48;
+  // A full rendered pixel survives filter rasterization at small panel sizes.
+  const radiusX=scaleX>1e-6?1/scaleX:unit;
+  const radiusY=scaleY>1e-6?1/scaleY:unit;
   const key=[radiusX.toFixed(4),radiusY.toFixed(4),alpha].join('-');
   let defs=svg.querySelector('defs');
   if(!defs){defs=filterNode('defs');svg.insertBefore(defs,svg.firstChild);}
@@ -364,7 +368,7 @@ function paintStick(reference,entry,colors,values,axes,variant){
   // The Solid annulus has one constant dark boundary even when its moving
   // material turns white. No extra graphic ring is created.
   paint(outer,'stroke',solid?colors.controlStroke:mixColor(colors.controlStroke,colors.activeColor||PRESS_WHITE,ring));
-  controlContrastFilter(outer,colors,ring);
+  controlContrastFilter(outer,colors,ring,true);
   paint(outer,'stroke-opacity',
     String(colors.controlStrokeAlpha+(CONTROL_PALETTE.activeBorderAlpha-colors.controlStrokeAlpha)*ring));
   if(center){

@@ -8,6 +8,7 @@ import {depthPriority,updateGhostRearHints} from './ghost-depth-policy.js';
 import {EXO_PALETTE} from './palette.js';
 import {setGhostFresnel} from './pbr-fresnel.js';
 import {stickMechanics} from './model-mechanics.js';
+import {frontFaceTransform} from './model-orientation.js';
 const pressedBlue=new THREE.Color(EXO_PALETTE.pressedBlue);
 const ghostColor=new THREE.Color();
 const idleColor=new THREE.Color();
@@ -168,6 +169,8 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
 export function applyStickPoseToRig(native,input){
   const pose=normalizeVisualInput(input);
   if(!native?.parts)return;
+  const front=frontFaceTransform(native.model?.source||'co');
+  const frontSign=Math.sign(Math.sin(front.rotationX));
   for(const side of ['left','right']){
     const stem=native.parts.find(p=>p.file===`${side}_stick.obj`)?.holder;
     const ring=native.parts.find(p=>p.file===`${side}_ring.obj`)?.holder;
@@ -180,7 +183,10 @@ export function applyStickPoseToRig(native,input){
     const s=pose[side];
     const mechanics=stickMechanics(native.model?.id,side);
     const tilt=mechanics.maxTiltDeg*Math.PI/180;
-    const q=new THREE.Quaternion().setFromEuler(tmpEuler.set(-s.y*tilt,0,s.x*tilt));
+    // Raw input is screen X right / Y down. The source front-face rotation
+    // maps screen Y rotation to local -Z for CO/Exo (+PI/2), +Z for PadForge.
+    // Positive screen Y rotates around +X, moving the cap down in front view.
+    const q=new THREE.Quaternion().setFromEuler(tmpEuler.set(s.y*tilt,0,-s.x*tilt*frontSign));
     holder.quaternion.copy(holder.userData.restQuaternion).multiply(q);
     holder.position.copy(holder.userData.restPosition);
     if(s.click)holder.position.y-=mechanics.clickTravel;

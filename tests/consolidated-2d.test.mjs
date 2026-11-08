@@ -123,7 +123,7 @@ test('Ghost housing outline and relief inks are achromatic on every background',
   assert.equal(lookPalette('dualsense','solid','dark').line,'#50687b','legacy Solid silhouette unchanged');
 });
 
-test('mixed counter-edge remains subpixel in rendered space under authored glyph transforms',async()=>{
+test('mixed counter-edge remains one rendered pixel under authored glyph transforms',async()=>{
   const r=await reference();
   const glyph=r.svg.querySelector('[id="btn-cross"]').querySelector('.glyph');
   // Original tiny glyph paths use a large authored transform; applying root
@@ -133,8 +133,8 @@ test('mixed counter-edge remains subpixel in rendered space under authored glyph
   const filterId=value(glyph,'filter').slice(5,-1);
   const filter=r.svg.querySelector('[id="'+filterId+'"]');
   const radius=filter.querySelector('feMorphology').getAttribute('radius').split(/\s+/).map(Number);
-  assert.ok(Math.abs(radius[0]*10-.48)<.006,'horizontal edge is .48 rendered pixels');
-  assert.ok(Math.abs((radius[1]??radius[0])*8-.48)<.006,'vertical edge is .48 rendered pixels');
+  assert.ok(Math.abs(radius[0]*10-1)<.006,'horizontal edge is one rendered pixel');
+  assert.ok(Math.abs((radius[1]??radius[0])*8-1)<.006,'vertical edge is one rendered pixel');
 });
 
 test('analog activity reuses the same contrast definitions for each authored transform',async()=>{
@@ -149,4 +149,26 @@ test('analog activity reuses the same contrast definitions for each authored tra
     paintPolished2D(r,'ghost','mixed',{values,left:{x:level,y:0},right:{x:level,y:0}});
     assert.equal(r.svg.querySelectorAll('[data-exo-control-contrast]').length,initial,'analog '+level+' must reuse definitions');
   }
+});
+
+test('active light-scene controls retain dark authored contours while moving ring keeps a counter-edge',async()=>{
+  const r=await reference();
+  const ring=r.svg.querySelector('[id="stick-l-cap-outline"]');
+  ring.getScreenCTM=()=>({a:2,b:0,c:0,d:2});
+  paintPolished2D(r,'ghost','light',{values:new Map([['l2',1],['l1',1],['b1',1],['ls',1]]),left:{x:1,y:0}});
+  for(const n of [r.svg.querySelector('[id="btn-cross-face"]'),
+    r.svg.querySelector('[id="stick-l-cap-top"]'),
+    r.svg.querySelector('[id="btn-l1"]').children[1],
+    r.svg.querySelector('[id="trigger-l2"]').querySelectorAll('path').find(n=>!n.id.endsWith('-pressure'))]){
+    assert.equal(value(n,'stroke'),'#000000',n.id||'shoulder/trigger contour');
+    assert.equal(Number(value(n,'stroke-opacity')),.9);
+    assert.equal(value(n,'filter'),'','filled-control contour needs no added expansion on light');
+  }
+  const trigger=r.svg.querySelector('[id="trigger-l2-pressure"]');
+  assert.equal(value(trigger,'fill'),'#ffffff');assert.equal(Number(value(trigger,'fill-opacity')),.4);
+  assert.equal(value(ring,'stroke'),'#ffffff','motion ring still signals analog activation');
+  const filter=r.svg.querySelector('[id="'+value(ring,'filter').slice(5,-1)+'"]');
+  assert.equal(filter.querySelector('feFlood').getAttribute('flood-color'),'#000000');
+  const radius=Number(filter.querySelector('feMorphology').getAttribute('radius').split(' ')[0]);
+  assert.equal(radius*2,1,'ring counter-edge remains one rendered pixel');
 });

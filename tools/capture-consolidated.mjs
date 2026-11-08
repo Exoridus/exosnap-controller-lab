@@ -38,6 +38,10 @@ export async function captureConsolidated(page,{output,images,shotProof}){
       webgl:proof.webglVersion,revision:proof.revision,drawStats:proof.drawStats});
   };
   await frame(()=>page.locator('#pressAll').uncheck());
+  // The final design evidence uses the available 480 px inspection size so
+  // source glyphs and hidden dashed inputs remain assessable in the PNGs.
+  await frame(()=>page.setViewportSize({width:1600,height:1400}));
+  await select('panelSize','480');
   await mix(0);
   const neutral=await feedbackHashes();
   const neutralFlat=hash(await page.locator('.flat-reference').screenshot());
@@ -97,17 +101,20 @@ export async function captureConsolidated(page,{output,images,shotProof}){
   await capture('3d-consolidated-feedback.png','Materialmix 0%, only cross active: white versus cool white');
   await select('testControl','ls');
   const clicks=await page.evaluate(()=>window.__exoPbrLab.model.meshes
-    .filter(mesh=>mesh.userData.role==='stick-cap').map(mesh=>({
+    .filter(mesh=>mesh.userData.role==='stick-cap'&&!mesh.isInstancedMesh).map(mesh=>({
       source:mesh.userData.sourceFile,alpha:mesh.material.opacity,
-      emissive:mesh.material.emissiveIntensity
+      emissive:mesh.material.emissiveIntensity,visible:mesh.visible
     })));
-  if(clicks.filter(c=>c.emissive>0).length!==1||!clicks.find(c=>/left/.test(c.source)&&c.emissive>0))
+  if(clicks.length!==2||clicks.some(c=>!c.visible)||clicks.filter(c=>c.emissive>0).length!==1||
+      !clicks.find(c=>/left/.test(c.source)&&c.emissive>0))
     throw Error('L3 feedback leaked to the other stick: '+JSON.stringify(clicks));
   await select('testControl','');
   await select('stickPose','move');
   await mix(70);
   await capture('3d-consolidated-sticks.png','Analog motion: ring feedback and complete moving assembly');
   await select('stickPose','neutral');
+  await select('panelSize','320');
+  await frame(()=>page.setViewportSize({width:1200,height:1120}));
   console.log('Consolidated browser checks: '+JSON.stringify({artwork,flatMixInvariant:true,
     neutralVariantsIdentical:true,activeVariantsDistinct:true,independent,angles,clicks}));
   return {artwork,flatMixInvariant:true,neutralVariantsIdentical:true,activeVariantsDistinct:true,

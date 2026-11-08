@@ -10,6 +10,7 @@ import {resolveHeroRecipe} from '../pbr-recipes.js';
 import * as artwork from '../control-glyphs.js';
 import {instantiateStickPairs} from '../pbr-optimizer.js';
 import {resolveLabRecipe} from '../controller-lab-style.js';
+import {stickMechanics} from '../model-mechanics.js';
 
 const read=async url=>fs.readFile(new URL('../'+url.replace(/^\.\//,''),import.meta.url),'utf8');
 const recipe=(mix=1,activeContrast='white')=>{
@@ -197,4 +198,41 @@ test('disposing a real instanced rig dispatches exactly one dispose event per in
  disposeNativeRig(rig);
  for(const instance of instances)assert.equal(counts.get(instance),1,'instance GPU resource dispose event');
  for(const [resource,count]of counts)assert.equal(count,1,`${resource.type} disposed exactly once`);
+});
+
+test('front-projected authored caps follow screen axes on both sticks and preserve click travel and neutral pose',async()=>{
+ for(const id of ['DualSenseCompact','XboxOneClean','Gamecube','GenericPro']){
+  const rig=await rigFor(id);
+  try{
+   const centers=()=>Object.fromEntries(['left','right'].map(side=>[
+    side,new THREE.Box3().setFromObject(mesh(rig,`${side}_cap.obj`)).getCenter(new THREE.Vector3())]));
+   rig.group.updateMatrixWorld(true);
+   const rest=centers();
+   const restMatrices=['left','right'].map(side=>mesh(rig,`${side}_cap.obj`).matrixWorld.clone());
+   for(const [axis,axes]of [['x',{x:1,y:0}],['y',{x:0,y:1}]]){
+    applyStickPoseToRig(rig,{left:axes,right:axes});rig.group.updateMatrixWorld(true);
+    const moved=centers();
+    for(const side of ['left','right']){
+     const delta=moved[side].clone().sub(rest[side]);
+     if(axis==='x')assert.ok(delta.x>1e-4,`${id} ${side}: positive input X moves right; delta ${delta.toArray()}`);
+     else assert.ok(delta.y<-1e-4,`${id} ${side}: positive input Y moves down; delta ${delta.toArray()}`);
+    }
+   }
+   const axes={x:.6,y:.3};
+   applyStickPoseToRig(rig,{left:axes,right:axes});rig.group.updateMatrixWorld(true);
+   const moving=centers();
+   applyStickPoseToRig(rig,{left:{...axes,click:true},right:{...axes,click:true}});
+   rig.group.updateMatrixWorld(true);
+   const clicked=centers();
+   for(const side of ['left','right']){
+    const delta=clicked[side].clone().sub(moving[side]);
+    assert.ok(Math.abs(delta.x)<1e-12&&Math.abs(delta.y)<1e-12,`${id} ${side}: click keeps screen axes`);
+    if(stickMechanics(id,side).clickTravel>0)assert.ok(delta.z<0,`${id} ${side}: click travels into controller`);
+    else assert.ok(delta.length()<1e-12,`${id} ${side}: authored zero click travel`);
+   }
+   applyStickPoseToRig(rig,{});rig.group.updateMatrixWorld(true);
+   ['left','right'].forEach((side,i)=>assert.ok(mesh(rig,`${side}_cap.obj`).matrixWorld.equals(restMatrices[i]),
+    `${id} ${side}: exact neutral return`));
+  }finally{disposeNativeRig(rig)}
+ }
 });
