@@ -123,6 +123,14 @@ export async function captureModelConsistency(page,{output,images,shotProof}){
    check(p.flat.every(f=>f.controls.every(c=>c.glyphs.every(g=>(g.display!=='none')===marks))),'2D marking toggle missed model',model.id);
    if(!marks)await shot('3d-final-model-'+model.id.toLowerCase()+'-markings-off.png',model.name+' / global markings off');
   }
+  // Unsupported click values must not become imaginary controls in the
+  // shared displayed sample, including the automatic demo's click sequence.
+  await input({buttons:{ls:1,rs:1},left:[.6,.8],right:[-.8,.6]});
+  const clicks=await page.evaluate(()=>({left:window.__exoPbrLab.input.left.click,right:window.__exoPbrLab.input.right.click,
+    ls:window.__exoPbrLab.input.values.get('ls'),rs:window.__exoPbrLab.input.values.get('rs')}));
+  for(const [side,key]of [['left','ls'],['right','rs']])
+    check(clicks[side]===clickable.includes(key)&&Boolean(clicks[key])===clickable.includes(key),'Unsupported layout click reached 2D/3D',{model:model.id,clicks,clickable});
+  await input({});
   console.log('Model acceptance complete: '+model.id+' / '+states.length+' input states / 4 transparency levels / 3 backgrounds / 3 mixes x 3 views');
  }
  }finally{

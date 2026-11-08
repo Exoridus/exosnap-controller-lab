@@ -61,3 +61,19 @@ test('manual and live states replace demo rather than merging; sampling twice do
  driver.setEnabled(false);const neutral=driver.sample(600);
  assert.equal(neutral.source,'neutral');assert.ok([...neutral.values.values()].every(v=>!v));
 });
+
+test('the shared display input suppresses stick-clicks absent from the actual layout without suppressing analog motion',async()=>{
+ assert.equal(typeof demo.stickClickCapabilities,'function');
+ assert.equal(typeof demo.applyStickClickCapabilities,'function');
+ for(const [id,left,right]of [['gamecube',false,false],['dualsense',true,true],['joycon_left',true,false],['joycon_right',false,true]]){
+  const mapping=JSON.parse(await read('references/controllers/'+id+'/mapping.json'));
+  const caps=demo.stickClickCapabilities(mapping);
+  assert.deepEqual(caps,{left,right});
+  const input=demo.createControllerState();input.left.x=.8;input.right.y=-.7;
+  input.left.click=input.right.click=true;input.values.set('ls',1);input.values.set('rs',1);
+  assert.equal(demo.applyStickClickCapabilities(input,caps),input);
+  assert.equal(input.left.click,left);assert.equal(input.right.click,right);
+  assert.equal(input.values.get('ls'),left?1:0);assert.equal(input.values.get('rs'),right?1:0);
+  assert.equal(input.left.x,.8);assert.equal(input.right.y,-.7);
+ }
+});
