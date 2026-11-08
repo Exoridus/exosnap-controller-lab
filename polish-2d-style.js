@@ -529,7 +529,7 @@ export function paintPolished2D(reference,mode,scene,{
     // A single scene-specific ink shared by the outer housing, interior
     // paths, shoulders, sticks, face/directional controls and glyphs.
     // No opaque black and no extra control-specific filter passes.
-    const ink={dark:'#ffffff',light:'#858585',mixed:'#b9c5ce'}[scene];
+    const ink={dark:'#ffffff',light:'#858585',mixed:'#8c98a3'}[scene];
     colors.coherentContours=true;
     colors.line=colors.control=colors.cap=colors.trigger=colors.controlStroke=
       colors.glyph=colors.pressedOutline=ink;

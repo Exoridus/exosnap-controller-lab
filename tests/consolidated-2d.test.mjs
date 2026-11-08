@@ -174,7 +174,7 @@ test('active light-scene controls retain dark authored contours while moving rin
 });
 
 test('current 2D Lab uses matching body/control/glyph ink and no thick mixed filters',async()=>{
-  const expected={dark:'#ffffff',light:'#858585',mixed:'#b9c5ce'};
+  const expected={dark:'#ffffff',light:'#858585',mixed:'#8c98a3'};
   for(const [scene,ink] of Object.entries(expected)){
     const r=await reference();
     const values=new Map([['b1',1],['l1',1],['l2',1]]);

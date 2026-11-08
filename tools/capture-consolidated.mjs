@@ -36,6 +36,30 @@ export async function captureConsolidated(page,{output,images,shotProof}){
   // source glyphs and hidden dashed inputs remain assessable in the PNGs.
   await frame(()=>page.setViewportSize({width:1600,height:1400}));
   await select('panelSize','480');
+  // Inspect ACTUAL SVG paint in Chromium. The earlier page had black
+  // per-glyph plates on light/mixed and clipped its outer side grips.
+  const flatAudit=await page.evaluate(()=>[...document.querySelectorAll('.sample--flat')].map(panel=>{
+    const svg=panel.querySelector('svg');
+    const outer=svg?.querySelector('[id$="-outline-strong"]');
+    const button=svg?.querySelector('[id$="-btn-cross-face"]');
+    const glyph=svg?.querySelector('[id$="-btn-cross"] .glyph');
+    const stroke=node=>node?.style?.getPropertyValue('stroke');
+    const fill=node=>node?.style?.getPropertyValue('fill');
+    const rect=outer?.getBoundingClientRect(),frame=panel.getBoundingClientRect();
+    return {scene:panel.dataset.scene,housing:stroke(outer)==='none'?fill(outer):stroke(outer),
+      button:stroke(button),glyph:fill(glyph),
+      filter:button?.style?.getPropertyValue('filter')||'',
+      glyphFilter:glyph?.style?.getPropertyValue('filter')||'',
+      outerFilter:outer?.style?.getPropertyValue('filter')||'',
+      leftMargin:rect?rect.left-frame.left:0,rightMargin:rect?frame.right-rect.right:0};
+  }));
+  for(const item of flatAudit){
+    const expected={dark:'#ffffff',light:'#858585',mixed:'#8c98a3'}[item.scene];
+    if(!expected||item.housing!==expected||item.button!==expected||item.glyph!==expected)
+      throw Error('2D body/control/glyph inks diverge: '+JSON.stringify(item));
+    if(item.filter||item.glyphFilter||item.outerFilter||item.leftMargin<1||item.rightMargin<1)
+      throw Error('2D black plate, double rim or clipped housing: '+JSON.stringify(item));
+  }
   await mix(0);
   const neutralFlat=hash(await page.locator('.flat-reference').screenshot());
   const neutral3D=await sourceHash();
