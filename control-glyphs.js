@@ -1,3 +1,4 @@
+import {softenedLegendColor} from './controller-visual-policy.js';
 // Model-family-aware, button-only artwork for the real source-authored controls.
 // Keep functional legends in face buttons; do not add any markings to the shell.
 // These decals do not alter or overwrite source geometry or model ownership.
@@ -141,18 +142,18 @@ export function installSurfaceMarking(mesh,texture){
  const directional=/^(up|down|left|right)$/.test(mesh.userData.artworkKey);
  const c=mesh.userData.sourceColor||new THREE.Color('#eeeeee');
  const light=.2126*c.r+.7152*c.g+.0722*c.b>.25;
- const idle=new THREE.Color(directional||light?'#303030':'#eeeeee');
- const state={mask:{value:texture},enabled:{value:1},ink:{value:idle.clone()},idle,active:new THREE.Color('#ffffff')};
+ const idle=new THREE.Color(softenedLegendColor('#'+c.getHexString()));
+ const state={mask:{value:texture},enabled:{value:1},ink:{value:idle.clone()},coverage:{value:.72},idle,active:new THREE.Color('#ffffff')};
  const previous=material.onBeforeCompile,previousKey=material.customProgramCacheKey();
  material.onBeforeCompile=function(shader,renderer){
   previous.call(this,shader,renderer);
-  shader.uniforms.controllerMarkMask=state.mask;shader.uniforms.controllerMarkEnabled=state.enabled;shader.uniforms.controllerMarkInk=state.ink;
+  shader.uniforms.controllerMarkMask=state.mask;shader.uniforms.controllerMarkEnabled=state.enabled;shader.uniforms.controllerMarkInk=state.ink;shader.uniforms.controllerMarkCoverage=state.coverage;
   shader.vertexShader=shader.vertexShader.replace('#include <common>',
    '#include <common>\nattribute vec2 controllerMarkUv;\nvarying vec2 vControllerMarkUv;\nvarying float vControllerMarkFacing;')
    .replace('#include <begin_vertex>','#include <begin_vertex>\nvControllerMarkUv=controllerMarkUv;\nvControllerMarkFacing=normal.y;');
   shader.fragmentShader=shader.fragmentShader.replace('#include <common>',
-   '#include <common>\nuniform sampler2D controllerMarkMask;\nuniform float controllerMarkEnabled;\nuniform vec3 controllerMarkInk;\nvarying vec2 vControllerMarkUv;\nvarying float vControllerMarkFacing;')
-   .replace('#include <map_fragment>','#include <map_fragment>\nfloat inkAlpha=texture2D(controllerMarkMask,vControllerMarkUv).a*controllerMarkEnabled*step(0.45,vControllerMarkFacing);\ndiffuseColor.rgb=mix(diffuseColor.rgb,controllerMarkInk,inkAlpha);');
+   '#include <common>\nuniform sampler2D controllerMarkMask;\nuniform float controllerMarkEnabled;\nuniform vec3 controllerMarkInk;\nuniform float controllerMarkCoverage;\nvarying vec2 vControllerMarkUv;\nvarying float vControllerMarkFacing;')
+   .replace('#include <map_fragment>','#include <map_fragment>\nfloat inkAlpha=texture2D(controllerMarkMask,vControllerMarkUv).a*controllerMarkEnabled*step(0.45,vControllerMarkFacing);\ndiffuseColor.rgb=mix(diffuseColor.rgb,controllerMarkInk,inkAlpha);\ndiffuseColor.a=max(diffuseColor.a,inkAlpha*controllerMarkCoverage);');
  };
  material.customProgramCacheKey=()=>previousKey+'|controller-surface-ink-v1';
  material.userData.surfaceMarking=state;material.needsUpdate=true;

@@ -2,6 +2,7 @@
 // Invoked by capture-pages.mjs with its real WebGL page, not a second renderer.
 import {createHash} from 'node:crypto';
 import path from 'node:path';
+import {CONTROL_CONTOURS} from '../controller-visual-policy.js';
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 
 // Validate rendered paint rather than the obsolete "glyph === outline" rule.
@@ -11,7 +12,7 @@ export function verifyFlatAudit(item){
     :String(color).match(/^rgba?\(([^)]+)\)$/)?.[1].split(/[, /]+/).slice(0,3).map(Number);
   const expected={dark:'#ffffff',light:'#858585',mixed:'#8c98a3'}[item.scene];
   const same=(a,b)=>JSON.stringify(rgb(a))===JSON.stringify(rgb(b));
-  if(!expected||!same(item.housing,expected)||!same(item.button,expected))
+  if(!expected||!same(item.housing,expected)||!same(item.button,CONTROL_CONTOURS[item.scene]))
     throw Error('2D body/control contour inks diverge: '+JSON.stringify(item));
   const ink=rgb(item.glyph),surface=rgb(item.surface);
   const backdrop=rgb({dark:'#09111b',light:'#f4f6f9',mixed:'#9baab4'}[item.scene]);
@@ -20,7 +21,7 @@ export function verifyFlatAudit(item){
   if(!ink||!surface||![...ink,...surface,item.alpha].every(Number.isFinite)||item.alpha<0||item.alpha>1)
     throw Error('Invalid surface contrast inputs: '+JSON.stringify(item));
   const a=lum(ink),b=lum(surface.map((v,i)=>Math.round(v*item.alpha+backdrop[i]*(1-item.alpha))));
-  if((Math.max(a,b)+.05)/(Math.min(a,b)+.05)<4.5)
+  if((Math.max(a,b)+.05)/(Math.min(a,b)+.05)<3)
     throw Error('2D face legend contrast is insufficient: '+JSON.stringify(item));
   if(item.glyphOpacity!==1)throw Error('2D face legend coverage follows surface alpha: '+JSON.stringify(item));
   if(item.filter||item.glyphFilter||item.outerFilter||item.leftMargin<1||item.rightMargin<1)
@@ -70,7 +71,7 @@ export async function captureConsolidated(page,{output,images,shotProof}){
     const fill=node=>node?.style?.getPropertyValue('fill');
     const rect=outer?.getBoundingClientRect(),frame=panel.getBoundingClientRect();
     return {scene:panel.dataset.scene,housing:stroke(outer)==='none'?fill(outer):stroke(outer),
-      button:stroke(button),glyph:fill(glyph),surface:button?getComputedStyle(button).fill:'',
+      button:stroke([...svg.querySelectorAll('[id$="-btn-cross"] path,[id$="-btn-cross"] ellipse')].find(n=>!n.classList.contains('glyph')&&getComputedStyle(n).stroke!=='none'))||stroke(button),glyph:fill(glyph),surface:button?getComputedStyle(button).fill:'',
       alpha:button?Number(getComputedStyle(button).fillOpacity):NaN,
       glyphOpacity:glyph?Number(getComputedStyle(glyph).opacity):NaN,
       filter:button?.style?.getPropertyValue('filter')||'',

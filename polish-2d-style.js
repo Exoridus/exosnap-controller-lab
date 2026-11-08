@@ -1,3 +1,4 @@
+import {CONTROL_NEUTRAL,CONTROL_CONTOURS,SCENE_BACKDROPS,softenedLegendColor} from './controller-visual-policy.js';
 // Browser-only 2D visual polish. All rendered surfaces and glyphs originate
 // in the existing authored SVGs; input mapping and moving transforms stay owned
 // by ControllerReference.
@@ -290,29 +291,26 @@ function getOrCreateXboxBumperClip(entry,pressure){
 function paintControlGroup(entry,colors,level){
   const {group,layer}=entry;
   const shapes=controlGeometry(group);
-  const pressure=shapes.find(node=>node.id.endsWith('-pressure')||
-    node.classList.contains('press-surface'));
-  const trigger=layer.role==='trigger';
+  const pressure=shapes.find(node=>node.id.endsWith('-pressure')||node.classList.contains('press-surface'));
+  const mapped=layer.pressElement&&shapes.find(node=>node.id===layer.pressElement||node.id.endsWith('-'+layer.pressElement));
+  const face=shapes.find(node=>/(?:-face|-surface)$/.test(node.id));
+  // Role and explicit mapping take precedence over a filename convention.
+  // Single authored paths include DS4 touchpad, Xbox D-pad and +/- keys.
+  const surface=pressure||mapped||face||shapes.find(node=>!node.classList.contains('detail'));
   for(const node of shapes){
-    // The author-provided -pressure path is the ACTUAL closed control area
-    // for R1/L1/L2/R2. The accompanying path is often ONLY a decorative,
-    // OPEN outline: filling that path creates a wedge while leaving the
-    // actual button dark. Always color the authored pressure geometry.
-    if(pressure){
-      if(node===pressure){
-        paintControl(node,colors,level,{stroke:shapes.length===1});
-        const clip=getOrCreateXboxBumperClip(entry,node);
-        if(clip)paint(node,'clip-path',clip);
-      }
-      else paintControl(node,colors,level,{fill:false});
-      continue;
+    // Converted outline paths use fill rather than stroke. They are structure,
+    // never a second translucent/active surface under the button.
+    if(colors.coherentContours&&node!==surface&&node.classList.contains('detail')){
+      const filled=authoredFill(node);paint(node,'fill',filled?colors.controlStroke:'none');
+      paint(node,'fill-opacity',filled?colors.controlStrokeAlpha:0);
+      if(visibleStroke(node))paint(node,'stroke',colors.controlStroke);
+      node.removeAttribute('data-exo-visible-control-fill');continue;
     }
-    // For controls without pressure geometry (Share/Options/PS), use the
-    // authored face or its real filled source. Preserve outline-only paths.
-    const identity=node.id||'';
-    const surface=authoredFill(node) ||
-      /(?:-face|-surface)$/.test(identity) || identity==='home-logo';
-    paintControl(node,colors,level,{fill:surface});
+    if(surface){
+      paintControl(node,colors,level,{fill:node===surface,
+        stroke:shapes.length===1||visibleStroke(node)});
+      if(node===pressure){const clip=getOrCreateXboxBumperClip(entry,node);if(clip)paint(node,'clip-path',clip);}
+    }else paintControl(node,colors,level,{fill:authoredFill(node)});
   }
 }
 
@@ -377,6 +375,10 @@ function paintStick(reference,entry,colors,values,axes,variant){
   // The static socket is part of the body and never becomes an input surface.
   if(pressure){paint(pressure,'fill','none');paint(pressure,'stroke','none');}
   if(!outer)return;
+  if(colors.coherentContours)for(const detail of group.querySelectorAll('[data-stick-detail]')){
+    if(visibleFill(detail))paint(detail,'fill',colors.controlStroke);
+    if(visibleStroke(detail))paint(detail,'stroke',colors.controlStroke);
+  }
   const movement=analogStickLevel(axes?.[entry.stickSide]);
   const clicked=clamp(values?.get(entry.control)||0)>.5;
   const levels=stickFeedbackLevels(movement,clicked,variant);
@@ -444,16 +446,7 @@ function paintDpad(entry,colors,values){
 // readbacks. This scalar policy also maps to QPainter/atlas color preparation.
 export function surfaceGlyphColor(colors,level=0){
   const state=controlSurfaceState(colors,level);
-  const surface=mixColor(colors.surfaceBackdrop||'#9baab4',state.fill,state.alpha);
-  const luminance=hex=>{
-    const c=rgb(hex).map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);
-    return .2126*c[0]+.7152*c[1]+.0722*c[2];
-  };
-  const l=luminance(surface);
-  const contrast=ink=>{const i=luminance(ink);return (Math.max(l,i)+.05)/(Math.min(l,i)+.05);};
-  const dark='#25282b',light='#ffffff';
-  const best=contrast(dark)>=contrast(light)?dark:light;
-  return contrast(best)>=4.5?best:(contrast('#000000')>contrast(best)?'#000000':best);
+  return softenedLegendColor(state.fill,state.alpha,colors.surfaceBackdrop||'#9baab4');
 }
 function paintGlyphs(entry,colors,showFaceSymbols,level=0){
   const isFace=['b1','b2','b3','b4'].includes(entry.control)&&entry.layer.role==='button';
@@ -462,7 +455,7 @@ function paintGlyphs(entry,colors,showFaceSymbols,level=0){
   // Keep authored Share/Options glyphs ABOVE their surfaces.
   if(face&&glyphs.some(node=>Boolean(node.compareDocumentPosition(face)&Node.DOCUMENT_POSITION_FOLLOWING)))
     for(const glyph of glyphs)entry.group.appendChild(glyph);
-  const surfaceInk=isFace&&colors.coherentContours;
+  const surfaceInk=colors.coherentContours&&entry.layer.role!=='body';
   const ink=surfaceInk?surfaceGlyphColor(colors,level):colors.glyph;
   for(const glyph of glyphs){
     if(colors.markingsVisible!==false&&(!isFace||showFaceSymbols))glyph.style.removeProperty('display');
@@ -582,9 +575,11 @@ export function paintPolished2D(reference,mode,scene,{
     // the neutral material or assume the same ink is legible on opaque faces.
     const ink={dark:'#ffffff',light:'#858585',mixed:'#8c98a3'}[scene];
     colors.coherentContours=true;
-    colors.surfaceBackdrop={dark:'#09111b',light:'#f4f6f9',mixed:'#9baab4'}[scene];
-    colors.control=colors.cap=colors.trigger=scene==='dark'?'#9ca3aa':ink;
-    colors.line=colors.controlStroke=colors.glyph=colors.pressedOutline=ink;
+    colors.surfaceBackdrop=SCENE_BACKDROPS[scene];
+    colors.control=colors.cap=colors.trigger=CONTROL_NEUTRAL;
+    colors.line=ink;
+    colors.controlStroke=colors.pressedOutline=CONTROL_CONTOURS[scene];
+    colors.glyph=softenedLegendColor(CONTROL_NEUTRAL,colors.controlAlpha,colors.surfaceBackdrop);
     colors.lineAlpha=.88;colors.controlStrokeAlpha=.88;colors.glyphAlpha=.88;
     colors.detailAlpha=.64;colors.contrastEdge=null;
     edgeLight=0;edgeShadow=0;
@@ -609,6 +604,9 @@ export function paintPolished2D(reference,mode,scene,{
     if(style===null)node.removeAttribute('style');else node.setAttribute('style',style);
   }
   ensureBaseFill(reference,colors);
+  for(const node of reference.svg.querySelectorAll('[data-decorative-marking]')){
+    if(markings)node.style.removeProperty('display');else paint(node,'display','none');
+  }
   for(const child of [...(reference.bodyShape?.children||[])]){
     if(child.hasAttribute('data-exo-polish-silhouette'))continue;
     if(!['path','ellipse','rect'].includes(child.localName))continue;

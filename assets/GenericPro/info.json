@@ -1,7 +1,9 @@
 {
-  "source": "ExoSnap original parametric model (no third-party mesh)",
-  "license": "MIT",
-  "description": "Compact, symmetric-sticks generic 3D gamepad with distinct controls and no brand markings",
+  "source": "ExoSnap segmented Generic Pro; profile from approved native SVG",
+  "license": "MIT AND CC0-1.0",
+  "profileSource": "references/controllers/generic/source.svg",
+  "profileSha256": "4a192594e161098c1c344f39dfb9ac4635f589edefe0033fe8e1255fa4b97ccc",
+  "description": "Approved source contours, real bevel/depth surfaces, corrected button/stick locations, same 23-part mechanical rig",
   "parts": [
     {
       "filename": "top_shell.obj",
@@ -36,30 +38,30 @@
       ]
     },
     {
-      "filename": "left_ring.obj",
-      "name": "left ring",
-      "visible": true,
-      "parent": -1,
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "color": [
-        0.34,
-        0.41,
-        0.48
-      ]
-    },
-    {
       "filename": "left_stick.obj",
       "name": "left stick",
       "visible": true,
       "parent": -1,
       "position": [
-        -0.53,
-        0.22,
-        0.28
+        -0.8810884999999999,
+        0.225,
+        -0.3023435
+      ],
+      "color": [
+        0.19,
+        0.24,
+        0.3
+      ]
+    },
+    {
+      "filename": "left_ring.obj",
+      "name": "left ring",
+      "visible": true,
+      "parent": 2,
+      "position": [
+        0,
+        0,
+        0
       ],
       "color": [
         0.19,
@@ -71,11 +73,27 @@
       "filename": "left_cap.obj",
       "name": "left cap",
       "visible": true,
-      "parent": 3,
+      "parent": 2,
       "position": [
         0,
         0,
         0
+      ],
+      "color": [
+        0.19,
+        0.24,
+        0.3
+      ]
+    },
+    {
+      "filename": "right_stick.obj",
+      "name": "right stick",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0.44614049999999994,
+        0.225,
+        0.24504299999999998
       ],
       "color": [
         0.19,
@@ -87,27 +105,11 @@
       "filename": "right_ring.obj",
       "name": "right ring",
       "visible": true,
-      "parent": -1,
+      "parent": 5,
       "position": [
         0,
         0,
         0
-      ],
-      "color": [
-        0.34,
-        0.41,
-        0.48
-      ]
-    },
-    {
-      "filename": "right_stick.obj",
-      "name": "right stick",
-      "visible": true,
-      "parent": -1,
-      "position": [
-        0.53,
-        0.22,
-        0.28
       ],
       "color": [
         0.19,
@@ -119,7 +121,7 @@
       "filename": "right_cap.obj",
       "name": "right cap",
       "visible": true,
-      "parent": 6,
+      "parent": 5,
       "position": [
         0,
         0,
@@ -302,9 +304,9 @@
         0
       ],
       "color": [
-        0.38,
-        0.52,
-        0.63
+        0.34,
+        0.41,
+        0.48
       ]
     },
     {

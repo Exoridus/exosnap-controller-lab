@@ -2,6 +2,7 @@
 // Release gate: only the original MIT geometry may be deployed.
 import {readdir,readFile,stat} from 'node:fs/promises';
 import path from 'node:path';
+import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 import {CONTROLLERS,APPROVED_3D_MODEL_IDS,GENERATED_3D_MODEL_IDS,isLicensedModel} from '../models.js';
 import {inspectObjText} from '../mesh-validation.js';
@@ -27,10 +28,13 @@ for(const entry of await readdir(assets,{withFileTypes:true})){
 }
 for(const id of GENERATED_3D_MODEL_IDS){
  const folder=path.join(assets,id);const info=JSON.parse(await readFile(path.join(folder,'info.json'),'utf8'));
- if(info.source!=='ExoSnap original parametric model (no third-party mesh)'||info.license!=='MIT')throw Error('Unapproved generated model provenance');
+ if(info.source!=='ExoSnap segmented Generic Pro; profile from approved native SVG'||info.license!=='MIT AND CC0-1.0')throw Error('Unapproved generated model provenance');
+ const profile=JSON.parse(await readFile(path.join(folder,'source-profile.json'),'utf8'));
+ const source=await readFile(path.join(assets,'..',profile.source));
+ if(createHash('sha256').update(source).digest('hex')!==info.profileSha256||profile.sha256!==info.profileSha256)throw Error('Generated profile provenance mismatch');
  for(const p of info.parts){if(!/^[\w.-]+\.obj$/.test(p.filename))throw Error('Invalid generated OBJ filename');
  const report=inspectObjText(await readFile(path.join(folder,p.filename),'utf8'));
  if(!report.valid)throw Error('Invalid original model part: '+id+'/'+p.filename);
  total++;bytes+=(await stat(path.join(folder,p.filename))).size;}
 }
-console.log('Verified '+total+' original MIT OBJ meshes across '+APPROVED_3D_MODEL_IDS.length+' controller families ('+(bytes/1024/1024).toFixed(2)+' MiB)');
+console.log('Verified '+total+' cleared OBJ meshes (Larf MIT + Generic MIT/CC0 profile) across '+APPROVED_3D_MODEL_IDS.length+' controller families ('+(bytes/1024/1024).toFixed(2)+' MiB)');

@@ -1,3 +1,5 @@
+import {CONTROL_NEUTRAL,isStructuralRole,isInteractiveRole,softenedLegendColor} from './controller-visual-policy.js';
+import {updateRimSurface} from './control-surface-material.js';
 // Browser-independent PBR material applicator for actual native OBJ meshes.
 // Mutate existing materials, not source geometry, when Materialmix or poses change.
 import * as THREE from 'three';
@@ -17,6 +19,8 @@ const tmpEuler=new THREE.Euler();
 const feedbackColor=new THREE.Color();
 const stickPoseRotation=new THREE.Quaternion();
 const white=new THREE.Color('#ffffff');
+const neutralControl=new THREE.Color(CONTROL_NEUTRAL);
+const supportColor=new THREE.Color();
 const clamp01=x=>Math.max(0,Math.min(1,Number.isFinite(Number(x))?Number(x):0));
 function normalizeVisualInput(input){
   if(input?.normalized===true)return input;
@@ -51,11 +55,10 @@ function consolidatedFeedback(recipe,sourceColor){
 export function applyPbrRecipeToRig(native,recipe,input=false){
   if(!native?.meshes||!recipe?.material)throw Error('Expected native rig and a PBR recipe');
   const pose=normalizeVisualInput(input);
-  // The broad source shaft/dome looks like a socket behind each cap. Preserve
-  // its rig and depth behavior; only its Ghost material blends into the shell.
-  // Opt in only the visually inspected source geometry; a colored Joy-Con
-  // shell must not recolor its deliberately dark hardware.
-  const integrateSupports=recipe.material.supportShellBlend&&native.model?.id==='DualSenseCompact';
+  // Semantic supports use the same shell-linked rule on every family. The
+  // source material and hierarchy survive. A split-color shell can nominate
+  // its physical support region in the original part manifest.
+  const integrateSupports=recipe.material.supportShellBlend;
   if(integrateSupports&&!native.supportShellColor){
     const shell=native.meshes.find(m=>m.userData.sourceFile==='top_shell.obj')||
       native.meshes.find(m=>isHousingRole(m.userData.role));
@@ -90,6 +93,14 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
     m.depthWrite=true;
     m.colorWrite=true;
     m.transparent=true;
+    // The offscreen image represents the nearest physical surface, not X-ray
+    // glass. Source-over inside the rig accumulated overlapping shell/support
+    // faces before depth was final (dark dishes and shoulder seams). Replace
+    // RGBA at passing fragments, then composite the single premultiplied image.
+    // Existing rear hints remain ordinary depth-tested overlays afterward.
+    const premultiplied=Boolean(recipe.consolidated);
+    if(m.premultipliedAlpha!==premultiplied){m.premultipliedAlpha=premultiplied;m.needsUpdate=true;}
+    m.blending=recipe.consolidated?THREE.NoBlending:THREE.NormalBlending;
     if(!unlit){m.emissive.setRGB(0,0,0);m.emissiveIntensity=0;}
     // Author-owned source colors define neutral hardware, not an almost-white
     // global stick/trigger palette. Applies to Joy-Con, Pro, DualSense etc.
@@ -97,12 +108,13 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
     const stickPart=['stick-stem','stick-cap','stick-pivot'].includes(mesh.userData.role);
     if(recipe.consolidated){
       const role=mesh.userData.role;
-      const support=['stick-stem','stick-base','stick-well'].includes(role);
+      const support=isStructuralRole(role);
+      const t=clamp01(recipe.mix),blend=t*t*(3-2*t);
       m.color.copy(mesh.userData.sourceColor);
+      if(isInteractiveRole(role))m.color.lerp(neutralControl,blend);
       m.opacity=support?(integrateSupports?recipe.material.supportOpacity:recipe.material.shell.opacity):spec.opacity;
       if(support&&integrateSupports&&native.supportShellColor){
-        const t=clamp01(recipe.mix),blend=t*t*(3-2*t);
-        m.color.lerp(native.supportShellColor,blend);
+        m.color.lerp(cached.supportShellColor||native.supportShellColor,blend);
         if(!unlit){
           for(const key of ['roughness','metalness','clearcoat','clearcoatRoughness','ior'])
             m[key]=spec[key]+(recipe.material.shell[key]-spec[key])*blend;
@@ -123,10 +135,17 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
           m.emissiveIntensity=(recipe.material.pressEmissiveIntensity??.16)*amount;
         }
       }
+      // Lower ring sidewall belongs to the support, not the analog indicator.
+      supportColor.copy(mesh.userData.sourceColor).lerp(cached.supportShellColor||native.supportShellColor||mesh.userData.sourceColor,blend);
+      updateRimSurface(m,true,supportColor,recipe.material.supportOpacity);
       const marking=m.userData.surfaceMarking;
-      if(marking)marking.ink.value.copy(marking.idle).lerp(marking.active,amount*.35);
+      if(marking){
+        marking.ink.value.set(softenedLegendColor('#'+m.color.getHexString(),m.opacity));
+        marking.coverage.value=.72;
+      }
       continue;
     }
+    updateRimSurface(m,false,m.color,m.opacity);
     const physicalShoulder=mesh.userData.role==='trigger'||
       /^(?:left|right)_bumper[.]obj$/.test(filename);
     if(stickPart||physicalShoulder)m.color.copy(mesh.userData.sourceColor);

@@ -171,7 +171,7 @@ test('2D parity check page can run without the Three.js module',()=>{
 test('each bundled SVG reference declares a license and complete mapping metadata',()=>{
   for(const layout of LAYOUTS){
     const mapping=JSON.parse(read(`references/controllers/${layout.id}/mapping.json`));
-    assert.ok(['MIT','GPL-3.0-only'].includes(mapping.license?.spdx),layout.id);
+    assert.ok(['MIT','GPL-3.0-only','MIT AND CC0-1.0'].includes(mapping.license?.spdx),layout.id);
     assert.ok(mapping.layers.every(l=>l.id&&l.role),layout.id);
   }
   assert.ok(existsSync(new URL('../licenses/GPL-3.0.txt',import.meta.url)));

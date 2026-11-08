@@ -84,7 +84,7 @@ test('visual history archives optional GameCube and consolidated captures with i
 test('Generic Pro source is vendored, segmented and paired with original 2D',async()=>{
  const manifest=JSON.parse(await readFile(path.join(root,'assets/GenericPro/info.json'),'utf8'));
  assert.equal(manifest.parts.length,23);
- assert.equal(manifest.license,'MIT');
+ assert.equal(manifest.license,'MIT AND CC0-1.0');
  const {CONTROLLERS,isLicensedModel}=await import('../models.js');
  const {layoutForId}=await import('../controller-catalog.js');
  assert.ok(isLicensedModel(CONTROLLERS.find(x=>x.id==='GenericPro')));
