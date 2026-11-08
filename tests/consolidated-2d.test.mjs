@@ -269,3 +269,49 @@ test('single-surface analog caps retain their original shape and use real analog
  assert.equal(value(outer,'stroke'),stroke);
  assert.equal(group.querySelector('[id$="-top"]'),null,'no invented C-stick click region');
 });
+
+test('Nintendo authored LED slots follow the SDL patterns on light/dark/mixed backgrounds',async()=>{
+  const {previewPlayerIndex,ledStates}=await import('../controller-player-leds.js');
+  for(const id of ['switch_pro','joycon_grip']){
+    const r=await reference(id);
+    const original=r.svg.querySelectorAll('path').map(n=>[n,n.getAttribute('d')]);
+    const banks=id==='switch_pro'?[['body-led-1','body-led-2','body-led-3','body-led-4']]:
+      [['body-led-l1','body-led-l2','body-led-l3','body-led-l4'],['body-led-r1','body-led-r2','body-led-r3','body-led-r4']];
+    const nodes=banks.map(bank=>bank.map(key=>r.bodyShape.querySelector('[id="'+key+'"]')));
+    assert.ok(nodes.flat().every(Boolean),id+' all authored LEDs present');
+    for(const scene of ['dark','light','mixed'])for(let index=0;index<8;index++){
+      const preview=previewPlayerIndex(String(index));
+      paintPolished2D(r,'ghost',scene,{coherentContours:true,playerPreview:preview});
+      const expected=ledStates(preview.mask);
+      for(let bank=0;bank<nodes.length;bank++)for(let slot=0;slot<4;slot++){
+        const node=nodes[bank][slot];
+        assert.equal(value(node,'fill')!=='none',expected[slot],id+' '+scene+' LED '+(slot+1));
+        assert.ok(value(node,'stroke').startsWith('#'));
+        if(scene==='light')assert.notEqual(value(node,'stroke'),'#ffffff',id+' light outline');
+      }
+      for(const [node,d]of original)assert.equal(node.getAttribute('d'),d,'no authored paths changed');
+    }
+    paintPolished2D(r,'ghost','light',{coherentContours:true,playerPreview:previewPlayerIndex('off')});
+    for(const node of nodes.flat())assert.equal(value(node,'fill'),'none','off preserves indicator outlines');
+  }
+});
+test('nested authored shell outlines use scene-specific shared contrast ink',async()=>{
+  for(const id of ['xbox_360','generic']){
+    const r=await reference(id);
+    const ids=id==='generic'?['body-dpad-well','body-top','body-panel']:['outline-strong'];
+    // The Xbox 360 guide bezel has no ID, but is a genuine nested clipped body path.
+    const nested=id==='xbox_360'?r.bodyShape.querySelectorAll('path').find(n=>
+      n.parentNode?.getAttribute('clip-path')==='url(#occlude)'&&n.getAttribute('transform')):null;
+    const nodes=ids.map(key=>r.bodyShape.querySelector('[id="'+key+'"]'));
+    if(nested)nodes.push(nested);
+    assert.ok(nodes.every(Boolean),id+' original shell paths remain accessible');
+    for(const scene of ['dark','light','mixed']){
+      paintPolished2D(r,'ghost',scene,{coherentContours:true});
+      const ink={dark:'#ffffff',light:'#858585',mixed:'#8c98a3'}[scene];
+      for(const node of nodes){
+        const stroke=value(node,'stroke'),fill=value(node,'fill');
+        assert.ok(stroke===ink||fill===ink,id+' '+(node.id||'nested bezel')+' '+scene+' has '+stroke+' / '+fill);
+      }
+    }
+  }
+});
