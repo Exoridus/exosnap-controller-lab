@@ -267,6 +267,48 @@ try{
       throw Error('Mismatch across six 2D sizes: '+JSON.stringify(dims));
   }
   await capturePolish('2d-dualsense-neutral-480.png','dualsense','solid+ghost neutral');
+
+  // Direct free-XY pointer movement must shift the SAME SVG stick layer in
+  // all six panels, without implicitly pressing L3/R3.
+  const dragTarget=polish.locator('.stage[data-look="solid"][data-scene="dark"] [id$="-stick-l-cap-top"]');
+  const dragBox=await dragTarget.boundingBox();
+  if(!dragBox)throw Error('Authored left stick is not pointer-targetable');
+  const px=dragBox.x+dragBox.width/2,py=dragBox.y+dragBox.height/2;
+  await polish.mouse.move(px,py);
+  await polish.mouse.down();
+  await polish.mouse.move(px+24,py-12,{steps:6});
+  const dragProof=await polish.evaluate(()=>{
+    const state=window.__exo2DPolish.inputState();
+    return {left:state.left,right:state.right,clickL:state.values.get('ls')||0,
+      clickR:state.values.get('rs')||0,
+      positions:window.__exo2DPolish.refs.map(x=>{
+        const entry=x.reference.controls.find(c=>c.stickSide==='left');
+        return entry?.group.getAttribute('transform');
+      })};
+  });
+  if(dragProof.left.x<.3||dragProof.left.y>-.2||
+    Math.abs(dragProof.right.x)>1e-5||Math.abs(dragProof.right.y)>1e-5||
+    dragProof.clickL||dragProof.clickR||new Set(dragProof.positions).size!==1)
+    throw Error('Free XY drag not synchronized across views: '+JSON.stringify(dragProof));
+  await capturePolish('2d-dualsense-free-xy-drag.png','dualsense',
+    'Left stick true pointer XY drag, no L3', '.stage[data-look="solid"][data-scene="dark"]');
+  await polish.mouse.up();
+  const released=await polish.evaluate(()=>window.__exo2DPolish.inputState().left);
+  if(Math.abs(released.x)>1e-5||Math.abs(released.y)>1e-5)
+    throw Error('Stick failed to spring back to neutral: '+JSON.stringify(released));
+  await polish.locator('#clickLeft').check();
+  const isolatedClick=await polish.evaluate(()=>{
+    const state=window.__exo2DPolish.inputState();
+    return {ls:state.values.get('ls')||0,rs:state.values.get('rs')||0,
+      left:state.left,right:state.right};
+  });
+  if(isolatedClick.ls!==1||isolatedClick.rs!==0||
+    Math.hypot(isolatedClick.left.x,isolatedClick.left.y)>1e-5)
+    throw Error('L3 click did not remain independent from stick travel: '+JSON.stringify(isolatedClick));
+  await capturePolish('2d-dualsense-isolated-l3.png','dualsense',
+    'Only L3 center pressed; neutral stick travel', '.stage[data-look="solid"][data-scene="dark"]');
+  await polish.locator('#clickLeft').uncheck();
+
   // Trigger tests compare the actual STAGE pixels: changing only a slider
   // label or a hidden DOM element cannot pass this screenshot check.
   await capturePolish('2d-dualsense-trigger-neutral.png','dualsense',

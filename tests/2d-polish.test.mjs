@@ -144,6 +144,7 @@ test('browser release will capture all specified 2D review states',async()=>{
   const capture=await file('tools/capture-pages.mjs');
   const names=['2d-switch-pro-solid-fixed.png','2d-gamecube-solid-fixed.png','2d-generic-solid-fixed.png',
     '2d-xbox-series-solid-fixed.png','2d-xbox-series-solid-pressed.png',
+    '2d-dualsense-free-xy-drag.png','2d-dualsense-isolated-l3.png',
     '2d-dualsense-neutral-480.png','2d-dualsense-stick-ring.png',
     '2d-dualsense-stick-click.png','2d-dualsense-motion-ring.png',
     '2d-dualsense-face-symbols-on.png','2d-dualsense-face-symbols-off.png',
