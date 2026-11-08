@@ -83,6 +83,11 @@ export async function captureModelConsistency(page,{output,images,shotProof}){
        }
       }
       if(directional===1&&!c.side&&c.values.length)for(const v of c.values){check(same(v.fill,'#ffffff'),'Pressed mapped surface not white',{model:model.id,state:state.name,c,v});check(v.alpha>.95,'Pressed mapped surface too transparent',{model:model.id,state:state.name,c,v});}
+      if(c.side&&!c.center&&c.outline){
+       const move=Math.hypot(...(state.value[c.side]||[0,0]))>.5;
+       check(same(c.outline.fill,move?'#ffffff':CONTROL_NEUTRAL),'Single-surface analog cap lost its real fill',{model:model.id,c});
+       check(Math.abs(c.outline.alpha-(move?.96:1-transparency/100))<1e-6,'Single-surface analog alpha mismatch',{model:model.id,c});
+      }
       if(c.side&&c.ring&&c.center){
        const move=Math.hypot(...(state.value[c.side]||[0,0]))>.5,click=!!state.value.buttons?.[c.side==='left'?'ls':'rs'];
        check(same(c.outline.stroke,CONTROL_CONTOURS[panel.scene]),'Stick contour changes color',{model:model.id,c});

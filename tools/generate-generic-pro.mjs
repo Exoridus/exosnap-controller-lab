@@ -59,7 +59,7 @@ for(const [dir,planes]of Object.entries({up:[[1,-1],[-1,-1]],down:[[1,1],[-1,1]]
 for(const [file,id]of [['back_button.obj','btn-view-face'],['start_button.obj','btn-menu-face'],['guide_button.obj','btn-home-face']])
  put(file,extrude(contour(id),.215,.267,.009),colors.well);
 for(const [side,key]of [['left','l'],['right','r']]){
- put(side+'_bumper.obj',extrude(contour('btn-'+key+'1-pressure'),.08,.19,.018),colors.bumper);
+ put(side+'_bumper.obj',extrude(contour('btn-'+key+'1-pressure'),.235,.30,.018),colors.bumper);
  put(side+'_trigger.obj',extrude(contour('trigger-'+key+'2-pressure'),-.17,-.045,.018),colors.stick);
 }
 await mkdir(root,{recursive:true});for(const [name,data]of Object.entries(objs))await writeFile(path.join(root,name),data);

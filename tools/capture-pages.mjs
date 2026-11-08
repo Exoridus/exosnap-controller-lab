@@ -179,22 +179,21 @@ try{
     coreSmoke.push({id,threeViewports:proof.sampleCount,svgViewports:proof.flatCount,
       rendered:true,webgl:proof.webglVersion});
     if(['JoyconGrip','JoyconLeft','JoyconRight'].includes(id)){
-      // A real neutral Chromium/WebGL frame, plus a role/material audit.
-      // The authored source metadata is dark, so idle caps and rear
-      // shoulder inputs must NEVER become pale pressed-state materials.
-      const materials=await page.evaluate(()=>{
-        const rig=window.__exoPbrLab.model;
-        return rig.meshes.filter(m=>
-          /^(?:left|right)_(?:cap|ring|stick|trigger|bumper)[.]obj$/
-            .test(m.userData.sourceFile||'')).map(m=>({
-          file:m.userData.sourceFile,
-          source:m.userData.sourceColor.getHexString(),
-          actual:m.material.color.getHexString(),
-          emissive:m.material.emissiveIntensity
-        }));
+      // Neutral now follows the shared semantic contract, not fixed black
+      // source materials. Assert exact expected color and zero input emission.
+      const materials=await page.evaluate(async()=>{
+        const [{Color},{CONTROL_NEUTRAL,isStructuralRole}]=await Promise.all([
+          import('three'),import('./controller-visual-policy.js')]);
+        const lab=window.__exoPbrLab,rig=lab.model,t=lab.mix,blend=t*t*(3-2*t);
+        return rig.meshes.filter(m=>/^(?:left|right)_(?:cap|ring|stick|trigger|bumper)[.]obj$/.test(m.userData.sourceFile||'')).map(m=>{
+          const expected=m.userData.sourceColor.clone().lerp(isStructuralRole(m.userData.role)
+            ?m.userData.supportShellColor||rig.supportShellColor:new Color(CONTROL_NEUTRAL),blend);
+          return {file:m.userData.sourceFile,expected:expected.getHexString(),actual:m.material.color.getHexString(),
+            emissive:m.material.emissiveIntensity};
+        });
       });
-      if(materials.length<3||materials.some(m=>m.actual!==m.source||m.emissive!==0))
-        throw Error('Joy-Con neutral hardware painted as pressed: '+JSON.stringify({id,materials}));
+      if(materials.length<3||materials.some(m=>m.actual!==m.expected||m.emissive!==0))
+        throw Error('Joy-Con neutral semantic material mismatch: '+JSON.stringify({id,materials}));
       const name='3d-joycon-'+id.slice('Joycon'.length).toLowerCase()+'-neutral.png';
       const bytes=await page.screenshot({path:path.join(output,name),
         fullPage:true,animations:'disabled',timeout:60000});

@@ -399,6 +399,16 @@ function paintStick(reference,entry,colors,values,axes,variant){
     paint(center,'stroke',colors.controlStroke);paint(center,'stroke-opacity',colors.controlStrokeAlpha);
     return;
   }
+  if(colors.ringSurface&&!center){
+    // Some original analog controls (e.g. C-stick) have one physical cap
+    // surface and no click region. Paint that exact surface, do not invent
+    // concentric geometry or let its outline masquerade as analog feedback.
+    paintControl(outer,colors,movement);
+    paint(outer,'stroke',colors.controlStroke);
+    paint(outer,'stroke-opacity',colors.controlStrokeAlpha);
+    outer.style.removeProperty('filter');
+    return;
+  }
   paint(outer,'fill',solid?mixColor(colors.control,colors.activeColor||PRESS_WHITE,ring):'none');
   paint(outer,'fill-opacity',String(solid?
     colors.controlAlpha+(colors.activeAlpha-colors.controlAlpha)*ring:0));

@@ -1,4 +1,4 @@
-import {CONTROL_NEUTRAL,isStructuralRole,isInteractiveRole,softenedLegendColor} from './controller-visual-policy.js';
+import {CONTROL_NEUTRAL,isStructuralRole,isInteractiveRole,softenedLegendColor,supportOpacityFor} from './controller-visual-policy.js';
 import {updateRimSurface} from './control-surface-material.js';
 // Browser-independent PBR material applicator for actual native OBJ meshes.
 // Mutate existing materials, not source geometry, when Materialmix or poses change.
@@ -21,6 +21,7 @@ const stickPoseRotation=new THREE.Quaternion();
 const white=new THREE.Color('#ffffff');
 const neutralControl=new THREE.Color(CONTROL_NEUTRAL);
 const supportColor=new THREE.Color();
+const ghostLegend=new THREE.Color('#aab2ba');
 const clamp01=x=>Math.max(0,Math.min(1,Number.isFinite(Number(x))?Number(x):0));
 function normalizeVisualInput(input){
   if(input?.normalized===true)return input;
@@ -112,7 +113,7 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
       const t=clamp01(recipe.mix),blend=t*t*(3-2*t);
       m.color.copy(mesh.userData.sourceColor);
       if(isInteractiveRole(role))m.color.lerp(neutralControl,blend);
-      m.opacity=support?(integrateSupports?recipe.material.supportOpacity:recipe.material.shell.opacity):spec.opacity;
+      m.opacity=support?(integrateSupports?supportOpacityFor(recipe.material,cached.supportCoverage):recipe.material.shell.opacity):spec.opacity;
       if(support&&integrateSupports&&native.supportShellColor){
         m.color.lerp(cached.supportShellColor||native.supportShellColor,blend);
         if(!unlit){
@@ -137,10 +138,10 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
       }
       // Lower ring sidewall belongs to the support, not the analog indicator.
       supportColor.copy(mesh.userData.sourceColor).lerp(cached.supportShellColor||native.supportShellColor||mesh.userData.sourceColor,blend);
-      updateRimSurface(m,true,supportColor,recipe.material.supportOpacity);
+      updateRimSurface(m,true,supportColor,supportOpacityFor(recipe.material,isHousingRole(role)?1:cached.supportCoverage));
       const marking=m.userData.surfaceMarking;
       if(marking){
-        marking.ink.value.set(softenedLegendColor('#'+m.color.getHexString(),m.opacity));
+        marking.ink.value.set(softenedLegendColor('#'+m.color.getHexString())).lerp(ghostLegend,1-m.opacity);
         marking.coverage.value=.72;
       }
       continue;

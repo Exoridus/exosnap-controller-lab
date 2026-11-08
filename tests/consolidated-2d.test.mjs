@@ -257,3 +257,15 @@ test('all Joy-Con source paths have mapped moving rim and center with independen
   }
  }
 });
+
+test('single-surface analog caps retain their original shape and use real analog fill without fabricated click regions',async()=>{
+ const r=await reference('gamecube'),options={coherentContours:true,ringSurface:true,material2D:{neutralOpacity:.3,activeOpacity:.96}};
+ const group=r.svg.querySelector('[id="stick-r-cap"]'),outer=group.querySelector('[id$="-outline"]');
+ paintPolished2D(r,'ghost','dark',options);
+ assert.equal(value(outer,'fill'),'#9ca3aa');assert.equal(Number(value(outer,'fill-opacity')),.3);
+ const stroke=value(outer,'stroke');
+ paintPolished2D(r,'ghost','dark',{...options,right:{x:1,y:0}});
+ assert.equal(value(outer,'fill'),'#ffffff');assert.equal(Number(value(outer,'fill-opacity')),.96);
+ assert.equal(value(outer,'stroke'),stroke);
+ assert.equal(group.querySelector('[id$="-top"]'),null,'no invented C-stick click region');
+});

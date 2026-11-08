@@ -102,6 +102,15 @@ export async function loadNativeRig(model, readText=httpText){
       mesh.userData.supportShellColor=candidates[best].userData.sourceColor.clone();
     }
   }
+  for(const stem of meshes.filter(m=>m.userData.role==='stick-stem')){
+    const rim=meshes.find(m=>m.userData.role==='stick-pivot'&&m.userData.control===stem.userData.control);
+    if(!rim)continue;
+    const a=new THREE.Box3().setFromObject(stem).getSize(new THREE.Vector3());
+    const b=new THREE.Box3().setFromObject(rim).getSize(new THREE.Vector3());
+    const ratio=Math.sqrt(a.x*a.y/Math.max(1e-12,b.x*b.y));
+    const t=Math.max(0,Math.min(1,(ratio-1.35)/.35));
+    stem.userData.supportCoverage=rim.userData.supportCoverage=t*t*(3-2*t);
+  }
   const bounds=new THREE.Box3().setFromObject(normalized);
   const extent=bounds.getSize(new THREE.Vector3());
   if(!Number.isFinite(extent.length())||extent.length()<.001)throw new Error('Invalid model bounding box');

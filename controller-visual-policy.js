@@ -15,3 +15,11 @@ export function softenedLegendColor(surface,opacity=1,backdrop='#9baab4'){
 }
 export function isStructuralRole(role){return ['stick-stem','stick-base','stick-well','structural-support'].includes(role);}
 export function isInteractiveRole(role){return ['button','trigger','touch-surface','paddle','stick-pivot','stick-cap'].includes(role);}
+
+// Broad collars fill a larger housing opening; reducing their coverage below
+// the surrounding shell creates a bright hole on light backgrounds. Compact
+// overlay domes keep the accepted quiet-alpha treatment. Factor is measured
+// from source geometry once, not selected by controller family.
+export function supportOpacityFor(material,coverage=0){
+ return material.supportOpacity+(material.shell.opacity-material.supportOpacity)*clamp(coverage);
+}
