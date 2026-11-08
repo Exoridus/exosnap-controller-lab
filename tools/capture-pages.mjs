@@ -182,12 +182,15 @@ try{
       // Neutral now follows the shared semantic contract, not fixed black
       // source materials. Assert exact expected color and zero input emission.
       const materials=await page.evaluate(async()=>{
-        const [{Color},{CONTROL_NEUTRAL,isStructuralRole}]=await Promise.all([
+        const [{Color},{CONTROL_NEUTRAL,isStructuralRole,isInteractiveRole}]=await Promise.all([
           import('three'),import('./controller-visual-policy.js')]);
         const lab=window.__exoPbrLab,rig=lab.model,t=lab.mix,blend=t*t*(3-2*t);
+        const retained=lab.model?.model?0.16:0;
         return rig.meshes.filter(m=>/^(?:left|right)_(?:cap|ring|stick|trigger|bumper)[.]obj$/.test(m.userData.sourceFile||'')).map(m=>{
-          const expected=m.userData.sourceColor.clone().lerp(isStructuralRole(m.userData.role)
-            ?m.userData.supportShellColor||rig.supportShellColor:new Color(CONTROL_NEUTRAL),blend);
+          const structural=isStructuralRole(m.userData.role);
+          const originalWeight=structural?blend:isInteractiveRole(m.userData.role)?blend*(1-retained):0;
+          const expected=m.userData.sourceColor.clone().lerp(structural
+            ?m.userData.supportShellColor||rig.supportShellColor:new Color(CONTROL_NEUTRAL),originalWeight);
           return {file:m.userData.sourceFile,expected:expected.getHexString(),actual:m.material.color.getHexString(),
             emissive:m.material.emissiveIntensity};
         });
