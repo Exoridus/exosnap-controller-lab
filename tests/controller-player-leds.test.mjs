@@ -9,10 +9,23 @@ test('Nintendo player index follows actual SDL HIDAPI mask sequence, not one-hot
   assert.throws(()=>ledMaskForPlayerIndex(-2),RangeError);
 });
 test('browser slot fallback and manual web preview never assert physical or SDL reads',()=>{
-  assert.deepEqual(previewPlayerIndex('auto',null),{index:0,mask:1,browserSlot:null,source:'demo'});
-  assert.deepEqual(previewPlayerIndex('auto',3),{index:3,mask:15,browserSlot:3,source:'browser-slot'});
+  assert.deepEqual(previewPlayerIndex('demo',null),{index:0,mask:1,browserSlot:null,source:'demo'});
+  assert.deepEqual(previewPlayerIndex('auto',3),{index:-1,mask:0,browserSlot:3,source:'unavailable'});
+  assert.deepEqual(previewPlayerIndex('auto',3,1),{index:1,mask:3,browserSlot:3,source:'reported'});
   assert.equal(previewPlayerIndex('off',3).mask,0);
   assert.equal(previewPlayerIndex('2',3).index,2);
-  assert.match(previewLabel(previewPlayerIndex('auto',3)),/Browser-Slot 3.*nur Vorschau/);
+  assert.match(previewLabel(previewPlayerIndex('auto',3)),/unbekannt/);
+  assert.match(previewLabel(previewPlayerIndex('demo',3)),/Demo P1/);
   assert.throws(()=>previewPlayerIndex('99'),RangeError);
+});
+
+test('Two separate browser Joy-Cons never receive different visual players by enumeration',()=>{
+  for(const mode of ['demo','auto','1']){
+    const left=previewPlayerIndex(mode,1),right=previewPlayerIndex(mode,2);
+    assert.equal(left.mask,right.mask,'a paired overlay uses one presentation index');
+    assert.equal(left.index,right.index);
+  }
+  const paired=previewPlayerIndex('auto',1,1);
+  assert.equal(paired.mask,3,'trusted provider index can be shared across devices');
+  assert.deepEqual(ledStates(paired.mask),[true,true,false,false]);
 });
