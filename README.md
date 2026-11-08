@@ -13,11 +13,11 @@ Das Lab zeigt eine Original-3D-Darstellung mit weißem Aktivfeedback und eine un
 Node.js ≥ 20: `npm ci`, danach `npm start`. Unter Windows kann `start.cmd` verwendet werden. `http://127.0.0.1:8792/` öffnet `pbr-lab.html`; die freigegebenen Modelle und die HDR-Lichtprobe liegen im Repository.
 
 - **3D · Weiß:** Eine einzige, quelldatengetreue 3D-Reihe mit weißem Aktivfeedback. Die frühere Blauweiß-Vergleichsreihe wurde entfernt.
-- **Materialmix — nur 3D:** 0 % bewahrt die deckende Darstellung; 100 % reduziert das Gehäuse auf 0,10 und neutrale Eingabeflächen auf 0,25 Alpha. Die 2D-Reihe bleibt unverändert.
+- **Materialmix — nur 3D:** 0 % bewahrt die deckende Darstellung; 100 % reduziert das Gehäuse auf 0,10 und neutrale Eingabeflächen auf 0,25 Alpha. Die 2D-Reihe bleibt unverändert. Neutrale 3D-Tasten behalten am Ghost-Endpunkt 16 % ihrer ursprünglichen RGB-Farbigkeit, ohne Alpha-Änderung.
 - **2D — Transparent:** Original-SVG-Pfade, neutrale Eingabeflächen mit 0,30 Alpha und aktive weiße Flächen mit 0,96. Äußere und innere Gehäusekonturen, Controls und Symbole haben dieselbe Farbregel pro Hintergrund. Auf Hell und Gemischt erscheinen graue statt schwarze Zusatzkonturen. Das SVG enthält seitliche Sicherheitsränder; Verzierungen erhalten kein Eingabefeedback.
 - **Eingaben:** Einzelne Tasten, beide analogen Trigger, Stick-Bewegung, L3/R3, alle Tasten oder ein Standard-Gamepad lassen sich vergleichen. Die 2D-Sticks können direkt gezogen werden; Bewegung und Klick bleiben unabhängig.
 - **Kamera und Größe:** Gemeinsame Kameraposition für 3D; 240, 320 oder 480 Pixel pro Feld. Das Mausrad über 2D/3D zoomt, Shift + Mausrad scrollt horizontal. Das 2D-SVG folgt dem Zoom, bleibt aber frontal.
-- **Aktivfarben & Qt-Parameter:** Eigene Farben für 2D/3D mit optionaler Kopplung; Sync ist standardmäßig aktiv. Der Download enthält die tatsächlich gewählten Parameter und benennt offene native Arbeit.
+- **Aktivfarben & Qt-Parameter:** Eigene Farben für 2D/3D mit optionaler Kopplung; Sync ist standardmäßig aktiv. Der Download enthält die tatsächlich gewählten Parameter und benennt offene native Arbeit. Eine subtile 3D-Außenkontur lässt sich im eingeklappten Darstellungsbereich für A/B-Vergleiche abschalten.
 
 ## Darstellung und Ressourcen
 
@@ -31,9 +31,11 @@ Der Qt-Port verwendet einen kleinen, rendererneutralen Materialvertrag. Das Lab 
 
 ## Nintendo-Spieler-LEDs: nur Anzeige
 
-Die Lab nutzt die vorhandenen Original-SVG-LEDs von Switch Pro und Joy-Con-Grip. Standard ist **Demo P1**. P1 bis P8 können manuell für das Overlay gewählt werden. Bei Joy-Con-Grip zeigen beide Seiten denselben Anzeigeindex. **Auto** zeigt nur dann einen tatsächlichen Spielerindex, wenn ein ausdrücklich angebundener Provider diesen verlässlich liefert; andernfalls erscheinen keine aktiven LEDs. Die Browser-Gamepad-Enumeration ist keine Spielerzuordnung und wird nicht als solche ausgegeben. Diese Browser-Lab liest keine physischen LED-Zustände und ändert keine Hardware-Einstellungen.
+Die Lab nutzt die vorhandenen Original-SVG-LEDs von Switch Pro und Joy-Con-Grip **auch auf der 3D-Oberfläche**. Die LED-Kästchen werden aus der 2D-Vorlage in den PBR-Shader der vorhandenen 3D-Gehäuseflächen projiziert; sie sind weder schwebende Rechtecke noch neue Meshes. Standard ist **Demo P1**. P1 bis P8 können manuell für das Overlay gewählt werden. Bei Joy-Con-Grip zeigen beide Seiten denselben Anzeigeindex. **Auto** zeigt nur dann einen tatsächlichen Spielerindex, wenn ein ausdrücklich angebundener Provider diesen verlässlich liefert; andernfalls erscheinen keine aktiven LEDs. Die Browser-Gamepad-Enumeration ist keine Spielerzuordnung und wird nicht als solche ausgegeben. Diese Browser-Lab liest keine physischen LED-Zustände und ändert keine Hardware-Einstellungen.
 
 ExoSnap nutzt auf `next` aktuell GameInput v4; die SDL3-Migration läuft separat in [ExoSnap PR #530](https://github.com/Exoridus/exosnap/pull/530). Der Lab-Draft implementiert daher keinen nativen Controller-Provider.
+
+Die äußere 3D-Kante wird nur nach dem fertigen Controller-Render aus dessen Alpha im vorhandenen GPU-Compositor betont. Die einzelnen Meshes bekommen keine neuen Konturen; Innennähte und transparente Überdeckungen bleiben der ursprünglichen Darstellung vorbehalten. Technische Einzelheiten und Qt-Nicht-Parität stehen in [Final 3D Polish](docs/FINAL_3D_POLISH.md).
 
 ## Prüfung und Veröffentlichung
 
