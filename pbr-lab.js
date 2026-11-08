@@ -39,7 +39,7 @@ const state={mix:.70,modelId:'DualSenseCompact',selected:'white',view:'front',pa
 const demo=new ControllerDemo();
 const manualInput=createControllerState();
 state.frameInput=createControllerState();state.markings=true;state.flatTransparency=.70;
-state.playerPreviewSelection='auto';state.playerPreview=previewPlayerIndex('auto');
+state.playerPreviewSelection='demo';state.playerPreview=previewPlayerIndex('demo');
 state.manualButtons=new Map();state.manualHeld=new Set();
 const demoPresets={neutral:poseForStickDemo('neutral'),move:poseForStickDemo('move'),click:poseForStickDemo('click')};
 const sampleNodes=[];
@@ -402,7 +402,9 @@ async function loadModel(id){
     prepareSilhouette(next);
     disposeNativeRig(state.native);
     state.native=next;state.modelId=id;
-    $('playerPreviewField').hidden=!['SwitchPro','JoyconGrip','JoyconLeft','JoyconRight'].includes(id);
+    const authoredPlayerLeds=['SwitchPro','JoyconGrip'].includes(id);
+    $('playerPreviewField').hidden=!authoredPlayerLeds;
+    $('playerIndexStatus').hidden=!authoredPlayerLeds;
     state.fitRadius=fitControllerRadius(new THREE.Box3().setFromObject(next.group).getSize(new THREE.Vector3()),{yaw:state.yaw,pitch:state.pitch});
     state.radius=state.fitRadius;updateCamera();
     if(state.renderer&&state.environmentMap)$('failureBanner').hidden=true;
