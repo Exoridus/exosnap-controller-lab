@@ -11,12 +11,15 @@ test('final PBR lab has one slider and exactly the two intended look rows',()=>{
   assert.equal((html.match(/type="range"/g)||[]).length,2);
   assert.ok(html.includes('id="materialMix"'));
   assert.ok(html.includes('id="gallery"'));
-  assert.ok(js.includes('const variants=HERO_VARIANTS'));
+  assert.ok(js.includes('const variants=LAB_VARIANTS'));
   assert.ok(!html.includes('variants=all'));
   assert.ok(!html.includes('<iframe'));
-  assert.ok(html.includes('data-look="solid"'));
-  assert.ok(html.includes('data-look="ghost"'));
+  assert.ok(html.includes('data-look="white"'));
+  assert.ok(html.includes('data-look="cool"'));
   assert.ok(js.includes("['dark','light','mixed']"));
+  assert.deepEqual([...html.matchAll(/data-look="([^"]+)"/g)].map(m=>m[1]),['white','cool']);
+  assert.ok(js.indexOf("flatCard.className='flat-reference'")>js.indexOf('for(const variant of variants)'));
+  assert.match(js,/flatReferences\.set\(scene,ref\)/);
 });
 test('one WebGL context and original OBJ model rig, no synthetic 3D previews',()=>{
   assert.equal((js.match(/new THREE\.WebGLRenderer\(/g)||[]).length,1);

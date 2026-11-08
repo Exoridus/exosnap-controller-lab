@@ -19,11 +19,14 @@ test('static Pages build exports a deployable offline-look viewer without source
 });
 test('screenshot proof rejects missing WebGL or missing 3D draw budgets',async()=>{
   const {verifyRenderedState}=await import('../tools/visual-capture-contract.mjs');
-  const source={status:'three-rendered',sampleCount:12,activeLooks:4,drawStats:Object.fromEntries(['solid','ghost','outline','identity'].map(x=>[x,{sourceCalls:20,calls:23}]))};
+  const source={status:'three-rendered',sampleCount:6,activeLooks:2,drawStats:Object.fromEntries(['white','cool'].map(x=>[x,{sourceCalls:20,calls:23}]))};
   assert.equal(verifyRenderedState({...source,nontransparentPixels:900}),true);
   assert.throws(()=>verifyRenderedState({...source,nontransparentPixels:0}),/nontransparent/);
   assert.throws(()=>verifyRenderedState({...source,status:'webgl-unavailable'}),/WebGL/);
   assert.throws(()=>verifyRenderedState({...source,drawStats:{}}),/draw/);
+  assert.throws(()=>verifyRenderedState({...source,sampleCount:5}),/six/);
+  assert.throws(()=>verifyRenderedState({...source,drawStats:{white:source.drawStats.white}}),/cool/);
+  assert.throws(()=>verifyRenderedState({...source,drawStats:{solid:source.drawStats.white,ghost:source.drawStats.cool}}),/white/);
 });
 test('visual history creates immutable commit-addressed references and rejects corrupted captures',async()=>{
   const {archiveSnapshots}=await import('../tools/archive-snapshots.mjs');
@@ -91,7 +94,7 @@ test('3D/2D ready gate prevents partial SVG loads from passing browser CI',async
   const {readFile}=await import('node:fs/promises');
   const app=await readFile(path.join(root,'pbr-lab.js'),'utf8');
   const capture=await readFile(path.join(root,'tools/capture-pages.mjs'),'utf8');
-  assert.ok(app.includes('flatReferences.size===variants.length*scenes.length'));
+  assert.ok(app.includes('flatReferences.size===scenes.length'));
   assert.ok(app.includes("flatReady?'three-rendered':'incomplete'"));
-  assert.ok(capture.includes("sample--flat svg').length===12"));
+  assert.ok(capture.includes("sample--flat svg').length===3"));
 });

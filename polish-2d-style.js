@@ -2,14 +2,14 @@
 // in the existing authored SVGs; input mapping and moving transforms stay owned
 // by ControllerReference.
 export const PRESS_WHITE='#ffffff';
-// One source of truth for all 2D control materials and glyphs. Backdrops and
-// controller identity must NEVER change these values in Ghost.
+// Shared alpha contract for authored 2D controls. Scene contrast changes only
+// achromatic ink; controller identity never changes the interactive palette.
 export const CONTROL_PALETTE=Object.freeze({
-  neutralFill:'#a8b9c7',neutralAlpha:.26,
+  neutralFill:'#ffffff',neutralAlpha:.26,
   activeFill:PRESS_WHITE,activeAlpha:.40,
-  border:'#667d90',borderAlpha:.94,
+  border:'#ffffff',borderAlpha:.86,
   activeBorderAlpha:.9,
-  glyph:'#8198a9',glyphAlpha:.9
+  glyph:'#ffffff',glyphAlpha:.86
 });
 const svgNs='http://www.w3.org/2000/svg';
 const clamp=n=>Math.max(0,Math.min(1,Number.isFinite(Number(n))?Number(n):0));
@@ -66,25 +66,26 @@ export function lookPalette(id,mode,scene,colorway='auto'){
   if(!['solid','ghost'].includes(mode))throw new TypeError('Unknown 2D look');
   const model=family(id),chosen=colorway==='auto'?standard[model]:colorway;
   const [shell,core]=shells[model][chosen];
+  if(!['dark','light','mixed'].includes(scene))throw new TypeError('Unknown background');
   const ghost=mode==='ghost',light=scene==='light';
+  const neutral=ghost?(light?'#000000':'#ffffff'):'#a8b9c7';
   return {
-    shell,core,control:CONTROL_PALETTE.neutralFill,
-    cap:CONTROL_PALETTE.neutralFill,trigger:CONTROL_PALETTE.neutralFill,
+    shell,core,control:neutral,cap:neutral,trigger:neutral,
     ghost,light,colorway:chosen,
     shellAlpha:ghost?0:.99,coreAlpha:ghost?0:.96,
     detailAlpha:ghost?0:.26,
-    // Only the outside silhouette is background-dependent. Controls are not.
+    // Housing relief keeps its historical look; interactive ink follows the scene.
     line:ghost?'#718b9d':'#50687b',
     lineAlpha:ghost?.91:.86,
     controlAlpha:ghost?CONTROL_PALETTE.neutralAlpha:.96,
     activeAlpha:ghost?CONTROL_PALETTE.activeAlpha:.98,
-    controlStroke:CONTROL_PALETTE.border,
-    controlStrokeAlpha:CONTROL_PALETTE.borderAlpha,
-    // Solid button legends need high contrast against opaque pale controls.
-    // Ghost retains the existing single neutral palette.
-    glyph:ghost?CONTROL_PALETTE.glyph:'#203446',
+    controlStroke:ghost?neutral:'#667d90',
+    controlStrokeAlpha:ghost?CONTROL_PALETTE.borderAlpha:.94,
+    // Filled Solid artwork retains its historical dark legend color.
+    glyph:ghost?neutral:'#203446',
     glyphAlpha:ghost?CONTROL_PALETTE.glyphAlpha:1,
-    pressedOutline:CONTROL_PALETTE.border
+    pressedOutline:ghost?neutral:'#667d90',
+    contrastEdge:ghost&&scene==='mixed'?'#000000':null
   };
 }
 // The review compares only silhouette treatments. All three options have
@@ -101,18 +102,11 @@ export function ghostReviewSettings(key,scene){
   if(!['dark','light','mixed'].includes(scene))throw new TypeError('Unknown review background');
   return Object.freeze({
     ...option,reviewLook:key,edgeLight:option.light,edgeShadow:option.shadow,
-    // Identical, shared materials for every control on every background.
-    control:CONTROL_PALETTE.neutralFill,
-    cap:CONTROL_PALETTE.neutralFill,trigger:CONTROL_PALETTE.neutralFill,
-    controlAlpha:CONTROL_PALETTE.neutralAlpha,
-    activeAlpha:CONTROL_PALETTE.activeAlpha,
-    controlStroke:CONTROL_PALETTE.border,
-    controlStrokeAlpha:CONTROL_PALETTE.borderAlpha,
-    shellAlpha:0,coreAlpha:0,detailAlpha:0,
-    line:'#718b9d',
-    lineAlpha:.91,
-    glyph:CONTROL_PALETTE.glyph,glyphAlpha:CONTROL_PALETTE.glyphAlpha,
-    pressedOutline:CONTROL_PALETTE.border
+    // Every edge treatment shares the scene's one interactive palette.
+    ...Object.fromEntries(Object.entries(lookPalette('dualsense','ghost',scene))
+      .filter(([key])=>['control','cap','trigger','controlAlpha','activeAlpha',
+        'controlStroke','controlStrokeAlpha','shellAlpha','coreAlpha','detailAlpha',
+        'line','lineAlpha','glyph','glyphAlpha','pressedOutline','contrastEdge'].includes(key)))
   });
 }
 const visibleFill=node=>{
@@ -130,9 +124,9 @@ function paint(node,name,value){node.style.setProperty(name,String(value),'impor
 export function controlSurfaceState(colors,level){
   const t=clamp(level);
   return {
-    fill:mixColor(colors.control,PRESS_WHITE,t),
+    fill:mixColor(colors.control,colors.activeColor||PRESS_WHITE,t),
     alpha:colors.controlAlpha+(colors.activeAlpha-colors.controlAlpha)*t,
-    stroke:mixColor(colors.controlStroke,PRESS_WHITE,t),
+    stroke:mixColor(colors.controlStroke,colors.activeColor||PRESS_WHITE,t),
     strokeAlpha:colors.controlStrokeAlpha+(CONTROL_PALETTE.activeBorderAlpha-colors.controlStrokeAlpha)*t
   };
 }
@@ -180,6 +174,41 @@ function activeEdgeFilter(node,level){
   }
   paint(node,'filter','url(#'+filterId+')');
 }
+// On a mixed frame, a narrow dark counter-edge preserves the authored light
+// contours across both bright and dark image regions. Also support a white
+// active surface on a light scene. Filters are shared per SVG/state, cached by
+// rendered unit and alpha; no texture readback or source-path clipping is used.
+function controlContrastFilter(node,colors,level){
+  if(!colors.ghost){activeEdgeFilter(node,level);return;}
+  const svg=node?.ownerSVGElement;
+  if(!svg)return;
+  const needsEdge=colors.contrastEdge||colors.light&&level>0;
+  if(!needsEdge){node.style.removeProperty('filter');return;}
+  const state=controlSurfaceState(colors,level);
+  const alpha=state.strokeAlpha.toFixed(3);
+  const unit=(svg.viewBox.baseVal.width||480)/(svg.getBoundingClientRect().width||320);
+  const key=[unit.toFixed(4),alpha].join('-');
+  let defs=svg.querySelector('defs');
+  if(!defs){defs=filterNode('defs');svg.insertBefore(defs,svg.firstChild);}
+  let filter=defs.querySelector('[data-exo-control-contrast="'+key+'"]');
+  if(!filter){
+    const source=svg.querySelector('[id="outline-strong"],[id$="-outline-strong"]');
+    const id=(source?.id||svg.id||'exo-controller')+'-control-contrast-'+key.replaceAll('.','_');
+    filter=filterNode('filter',{id,x:'-15%',y:'-15%',width:'130%',height:'130%',
+      filterUnits:'objectBoundingBox',primitiveUnits:'userSpaceOnUse',
+      'color-interpolation-filters':'sRGB','data-exo-control-contrast':key});
+    const opaque=filterNode('feComponentTransfer',{in:'SourceAlpha',result:'contour-alpha'});
+    opaque.append(filterNode('feFuncA',{type:'linear',slope:100,intercept:0}));
+    const grow=filterNode('feMorphology',{in:'contour-alpha',operator:'dilate',radius:(unit*.48).toFixed(3),result:'expanded'});
+    const edge=filterNode('feComposite',{in:'expanded',in2:'contour-alpha',operator:'out',result:'counter-edge'});
+    const ink=filterNode('feFlood',{'flood-color':'#000000','flood-opacity':alpha,result:'contrast-ink'});
+    const shade=filterNode('feComposite',{in:'contrast-ink',in2:'counter-edge',operator:'in',result:'contrast-edge'});
+    const merge=filterNode('feMerge');
+    merge.append(filterNode('feMergeNode',{in:'contrast-edge'}),filterNode('feMergeNode',{in:'SourceGraphic'}));
+    filter.append(opaque,grow,edge,ink,shade,merge);defs.append(filter);
+  }
+  paint(node,'filter','url(#'+filter.id+')');
+}
 function paintControl(node,colors,level,{fill=true,stroke=true}={}){
   if(!node)return;
   const state=controlSurfaceState(colors,level);
@@ -191,7 +220,7 @@ function paintControl(node,colors,level,{fill=true,stroke=true}={}){
     paint(node,'stroke',state.stroke);
     paint(node,'stroke-opacity',String(state.strokeAlpha));
   }else paint(node,'stroke','none');
-  activeEdgeFilter(node,level);
+  controlContrastFilter(node,colors,level);
 }
 // The authored source may contain face paths, visible outlines, and unused
 // pressure placeholders in different nesting arrangements. Pick real filled
@@ -318,21 +347,24 @@ function paintStick(reference,entry,colors,values,axes,variant){
   // showing the game. Ghost remains outline-based, with no double alpha layer.
   // The smaller source-authored center covers the middle in Solid.
   const solid=!colors.ghost;
-  paint(outer,'fill',solid?mixColor(colors.control,PRESS_WHITE,ring):'none');
+  paint(outer,'fill',solid?mixColor(colors.control,colors.activeColor||PRESS_WHITE,ring):'none');
   paint(outer,'fill-opacity',String(solid?
     colors.controlAlpha+(colors.activeAlpha-colors.controlAlpha)*ring:0));
   // The Solid annulus has one constant dark boundary even when its moving
   // material turns white. No extra graphic ring is created.
-  paint(outer,'stroke',solid?colors.controlStroke:mixColor(colors.controlStroke,PRESS_WHITE,ring));
-  activeEdgeFilter(outer,ring);
+  paint(outer,'stroke',solid?colors.controlStroke:mixColor(colors.controlStroke,colors.activeColor||PRESS_WHITE,ring));
+  controlContrastFilter(outer,colors,ring);
   paint(outer,'stroke-opacity',
     String(colors.controlStrokeAlpha+(CONTROL_PALETTE.activeBorderAlpha-colors.controlStrokeAlpha)*ring));
   if(center){
     const level=levels.center;
     paintControl(center,colors,level);
-    // Preserve a dark existing center boundary during white L3/R3.
-    paint(center,'stroke',colors.controlStroke);
-    paint(center,'stroke-opacity',String(colors.controlStrokeAlpha));
+    // Solid retains a dark boundary; Ghost follows the same interactive
+    // contour state as shoulders, faces and the moving analog ring.
+    if(solid){
+      paint(center,'stroke',colors.controlStroke);
+      paint(center,'stroke-opacity',String(colors.controlStrokeAlpha));
+    }
     // Keep the exact source cap boundary visible, including during white L3.
     const attr='data-exo-authored-stroke-width';
     if(!center.hasAttribute(attr)){
@@ -355,8 +387,9 @@ function paintDpad(entry,colors,values){
   paintControlGroup(entry,colors,level);
   const dish=group.querySelector('[id$="-dish"]');
   if(dish)paintControl(dish,colors,0,{fill:false});
+  return level;
 }
-function paintGlyphs(entry,colors,showFaceSymbols){
+function paintGlyphs(entry,colors,showFaceSymbols,level=0){
   const isFace=['b1','b2','b3','b4'].includes(entry.control)&&entry.layer.role==='button';
   const face=entry.group.querySelector('[id$="-face"]');
   const glyphs=[...entry.group.querySelectorAll('.glyph')].filter(node=>!node.closest('defs,mask'));
@@ -368,11 +401,12 @@ function paintGlyphs(entry,colors,showFaceSymbols){
       if(showFaceSymbols)glyph.style.removeProperty('display');
       else paint(glyph,'display','none');
     }
-    // One exact glyph color/alpha for all backgrounds and all input states.
-    // Never invert or darken the symbol just because its control is pressed.
+    // Authored symbols use the same scene ink and contour alpha as inputs.
     if(visibleFill(glyph))paint(glyph,'fill',colors.glyph);
     if(visibleStroke(glyph))paint(glyph,'stroke',colors.glyph);
-    paint(glyph,'opacity',String(colors.glyphAlpha));
+    if(colors.ghost){paint(glyph,'fill-opacity',1);paint(glyph,'stroke-opacity',1);}
+    paint(glyph,'opacity',String(colors.glyphAlpha+(CONTROL_PALETTE.activeBorderAlpha-colors.glyphAlpha)*clamp(level)));
+    if(colors.ghost)controlContrastFilter(glyph,colors,level);
   }
 }
 // 2D cannot reproduce v25/26's angle-dependent 3D Fresnel shader. Instead,
@@ -466,25 +500,48 @@ function paintEdgeRelief(reference,mode,scene,edgeLight,edgeShadow){
 }
 export function paintPolished2D(reference,mode,scene,{
   values=new Map(),left=null,right=null,colorway='auto',
-  stickFeedback='ring',showFaceSymbols=true,edgeLight=0,edgeShadow=0,reviewLook=null
+  stickFeedback='ring',showFaceSymbols=true,edgeLight=0,edgeShadow=0,reviewLook=null,activeColor=PRESS_WHITE
 }={}){
   if(!reference?.svg)return;
   const colors=reviewLook?
     {...lookPalette(reference.layout.id,'ghost',scene,colorway),
       ...ghostReviewSettings(reviewLook,scene)}:
     lookPalette(reference.layout.id,mode,scene,colorway);
+  colors.activeColor=/^#[\da-f]{6}$/i.test(activeColor)?activeColor:PRESS_WHITE;
   if(reviewLook&&mode!=='ghost')throw new TypeError('Review look requires Ghost mode');
   if(reviewLook){
     const preset=ghostReviewSettings(reviewLook,scene);
     edgeLight=preset.edgeLight;edgeShadow=preset.edgeShadow;
   }
+  // Unsupported artwork (for example DualSense mute) is decorative. Capture
+  // its authored paint before the reference's generic preview update, then
+  // restore it so even synthetic Press All cannot color it as an input.
+  const decorations=reference.controls.filter(entry=>entry.layer.role!=='body'&&
+    (entry.layer.inputStatus==='unsupported'||entry.layer.role==='button'&&!entry.layer.binding));
+  for(const entry of decorations){
+    if(!entry.polishDecorationPaint)entry.polishDecorationPaint=[entry.group,...entry.group.querySelectorAll('*')]
+      .map(node=>[node,node.getAttribute('style')]);
+  }
   // Existing binding owns the transform, mask cutouts and live input mapping.
   reference.update(values,{left,right});
+  for(const entry of decorations)for(const [node,style]of entry.polishDecorationPaint){
+    if(style===null)node.removeAttribute('style');else node.setAttribute('style',style);
+  }
   ensureBaseFill(reference,colors);
   for(const child of [...(reference.bodyShape?.children||[])]){
     if(child.hasAttribute('data-exo-polish-silhouette'))continue;
     if(!['path','ellipse','rect'].includes(child.localName))continue;
     const detail=child.classList.contains('detail')||child.id.endsWith('speaker-grille');
+    // All body embellishments keep complete, original painted paths. Ghost
+    // adapts only interactive marks and the separate outer silhouette.
+    if(!child.id.endsWith('outline-strong')){
+      if(!Object.hasOwn(child,'polishAuthoredBodyStyle'))child.polishAuthoredBodyStyle=child.getAttribute('style');
+      if(colors.ghost){
+        if(child.polishAuthoredBodyStyle===null)child.removeAttribute('style');
+        else child.setAttribute('style',child.polishAuthoredBodyStyle);
+        continue;
+      }
+    }
     // An SVG shape without an explicit fill still inherits SVG's black
     // default. Ghost review must remove the paint itself, not just set alpha
     // on shapes that happen to declare a fill property.
@@ -512,20 +569,20 @@ export function paintPolished2D(reference,mode,scene,{
     // The mapping also contains the body layer for source provenance.
     // It is NOT an interactive control; recoloring its first path as a
     // button was the source of the unwanted filled "Ghost shell".
-    if(entry.layer.role==='body')continue;
+    if(entry.layer.role==='body'||decorations.includes(entry))continue;
     if(entry.stickSide){
       paintStick(reference,entry,colors,values,{left,right},stickFeedback);
-      paintGlyphs(entry,colors,showFaceSymbols);
+      paintGlyphs(entry,colors,showFaceSymbols,Math.max(analogStickLevel({left,right}[entry.stickSide]),clamp(values.get(entry.control)||0)));
       continue;
     }
     if(entry.layer.role==='directional-pad'){
-      paintDpad(entry,colors,values);
-      paintGlyphs(entry,colors,showFaceSymbols);
+      const level=paintDpad(entry,colors,values);
+      paintGlyphs(entry,colors,showFaceSymbols,level);
       continue;
     }
     const level=controlLevel(entry,values,{left,right});
     paintControlGroup(entry,colors,level);
-    paintGlyphs(entry,colors,showFaceSymbols);
+    paintGlyphs(entry,colors,showFaceSymbols,level);
   }
   paintEdgeRelief(reference,mode,scene,edgeLight,edgeShadow);
 }

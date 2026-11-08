@@ -36,7 +36,9 @@ test('Ghost stick motion brightens the moving ring and L3 retains shaded, transl
 test('stick tilt poses change real source pivots and return exactly to neutral',async()=>{
  const rig=await loadNativeRig(CONTROLLERS[0],read);
  try{
-  const left=rig.parts.find(p=>p.file==='left_stick.obj').holder;
+  // CO cap/stem are siblings below the ring; its quaternion is the actual
+  // moving assembly, while the stem's local quaternion remains unchanged.
+  const left=rig.parts.find(p=>p.file==='left_ring.obj').holder;
   const base=left.quaternion.clone();
   applyStickPoseToRig(rig,poseForStickDemo('move'));
   assert.ok(!left.quaternion.equals(base));

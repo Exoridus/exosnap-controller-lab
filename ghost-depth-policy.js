@@ -33,7 +33,7 @@ export function prepareGhostOcclusion(native,{rearHints=true}={}){
   for(const mesh of native.meshes){
     if(!mesh.visible||!mesh.geometry||mesh.isInstancedMesh)continue;
     const role=mesh.userData.role,key=mesh.userData.control;
-    const hint=makeRearHint(mesh,role,key,0);
+    const hint=makeRearHint(mesh,role,key,0,{contrastLayers:true});
     if(!hint)continue;
     hint.material.color.set(EXO_PALETTE.idleControl);
     hint.visible=false;
@@ -41,20 +41,40 @@ export function prepareGhostOcclusion(native,{rearHints=true}={}){
     hint.material.depthTest=true;
     hint.material.depthFunc=THREE.GreaterDepth;
     hint.material.depthWrite=false;
-    hint.renderOrder=30;
+    hint.renderOrder=31;
     mesh.add(hint);
+    mesh.add(hint.userData.hiddenFill);
+    mesh.add(hint.userData.hiddenOutline);
     native.rearHintLines.push(hint);
   }
   return native;
 }
-export function updateGhostRearHints(native,recipe){
+export function updateGhostRearHints(native,recipe,input={}){
   if(!native?.rearHintLines)return;
   const mix=Number(recipe?.mix)||0;
   const ghostStyle=recipe?.variant==='ghost'||recipe?.variant==='outline';
   const visibility=ghostStyle?Math.min(.22,Math.max(0,(mix-.56)/.44)*.22):0;
   for(const hint of native.rearHintLines){
-    hint.visible=visibility>.005;
-    hint.material.opacity=visibility;
+    const key=hint.userData.control;
+    const values=input?.values;
+    const button=values instanceof Map?values.get(key):values?.[key];
+    const trigger=key==='l2'?input.triggers?.left:key==='r2'?input.triggers?.right:0;
+    const amount=input.allPressed?1:Math.max(0,Math.min(1,Number(button)||0));
+    const active=Math.max(amount,Math.max(0,Math.min(1,Number(trigger)||0)));
+    const policy=recipe?.consolidated&&recipe.hiddenIndicators?.enabled?recipe.hiddenIndicators:null;
+    const alpha=policy?(policy.idleOpacity??.28)+((policy.activeOpacity??.90)-(policy.idleOpacity??.28))*active:visibility;
+    hint.visible=alpha>.005;
+    hint.material.opacity=alpha;
+    hint.material.color.set(policy?'#ffffff':EXO_PALETTE.idleControl);
+    if(policy&&active>0)hint.material.color.copy(hint.parent.material.color);
+    const fill=hint.userData.hiddenFill;
+    if(fill){
+      fill.visible=!!policy&&active>0;
+      fill.material.opacity=policy?(policy.activeFillOpacity??.12)*active:0;
+      if(fill.visible)fill.material.color.copy(hint.parent.material.color);
+    }
+    const outline=hint.userData.hiddenOutline;
+    if(outline){outline.visible=!!policy&&hint.visible;outline.material.opacity=alpha;}
   }
 }
 // Fat Line shaders need pixel-size viewport uniforms; an unconfigured
@@ -62,22 +82,21 @@ export function updateGhostRearHints(native,recipe){
 export function setRearHintViewport(native,width,height){
   const w=Math.max(1,Math.round(Number(width)||1));
   const h=Math.max(1,Math.round(Number(height)||1));
-  for(const hint of native?.rearHintLines||[])hint.material.resolution.set(w,h);
+  for(const hint of native?.rearHintLines||[]){
+    hint.material.resolution.set(w,h);
+    hint.userData.hiddenOutline?.material.resolution.set(w,h);
+  }
 }
 
-// Hide complete rear-facing trigger/paddle surfaces in front-facing Ghost;
-// their optional dashed line children are still rendered against housing depth.
-// The rear view restores original physical meshes. Called after material updates.
-export function hideOccludedRearControls(native,recipe,{yaw=0}={}){
+// Compatibility entry point: physical depth tests decide each fragment. Never
+// remove a whole trigger at a camera angle; its exposed edge must stay visible.
+export function hideOccludedRearControls(native,recipe,view={}){
   if(!native?.meshes)return;
-  const ghost=(recipe?.variant==='ghost'||recipe?.variant==='outline');
-  const frontAngle=Math.abs(Math.atan2(Math.sin(yaw),Math.cos(yaw)));
-  const occluded=ghost&&Number(recipe.mix)>.28&&frontAngle<.87;
   for(const mesh of native.meshes){
     const rear=['trigger','paddle'].includes(mesh.userData.role);
     if(!rear)continue;
     // A visible bumper is not automatically a rear-only trigger.
-    mesh.material.colorWrite=!occluded;
-    mesh.material.depthWrite=!occluded;
+    mesh.material.colorWrite=true;
+    mesh.material.depthWrite=true;
   }
 }

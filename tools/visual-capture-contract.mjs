@@ -1,8 +1,8 @@
 /** Pure release gate: only actual, successfully completed Three.js frames count. */
-export const REQUIRED_LOOKS=Object.freeze(['solid','ghost','outline','identity']);
+export const REQUIRED_LOOKS=Object.freeze(['white','cool']);
 export function verifyRenderedState(state){
   if(state?.status!=='three-rendered')throw Error('WebGL renderer has not produced an accepted 3D frame');
-  if(state.sampleCount!==12)throw Error(`Expected twelve visible 3D panels, got ${state.sampleCount}`);
+  if(state.sampleCount!==6)throw Error(`Expected six visible 3D panels, got ${state.sampleCount}`);
   if(state.nontransparentPixels!==undefined&&state.nontransparentPixels<250)throw Error('Offscreen 3D target has too few nontransparent pixels');
   for(const key of REQUIRED_LOOKS){
     const stats=state.drawStats?.[key];

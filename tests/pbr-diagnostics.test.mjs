@@ -14,8 +14,8 @@ test('two curated looks use one true shared renderer and truthful per-view stati
  assert.ok(js.includes('renderer.info.render.calls'));
  assert.ok(!js.includes("rendered===18"));
  assert.ok(html.includes('id="gallery"'));
- assert.ok(html.includes('data-look="solid"'));
- assert.ok(html.includes('data-look="ghost"'));
+ assert.ok(html.includes('data-look="white"'));
+ assert.ok(html.includes('data-look="cool"'));
  // Material opacity still has exactly one slider; the additional range input
   // is solely an explicit L2/R2 analog input simulator, not another material knob.
   assert.equal((html.match(/id="materialMix"/g)||[]).length,1);

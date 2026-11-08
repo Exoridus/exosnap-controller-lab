@@ -6,6 +6,7 @@ import {resolveHeroRecipe,HERO_VARIANTS} from '../pbr-recipes.js';
 import {resolve2DPaint} from '../material-paint.js';
 import {applyPbrRecipeToRig} from '../pbr-appearance.js';
 import {EXO_PALETTE} from '../palette.js';
+import {LAB_VARIANTS} from '../controller-lab-style.js';
 
 const html=fs.readFileSync(new URL('../pbr-lab.html',import.meta.url),'utf8');
 const gallery=fs.readFileSync(new URL('../pbr-lab.js',import.meta.url),'utf8');
@@ -42,13 +43,14 @@ test('off button stays translucent in Ghost and restores without new geometry',(
   assert.equal(native.meshes[0].material.emissiveIntensity,0);
 });
 
-test('comparison has four distinct looks in one document, no nested viewers',()=>{
-  assert.deepEqual(HERO_VARIANTS.map(x=>x.key),['solid','ghost','outline','identity']);
+test('main comparison has two feedback variants and one independent authored 2D row',()=>{
+  assert.deepEqual(LAB_VARIANTS.map(x=>x.key),['white','cool']);
+  assert.deepEqual(HERO_VARIANTS.map(x=>x.key),['solid','ghost','outline','identity'],'historical recipes remain available');
   assert.doesNotMatch(html,/<iframe\b/i);
   assert.doesNotMatch(matrix,/<iframe\b/i);
   assert.match(html,/id="gallery"/);
-  assert.match(html,/data-look="solid"/);
-  assert.match(html,/data-look="ghost"/);
+  assert.match(html,/data-look="white"/);
+  assert.match(html,/data-look="cool"/);
   assert.match(gallery,/className='look-views'/);
   assert.match(gallery,/className='sample sample--flat'/);
   assert.match(gallery,/canvas.id='threeCanvas'/);
@@ -63,7 +65,7 @@ test('Qt Quick 3D material reference also uses opaque bright LED faces',()=>{
 });
 
 test('initial view and controls match the visible default settings',()=>{
-  assert.match(gallery,/selected:'ghost',view:'front',panelWidth:320/);
+  assert.match(gallery,/selected:'white',view:'front',panelWidth:320/);
   assert.match(gallery,/yaw:0,pitch:0,radius:7\.8/);
   assert.match(html,/<option value="front" selected>/);
   assert.match(html,/value="70" id="materialMix"/);

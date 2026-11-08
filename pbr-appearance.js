@@ -7,23 +7,42 @@ import {updateStickInstances} from './pbr-optimizer.js';
 import {depthPriority,updateGhostRearHints} from './ghost-depth-policy.js';
 import {EXO_PALETTE} from './palette.js';
 import {setGhostFresnel} from './pbr-fresnel.js';
+import {stickMechanics} from './model-mechanics.js';
 const pressedBlue=new THREE.Color(EXO_PALETTE.pressedBlue);
 const ghostColor=new THREE.Color();
 const idleColor=new THREE.Color();
 const tmpEuler=new THREE.Euler();
+const feedbackColor=new THREE.Color();
+const white=new THREE.Color('#ffffff');
 const clamp01=x=>Math.max(0,Math.min(1,Number.isFinite(Number(x))?Number(x):0));
 function normalizeVisualInput(input){
   if(typeof input==='boolean')return {allPressed:input,left:normalizeStickInput(),right:normalizeStickInput(),
     triggers:{left:input?1:0,right:input?1:0}};
   const allPressed=!!input?.allPressed;
-  return {allPressed,left:normalizeStickInput(input?.left),right:normalizeStickInput(input?.right),
-    triggers:{left:allPressed?1:clamp01(input?.triggers?.left??0),
-      right:allPressed?1:clamp01(input?.triggers?.right??0)}};
+  const values=input?.values instanceof Map?input.values:new Map(Object.entries(input?.values||{}));
+  const left=normalizeStickInput(input?.left),right=normalizeStickInput(input?.right);
+  left.click=left.click||!!values.get('ls');right.click=right.click||!!values.get('rs');
+  return {allPressed,left,right,values,
+    triggers:{left:allPressed?1:Math.max(clamp01(input?.triggers?.left??0),clamp01(values.get('l2'))),
+      right:allPressed?1:Math.max(clamp01(input?.triggers?.right??0),clamp01(values.get('r2')))}};
 }
 function relevantStick(file){
   const n=String(file).toLowerCase();
   if(!/(?:left|right)/.test(n))return null;
   return n.includes('left')?'left':'right';
+}
+function consolidatedFeedback(recipe,sourceColor){
+  const specified=new THREE.Color(recipe.material.pressBlue||'#ffffff');
+  const baseline=recipe.material.defaultPressBlue;
+  const custom=recipe.material.customActiveColor??(baseline
+    ?!specified.equals(new THREE.Color(baseline))
+    :!specified.equals(white)&&!specified.equals(new THREE.Color(EXO_PALETTE.pressedBlue)));
+  if(custom)return feedbackColor.copy(specified);
+  // The option changes input feedback only. Dark source parts always receive
+  // white; a bright source surface may receive cool color inversely to mix.
+  const luminance=.2126*sourceColor.r+.7152*sourceColor.g+.0722*sourceColor.b;
+  return feedbackColor.copy(white).lerp(pressedBlue.set(EXO_PALETTE.pressedBlue),
+    recipe.activeContrast==='cool'&&luminance>.55?1-clamp01(recipe.mix):0);
 }
 export function applyPbrRecipeToRig(native,recipe,input=false){
   if(!native?.meshes||!recipe?.material)throw Error('Expected native rig and a PBR recipe');
@@ -42,7 +61,8 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
     const spec=control?recipe.material.controls:recipe.material.shell;
     m.color.copy(mesh.userData.sourceColor).lerp(ghostColor.set(spec.ghostTint),1-spec.originalColorWeight);
     if(control&&spec.idleTint&&spec.idleTintWeight)m.color.lerp(idleColor.set(spec.idleTint),spec.idleTintWeight);
-    if(!unlit&&!control)setGhostFresnel(m,recipe.ghostFresnel?.strength||0);
+    if(!unlit&&!control&&(!recipe.consolidated||m.userData.exoGhostFresnelUniform))
+      setGhostFresnel(m,recipe.consolidated?0:recipe.ghostFresnel?.strength||0);
     if(!unlit){
       m.roughness=control?Math.min(1,spec.roughness+.06):spec.roughness;
       m.metalness=spec.metalness;
@@ -54,12 +74,35 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
     mesh.renderOrder=depthPriority(mesh.userData.role,mesh.userData.sourceFile);
     m.depthTest=true;
     m.depthWrite=true;
+    m.colorWrite=true;
     m.transparent=true;
     if(!unlit){m.emissive.setRGB(0,0,0);m.emissiveIntensity=0;}
     // Author-owned source colors define neutral hardware, not an almost-white
     // global stick/trigger palette. Applies to Joy-Con, Pro, DualSense etc.
     const filename=String(mesh.userData.sourceFile||'').toLowerCase();
     const stickPart=['stick-stem','stick-cap','stick-pivot'].includes(mesh.userData.role);
+    if(recipe.consolidated){
+      const role=mesh.userData.role;
+      const support=['stick-stem','stick-base','stick-well'].includes(role);
+      m.color.copy(mesh.userData.sourceColor);
+      m.opacity=support?(recipe.material.supportOpacity??recipe.material.shell.opacity):spec.opacity;
+      let amount=0;
+      const side=relevantStick(mesh.userData.sourceFile);
+      if(role==='stick-pivot'&&side)amount=pose.allPressed?1:stickVisualState(pose[side]).moving;
+      else if(role==='stick-cap'&&side)amount=pose.allPressed||pose[side].click?1:0;
+      else if(role==='trigger')amount=pose.triggers[side]??clamp01(pose.values?.get(mesh.userData.control));
+      else if(control&&!support&&mesh.userData.control)amount=pose.allPressed?1:clamp01(pose.values?.get(mesh.userData.control));
+      if(amount>0){
+        const active=consolidatedFeedback(recipe,mesh.userData.sourceColor);
+        m.color.lerp(active,amount);
+        m.opacity+=(Math.max(m.opacity,recipe.material.pressOpacity??1)-m.opacity)*amount;
+        if(!unlit){
+          m.emissive.copy(active);
+          m.emissiveIntensity=(recipe.material.pressEmissiveIntensity??.16)*amount;
+        }
+      }
+      continue;
+    }
     const physicalShoulder=mesh.userData.role==='trigger'||
       /^(?:left|right)_bumper[.]obj$/.test(filename);
     if(stickPart||physicalShoulder)m.color.copy(mesh.userData.sourceColor);
@@ -120,20 +163,26 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
     }
   }
   updateStickInstances(native,pose);
-  updateGhostRearHints(native,recipe);
+  updateGhostRearHints(native,recipe,pose);
 }
 export function applyStickPoseToRig(native,input){
   const pose=normalizeVisualInput(input);
   if(!native?.parts)return;
   for(const side of ['left','right']){
-    const holder=native.parts.find(p=>p.file===`${side}_stick.obj`)?.holder;
+    const stem=native.parts.find(p=>p.file===`${side}_stick.obj`)?.holder;
+    const ring=native.parts.find(p=>p.file===`${side}_ring.obj`)?.holder;
+    // CO's authored cap and stem are siblings below the moving ring. Rotate
+    // that assembly once, so the cap follows the shaft without double tilt.
+    const holder=ring&&stem?.parent===ring?ring:stem;
     if(!holder)continue;
     if(!holder.userData.restQuaternion)holder.userData.restQuaternion=holder.quaternion.clone();
     if(!holder.userData.restPosition)holder.userData.restPosition=holder.position.clone();
     const s=pose[side];
-    const q=new THREE.Quaternion().setFromEuler(tmpEuler.set(-s.y*.23,0,s.x*.23));
+    const mechanics=stickMechanics(native.model?.id,side);
+    const tilt=mechanics.maxTiltDeg*Math.PI/180;
+    const q=new THREE.Quaternion().setFromEuler(tmpEuler.set(-s.y*tilt,0,s.x*tilt));
     holder.quaternion.copy(holder.userData.restQuaternion).multiply(q);
     holder.position.copy(holder.userData.restPosition);
-    if(s.click)holder.position.y-=.008;
+    if(s.click)holder.position.y-=mechanics.clickTravel;
   }
 }

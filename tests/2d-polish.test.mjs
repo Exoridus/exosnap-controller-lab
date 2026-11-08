@@ -62,7 +62,7 @@ test('Solid ring has its own material, Xbox bumpers do not flood the center',asy
   assert.match(code,/paint\(outer,'fill',solid\?mixColor/);
   assert.match(code,/clip\.setAttribute\('id',pressure\.id\+'-material-clip'\)/);
   assert.match(code,/entry\.layoutId=reference\.layout\.id/);
-  assert.match(code,/glyph:ghost\?CONTROL_PALETTE\.glyph:'#203446'/);
+  assert.match(code,/glyph:ghost\?neutral:'#203446'/);
 });
 test('Solid paints a full authored source silhouette, while Ghost leaves it empty',async()=>{
   const code=await file('polish-2d-style.js');

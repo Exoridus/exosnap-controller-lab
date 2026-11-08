@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {GHOST_REVIEW_LOOKS,ghostReviewSettings,CONTROL_PALETTE,controlSurfaceState} from '../polish-2d-style.js';
+import {GHOST_REVIEW_LOOKS,ghostReviewSettings,CONTROL_PALETTE,controlSurfaceState,lookPalette} from '../polish-2d-style.js';
 
 const source=async name=>readFile(new URL('../'+name,import.meta.url),'utf8');
 test('A/B/C only change edge relief and always leave shell 100% transparent',()=>{
@@ -16,7 +16,7 @@ test('A/B/C only change edge relief and always leave shell 100% transparent',()=
       assert.equal(x.control,x.trigger);
       assert.equal(x.controlAlpha,CONTROL_PALETTE.neutralAlpha);
       assert.equal(x.activeAlpha,CONTROL_PALETTE.activeAlpha);
-      assert.equal(x.controlStroke,CONTROL_PALETTE.border);
+      assert.equal(x.controlStroke,lookPalette('dualsense','ghost',scene).controlStroke);
     }
     assert.equal(a[0].edgeLight,0);
     assert.equal(a[0].edgeShadow,0);
@@ -26,8 +26,10 @@ test('A/B/C only change edge relief and always leave shell 100% transparent',()=
       assert.ok(a.every(x=>x[key]===a[0][key]),key+' differs across review looks');
   }
   const settings=['dark','light','mixed'].map(scene=>ghostReviewSettings('shadow',scene));
-  for(const key of ['control','cap','trigger','controlAlpha','activeAlpha','controlStroke','controlStrokeAlpha','glyph','glyphAlpha'])
+  for(const key of ['controlAlpha','activeAlpha','controlStrokeAlpha','glyphAlpha'])
     assert.ok(settings.every(x=>x[key]===settings[0][key]),'Backdrop must not change '+key);
+  assert.notEqual(settings[0].control,settings[1].control);
+  assert.notEqual(settings[0].glyph,settings[1].glyph);
   const idle=controlSurfaceState(settings[0],0);
   const active=controlSurfaceState(settings[0],1);
   assert.equal(idle.fill,CONTROL_PALETTE.neutralFill);
@@ -63,6 +65,6 @@ test('comparison uses original SVGs with correct independent input states',async
   assert.ok(!html.includes('Gehaeusefarbe'));
   // The moving RIM cannot have any overlapping fill beneath the neutral
   // center: motion and L3 click must remain independently visible.
-  assert.match(style,/paint\(outer,'fill',solid\?mixColor\(colors\.control,PRESS_WHITE,ring\):'none'\)/);
-  assert.match(style,/mixColor\(colors\.control,PRESS_WHITE,ring\)/);
+  assert.match(style,/paint\(outer,'fill',solid\?mixColor\(colors\.control,colors\.activeColor\|\|PRESS_WHITE,ring\):'none'\)/);
+  assert.match(style,/mixColor\(colors\.control,colors\.activeColor\|\|PRESS_WHITE,ring\)/);
 });
