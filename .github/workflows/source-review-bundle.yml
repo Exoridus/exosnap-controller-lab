@@ -25,6 +25,9 @@ jobs:
           rm .github/review-delta-{1,2,3}.py .github/workflows/source-review-bundle.yml
           git add -A
           test "$(git write-tree)" = c25280acb407dc01db01ad9f38959949328490c8
+          # GITHUB_TOKEN writes source only. Workflow edits use the authenticated connector.
+          git restore --source=HEAD --staged --worktree .github/workflows
+          test -z "$(git diff --cached --name-only -- .github/workflows)"
       - name: Verify final source
         run: |
           npm ci --ignore-scripts --no-audit --no-fund
