@@ -34,14 +34,19 @@ test('2D reapplication cache changes if only pressed color changes; SVG Press bl
   assert.equal(resolve2DPaint(blue,'dark').pressedBlue,'#79bdff');
 });
 
-test('single real comparison grid uses four switchable rows and separate 2D/3D color controls',()=>{
+test('main comparison uses white feedback and fixed authored 2D with separate active colors',()=>{
   const html=fs.readFileSync(new URL('../pbr-lab.html',import.meta.url),'utf8');
   const js=fs.readFileSync(new URL('../pbr-lab.js',import.meta.url),'utf8');
   assert.ok(!/<iframe\b/i.test(html));
-  for(const key of keys)assert.match(html,new RegExp('data-look="'+key+'"'));
-  assert.match(html,/id="color2D"/);
+  assert.deepEqual([...html.matchAll(/data-look="([^"]+)"/g)].map(m=>m[1]),[]);
+  assert.match(html,/Aktiv: Weiß/);
+   assert.match(html,/id="color2D"/);
   assert.match(html,/id="color3D"/);
-  assert.match(js,/recipeFor2D\(variant\.key\)/);
+  assert.match(js,/paintPolished2D\(ref,'ghost',sceneName/);
+  assert.doesNotMatch(js,/recipeFor2D|applyMaterialAppearance/);
+  const flatPaint=js.split('function updateFlatReferences(){')[1].split('function makeScene(){')[0];
+  assert.match(flatPaint,/flatAppearanceKey\(input,activeColors\.color2D\)/);
+  assert.doesNotMatch(flatPaint,/state\.mix|recipeFor3D/);
   assert.match(js,/recipeFor3D\(variant\.key\)/);
   assert.match(js,/activeColors\.edit\('2d'/);
   assert.match(js,/activeColors\.edit\('3d'/);

@@ -1,65 +1,36 @@
-# ExoSnap Controller3D Lab – GitHub Pages / Screenshot-Historie
+# ExoSnap Controller Lab — Abschlussvergleich
 
-**Generic Pro v1:** 23 original authored 3D-OBJ parts (`assets/GenericPro`), paired with the existing 2D generic layout. Browser-smoke and neutral/pressed screenshots are mandatory in CI. The existing cleared core models remain selectable; Xbox Series / Steam Controller 2026 are not misrepresented as cleared.
+[Lab öffnen](https://exoridus.github.io/exosnap-controller-lab/pbr-lab.html) · [Bildnachweise und Verlauf](https://exoridus.github.io/exosnap-controller-lab/screenshots.html) · [Qt-Handoff und genaue Parameter](docs/CONTROLLER_CONSOLIDATION.md)
 
+Das Lab zeigt eine Original-3D-Darstellung mit weißem Aktivfeedback und eine unabhängige transparente 2D-Ansicht. Jede Reihe hat drei Hintergründe: dunkel, hell und gemischt.
 
-**Live:** [Controller Lab](https://exoridus.github.io/exosnap-controller-lab/) · [Screenshot-Historie](https://exoridus.github.io/exosnap-controller-lab/screenshots.html). Veröffentlichung per GitHub Actions nach erfolgreichen Tests und echten WebGL2-Aufnahmen.
+## Start und Bedienung
 
-- **Start:** `npm start` → `http://127.0.0.1:8792/` (ein 6-Spalten-Grid, vier Looks, 2D/3D).
-- **Setup:** [GITHUB_PAGES_SETUP.md](GITHUB_PAGES_SETUP.md).
-- **Aktuelle und alte Screenshots:** `/screenshots.html` nach erfolgreichem Pages-Deploy; historische Bilder im Branch `visual-history`, unter der Quell-SHA.
-- **CI:** `.github/workflows/pages-and-screenshots.yml` – Tests → echte Chromium-WebGL-Aufnahmen → Versionsarchiv → Pages.
-- **Rendering-Nachweis:** Die CI erzeugt und archiviert echte WebGL2-Screenshots (neutral/pressed) im Branch [`visual-history`](https://github.com/Exoridus/exosnap-controller-lab/tree/visual-history). Ein Screenshot belegt Rendering, aber noch keine visuelle Qualitätsfreigabe.
+Node.js ≥ 20: `npm ci`, danach `npm start`. Unter Windows kann `start.cmd` verwendet werden. `http://127.0.0.1:8792/` öffnet `pbr-lab.html`; die freigegebenen Modelle und die HDR-Lichtprobe liegen im Repository.
 
----
+- **3D · Weiß:** Eine einzige, quelldatengetreue 3D-Reihe mit weißem Aktivfeedback. Die frühere Blauweiß-Vergleichsreihe wurde entfernt.
+- **Materialmix — nur 3D:** 0 % bewahrt die deckende Darstellung; 100 % reduziert das Gehäuse auf 0,10 und neutrale Eingabeflächen auf 0,25 Alpha. Die 2D-Reihe bleibt unverändert.
+- **2D — Transparent:** Original-SVG-Pfade, neutrale Eingabeflächen mit 0,26 Alpha und aktive weiße Flächen mit 0,40. Äußere und innere Gehäusekonturen, Controls und Symbole haben dieselbe Farbregel pro Hintergrund. Auf Hell und Gemischt erscheinen graue statt schwarze Zusatzkonturen. Das SVG enthält seitliche Sicherheitsränder; Verzierungen erhalten kein Eingabefeedback.
+- **Eingaben:** Einzelne Tasten, beide analogen Trigger, Stick-Bewegung, L3/R3, alle Tasten oder ein Standard-Gamepad lassen sich vergleichen. Die 2D-Sticks können direkt gezogen werden; Bewegung und Klick bleiben unabhängig.
+- **Kamera und Größe:** Gemeinsame Kameraposition für 3D; 240, 320 oder 480 Pixel pro Feld. Das Mausrad über 2D/3D zoomt, Shift + Mausrad scrollt horizontal. Das 2D-SVG folgt dem Zoom, bleibt aber frontal.
+- **Aktivfarben & Qt-Parameter:** Eigene Farben für 2D/3D mit optionaler Kopplung; Sync ist standardmäßig aktiv. Der Download enthält die tatsächlich gewählten Parameter und benennt offene native Arbeit.
 
-# ExoSnap Controller3D Lab v40 – Kontrast, Verdeckung und korrektes 6er-Grid
+## Darstellung und Ressourcen
 
-**Start:** `start.cmd` oder `npm start`; `http://127.0.0.1:8792/` öffnet direkt das vierzeilige Materialvergleichs-Grid. Das Modell DualSense ist offline enthalten.
+Sichtbare Trigger werden nicht mehr anhand eines Kamerawinkels vollständig ausgeblendet. Der Tiefentest entscheidet über ihre sichtbaren Teile. Verdeckte Schultertasten erhalten gestrichelte Konturen mit dunkler Gegenkontur und eigenem Eingabefeedback. Die bewegliche Stick-Hierarchie kippt Kappe und Schaft gemeinsam in die angezeigte Richtung. Face-, kleinere quellgetreue D-Pad-Prägungen und unterstützte Create/Options-Symbole kommen aus den originalen SVG-Pfaden.
 
-**Navigation und Zoom:** Sechs Spalten pro Look (3D Dunkel/Hell/Mixed, 2D Dunkel/Hell/Mixed); horizontales Scrollen ist ausdrücklich erlaubt. Das Mausrad über **jedem** 2D-/3D-Feld zoomt und verhindert vertikales Seitenscrollen an dieser Stelle. **Shift + Mausrad** scrollt innerhalb des Grids horizontal. Außerhalb der Viewer kann die Seite normal vertikal scrollen. Keine zusätzlichen Labels/Cards.
+Ein originales Rig, ein WebGL-Kontext, eine Kamera und eine HDR-Probe versorgen die Ansicht. Das Modell wird einmal gerendert; dieselbe GPU-Textur wird auf die drei Hintergründe gelegt. Änderungen werden bedarfsgesteuert gezeichnet. Ein 3D-Materialwechsel zeichnet das unveränderte 2D-SVG nicht neu.
 
-**Neu:**
-- `silhouette-composite.js`: jedes 3D-Modell wird pro Look weiterhin nur einmal als transparente GPU-Textur gerendert; beim Einblenden erhalten Dark/Light/Mixed verschiedene dunkle/helle Außenkanten. Auf hellen Hintergründen wird nur schwach transparentes Material dezent abgedunkelt, nicht der voll deckende blaue Press-Zustand. Kein CPU-Readback. Der Compositor benötigt einen eigenen kleinen Fragment-Shader; dieser ist nach Qt Quick zu portieren.
-- `ghost-depth-policy.js`: bewegliche Kappen und Schäfte schreiben Tiefe **vor** den Sockeln; in Ghost/Outline werden hintere Trigger/Paddles frontal als vollständige Flächen ausgeblendet, während optionale depth-getestete gestrichelte Hints bleiben. Seiten-/Rückansichten geben die echten Teile wieder frei.
-- `control-glyphs.js`: echte 3D-Planes mit vier Sony-Tastensymbolen auf der Original-DualSense-Geometrie, ohne Änderung ihrer OBJ-Dreiecke.
-- 2D-SVGs mit 86 % Panelgröße und einem auf Hell/Mixed angepassten Flächenkontrast. Gemeinsamer Zoom auch für das flache SVG, das nicht dem 3D-Orbit folgt.
-- Vier Looks und separate 2D-/3D-Press-Color-Picker bleiben erhalten.
+`shareEquivalentControlGeometry` teilt nur exakt nachgewiesene Geometrien und erhält individuelle Materialien und Bewegungen. Gemeinsame Buffer sparen Speicher; kompatible Stick-Instanzen sparen zusätzlich Draw Calls. Unterschiedliche Eingabe-/Materialzustände wechseln für das betroffene Paar zu getrennten Meshes. `node tools/audit-geometry-reuse.mjs --json` gibt die tatsächlichen Einsparungen pro Modell aus. Face- und D-Pad-Teile werden nicht aufgrund bloßer Ähnlichkeit vereinheitlicht.
 
-**Qualitätsgrenze:** Frühere lokale Browserprüfungen dieser Chat-Umgebung scheiterten mit `ERR_BLOCKED_BY_ADMINISTRATOR`. Die GitHub-CI erzeugt inzwischen echte Chromium-WebGL2-Bildnachweise; eine ästhetische 3D-Freigabe oder native Qt-Quick-3D-Parität folgt daraus noch nicht. Für den Qt-Port siehe `QT_V40_COMPOSITOR.md`.
+Der Qt-Port verwendet einen kleinen, rendererneutralen Materialvertrag. Das Lab installiert keinen zusätzlichen Fresnel-Patch auf den PBR-Materialien. Die verdeckten Linien und der Hintergrund-Compositor benötigen dennoch eine eigene native Umsetzung und Bildprüfung; `nativeValidated` bleibt `false`. Details stehen im [aktuellen Handoff](docs/CONTROLLER_CONSOLIDATION.md).
 
----
+## Prüfung und Veröffentlichung
 
-# ExoSnap Controller3D Lab v39 – vier echte Rendering-Looks
+`npm run verify` prüft Syntax und die vollständige Node-Suite. `tools/capture-pages.mjs` erzeugt echte Chromium-WebGL2-/SVG-Bilder und prüft zusätzlich Mix-Unabhängigkeit, einzelne verdeckte Eingaben, Originalsymbole, Kamerapositionen und Aktivfarben. Ein Fehler verhindert die Pages-Veröffentlichung. Bilder sind Rendernachweise; die finale ästhetische Auswahl trifft der Nutzer.
 
-**Windows:** ZIP vollständig entpacken, `start.cmd` öffnen; `http://127.0.0.1:8792/` startet automatisch `pbr-lab.html`.
-**Alternativ:** Node.js ≥ 20 → `npm start`.
+Der Workflow `.github/workflows/pages-and-screenshots.yml` archiviert erfolgreiche Aufnahmen dauerhaft im Branch `visual-history` unter ihrer Quell-SHA und veröffentlicht anschließend Pages. Der Arbeitsbranch führt alle Prüfungen mit Artefakten aus. GitHub Pages wird aufgrund der vorhandenen Umgebungsschutzregeln nur durch eine freigegebene Übernahme nach `main` veröffentlicht. Siehe auch [Pages-Setup](GITHUB_PAGES_SETUP.md).
 
-## Vergleichsfläche
+**Modelle und Lizenzen:** Generic Pro enthält 23 eigene OBJ-Teile und verwendet das vorhandene generische 2D-Layout. Nur freigegebene Kernmodelle sind auswählbar; Xbox Series / Steam Controller 2026 werden nicht als freigegebene 3D-Modelle ausgegeben. Lizenzprüfung und Originaldateien bleiben Bestandteil des Repositories.
 
-Ein einziges Grid, keine iFrames, vier einzeln abschaltbare Look-Reihen. Jede Reihe zeigt 3D Dunkel / Hell / Gemischt direkt neben 2D Dunkel / Hell / Gemischt. Gemeinsamer Materialmix (Standard 70 %), Kamera, Gamepad, Stickpose, Press-All. Nur ein Three.js-WebGL-Kontext und ein originales OBJ-Rig.
-
-Die vier Look-Schalter sind bewusst klein gehalten; ihre Namen stehen im Hover-Titel:
-
-- **A – Environment Solid:** Originalfarben, deckendes IBL-Material, normale PBR-Reflexionen, keine Szenenlampen.
-- **B – Environment Ghost:** Matte transparente Oberflächen, klarere kühle Controls, dieselbe HDR-Lichtprobe, keine Szenenlampen.
-- **C – Outline Ghost:** Unlit, minimale Shell-Deckkraft, schmale helle/dunkle backface-Silhouette ohne Shader-Postprocessing.
-- **D – Hybrid Identity:** Erhält Originalfarbzonen wesentlich stärker, halbtransparent mit kontrollierter kühler Control-Tönung.
-
-**Aktivfarbe:** Unabhängige Color Picker `2D aktiv` und `3D aktiv`. Standardmäßig **nicht gekoppelt**; die Checkbox **Sync** koppelt sie auf ausdrücklichen Wunsch. 2D-Pressed-Paint wird bei einer Farbänderung trotz unverändertem Press-State neu gezeichnet. Der 3D-Pressed-State benutzt direkt den neuen 3D-Wert, mit eigenem Emissionston. Materialmix-Updates regenerieren keine Modellgeometrie.
-
-## Technischer Rahmen
-
-Eine einzige originale 256×128 Radiance-HDR-Datei `assets/studio-neutral.hdr` beleuchtet die drei PBR-Looks über `Scene.environment`. Keine `PointLight`-/`DirectionalLight`-/`AmbientLight`-Objekte im Vierer-Vergleich. Für Qt Quick 3D enthält `qt-quick3d-port/EnvironmentProbe.qml` die passende `SceneEnvironment.lightProbe`-Referenz; Licht- und Farbskalen beider Renderer müssen bei der Portierung visuell kalibriert werden.
-
-Der Three.js-Decoder `hdr-probe.js` liest das originale HDR-Asset direkt; es wird **kein zusätzlicher Download** benötigt. Das Unlit-Outline nutzt zwei zusätzliche Backface-Draws pro sichtbarem Shell-Mesh und teilt sich dessen BufferGeometry. Rear-Hints werden ausschließlich bei Ghost/Outline aktiviert, sind gestrichelt und depth-getestet.
-
-Three.js-Renderer: echtes WebGL2, MSAA 4× im Offscreen-Ziel (wenn unterstützt), DPR max. 1,75; ein 3D-Render pro Look + 3 GPU-Blits für die drei Hintergrundansichten. Die 2D-Panels rendern unveränderte Original-SVGs mit eigenen Materialfarben.
-
-## Checks und Grenzen
-
-`npm run verify` führt die gesamte Node-Test-Suite aus. `tests/v39-four-looks.test.mjs`, `v39-color-controls.test.mjs`, `v39-rear-hints.test.mjs` und `v39-hdr-probe.test.mjs` prüfen insbesondere die neuen Zustands-/Beleuchtungs-/Importverträge. 
-
-**Keine visuelle 3D-Freigabe:** Lokale Navigation in den verfügbaren Chromium-Tests schlägt mit `ERR_BLOCKED_BY_ADMINISTRATOR` fehl. Ohne echtes WebGL-Bild wird weder die finale 3D-Ästhetik noch native Qt-Quick-3D-Parität behauptet. Die v39-Looks sind ein implementierter, reproduzierbarer Vergleichsstand, keine endgültige Produktionsabnahme.
-
-Die alte technische v28–v38-Hauptvorschau bleibt via `index.html?layout=dualsense` erreichbar. Archivseiten bleiben im ZIP, sind aber nicht Bestandteil des Startmenüs.
+Die technische ältere Vorschau bleibt unter `index.html?layout=dualsense` erreichbar. Frühere Vergleichsrezepte sind erhalten; ihre Beschreibung steht in den [historischen v39/v40-Notizen](docs/ARCHIVE_V39_V40.md).

@@ -1,5 +1,7 @@
 # ExoSnap v40 – Qt Quick 3D / Three.js parity note
 
+Historical v40 notes. The current Lab contract and remaining native work are in [Controller Consolidation](docs/CONTROLLER_CONSOLIDATION.md).
+
 Source: `silhouette-composite.js`, `ghost-depth-policy.js`, `control-glyphs.js`, `pbr-recipes.js`, plus the actual original OBJ controller mesh hierarchy.
 
 ## Rendering contract

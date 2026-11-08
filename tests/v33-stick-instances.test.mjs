@@ -11,8 +11,13 @@ test('independent L3 states restore individual geometries rather than corrupt in
  const rig=await loadNativeRig(CONTROLLERS[0],read);try{
  instantiateStickPairs(rig);const recipe=resolveHeroRecipe('ghost',1);
  applyPbrRecipeToRig(rig,recipe,{...poseForStickDemo('move'),allPressed:false});
- assert.ok(rig.stickInstances.every(group=>group.instance.visible));
+ assert.deepEqual(rig.stickInstances.filter(group=>group.instance.visible).map(group=>group.role),['stick-stem','stick-cap']);
+ assert.ok(rig.stickInstances.find(group=>group.role==='stick-pivot').originals.every(mesh=>mesh.visible));
+ assert.ok(rig.stickInstances.filter(group=>group.instance.visible).every(group=>group.instance.material===group.originals[0].material));
  applyPbrRecipeToRig(rig,recipe,{left:normalizeStickInput({x:0,y:0,click:true}),right:normalizeStickInput(),allPressed:false});
- assert.ok(rig.stickInstances.every(group=>!group.instance.visible && group.originals.every(m=>m.visible)));
+ assert.deepEqual(rig.stickInstances.filter(group=>group.instance.visible).map(group=>group.role),['stick-stem','stick-pivot']);
+ const cap=rig.stickInstances.find(group=>group.role==='stick-cap');
+ assert.ok(!cap.instance.visible&&cap.originals.every(mesh=>mesh.visible));
+ assert.notEqual(cap.originals[0].material.color.getHexString(),cap.originals[1].material.color.getHexString());
  }finally{disposeNativeRig(rig)}
 });

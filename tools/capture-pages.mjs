@@ -8,6 +8,7 @@ import {mkdir,writeFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import path from 'node:path';
 import {verifyRenderedState} from './visual-capture-contract.mjs';
+import {captureConsolidated} from './capture-consolidated.mjs';
 const args=process.argv.slice(2);
 const arg=(name,def)=>{const i=args.indexOf(name);return i<0?def:args[i+1]};
 const base=arg('--base',process.env.CAPTURE_BASE_URL||'http://127.0.0.1:8792/');
@@ -19,10 +20,11 @@ const runtimeErrors=[];
 try{
   browser=await playwright.chromium.launch({
     headless:true,channel:process.env.EXO_BROWSER_CHANNEL||'chromium',
+    executablePath:process.env.EXO_BROWSER_EXECUTABLE||undefined,
     args:['--use-gl=angle','--use-angle=swiftshader-webgl','--enable-unsafe-swiftshader','--disable-dev-shm-usage'],
     timeout:60000
   });
-  const page=await browser.newPage({viewport:{width:2170,height:1250},deviceScaleFactor:1,reducedMotion:'reduce'});
+  const page=await browser.newPage({viewport:{width:1200,height:1120},deviceScaleFactor:1,reducedMotion:'reduce'});
   page.on('pageerror',error=>runtimeErrors.push('pageerror: '+error.message));
   page.on('console',message=>{
     if(message.type()!=='error')return;
@@ -36,20 +38,20 @@ try{
   await page.goto(new URL('pbr-lab.html',base).href,{waitUntil:'domcontentloaded',timeout:60000});
   await page.waitForFunction(()=>
     document.body.dataset.renderReady==='three-rendered' &&
-    document.querySelectorAll('.variant:not([hidden]) .sample--flat svg').length===12,
+    document.querySelectorAll('.sample--flat svg').length===3,
     {timeout:90000});
   const shotProof=async()=>{
     // Model switching renders WebGL before all independent 2D SVG loads finish.
     // Wait for the *paired* views instead of racing asynchronous SVG loading.
     await page.waitForFunction(()=>
       document.body.dataset.renderReady==='three-rendered' &&
-      document.querySelectorAll('.variant:not([hidden]) .sample--flat svg').length===12,
+      document.querySelectorAll('.sample--flat svg').length===3,
       {timeout:60000});
     const state=await page.evaluate(()=>({
       status:document.body.dataset.renderReady,
       revision:Number(document.body.dataset.renderRevision||0),
       sampleCount:document.querySelectorAll('.variant:not([hidden]) .sample:not(.sample--flat)').length,
-      flatCount:document.querySelectorAll('.variant:not([hidden]) .sample--flat svg').length,
+      flatCount:document.querySelectorAll('.sample--flat svg').length,
       drawStats:window.__exoPbrLab?.drawStats,
       nontransparentPixels:(()=>{
         const lab=window.__exoPbrLab;const target=lab?.renderTarget;const renderer=lab?.renderer;
@@ -62,7 +64,7 @@ try{
       webglVersion:(()=>{const gl=document.querySelector('#threeCanvas')?.getContext('webgl2');return gl?.getParameter(gl.VERSION) || null})(),
     }));
     verifyRenderedState(state);
-    if(state.flatCount!==12)throw Error(`Expected 12 real authored SVG panels; got ${state.flatCount}`);
+    if(state.flatCount!==3)throw Error(`Expected 3 real authored SVG panels; got ${state.flatCount}`);
     if(!state.webglVersion)throw Error('Screenshot was not produced with a real WebGL2 context');
     if(runtimeErrors.length)throw Error(runtimeErrors.join('\n'));
     return state;
@@ -84,6 +86,7 @@ try{
     before=proof;
   }
   if(images[0].sha256===images[1].sha256)throw Error('Neutral and pressed-state screenshots are identical: input response not verified');
+  const consolidated=await captureConsolidated(page,{output,images,shotProof});
   // A separate, actual GameCube render validates model switching, model-specific
   // A/B/X/Y button legends and the source-authored purple/green/red/yellow palette.
   const previousRevision=before.revision;
@@ -98,7 +101,7 @@ try{
   const cube=await shotProof();
   const artwork=await page.evaluate(()=>{
     const marks=[];window.__exoPbrLab?.model?.group?.traverse(obj=>{
-      if(obj.userData?.artworkSource==='2d-svg')marks.push(obj.userData.buttonGlyph);
+      if(obj.userData?.artworkSource==='2d-svg'&&obj.userData.buttonGlyph)marks.push(obj.userData.buttonGlyph);
     });return marks;
   });
   if(artwork.sort().join(',')!=='A,B,X,Y')
@@ -116,7 +119,7 @@ try{
   await page.waitForFunction(previous=>
     document.body.dataset.renderReady==='three-rendered' &&
     window.__exoPbrLab?.model?.model?.id==='GenericPro' &&
-    window.__exoPbrLab?.flatReferences?.size===12 &&
+    window.__exoPbrLab?.flatReferences?.size===3 &&
     Number(document.body.dataset.renderRevision||0)>previous,
     neutralPrevious,{timeout:60000});
   let genericProof=await shotProof();
@@ -161,7 +164,7 @@ try{
     await page.waitForFunction(({id,previous})=>
       document.body.dataset.renderReady==='three-rendered' &&
       window.__exoPbrLab?.model?.model?.id===id &&
-      window.__exoPbrLab?.flatReferences?.size===12 &&
+      window.__exoPbrLab?.flatReferences?.size===3 &&
       Number(document.body.dataset.renderRevision||0)>=previous,
       {id,previous},{timeout:60000});
     const proof=await shotProof();
@@ -549,6 +552,8 @@ try{
           hasLight: Boolean(edge?.querySelector('[result="edge-light"]')),
           hasShadow: Boolean(edge?.querySelector('[result="edge-shadow"]')),
           glyphFilter: getComputedStyle(face.group.querySelector('.glyph')).filter,
+          glyphContrast: [...ghost.reference.svg.querySelectorAll('[data-exo-control-contrast]')]
+            .some(filter=>getComputedStyle(face.group.querySelector('.glyph')).filter.includes('#'+filter.id)),
           solidFilter: getComputedStyle(solidOutline).filter,
           clipped: edge?.getAttribute('width'),
           geometryCopies: ghost.reference.svg.querySelectorAll('[data-exo-stick-click],[data-exo-polish-ring-mask]').length,
@@ -559,7 +564,8 @@ try{
       assert2D(state.activeFilters,expectLight||expectShadow?1:0,'No residual filter at zero');
       assert2D(state.hasLight,expectLight,'Light channel only when requested');
       assert2D(state.hasShadow,expectShadow,'Shadow channel only when requested');
-      assert2D(state.glyphFilter,'none','No per-glyph glow/edge pass');
+      if(scene==='mixed')assert2D(state.glyphContrast,true,'Mixed glyph keeps shared grayscale counter-edge');
+      else assert2D(state.glyphFilter,'none','Neutral glyph has no silhouette relief or active glow');
       assert2D(state.solidFilter,'none','Solid baseline remains unfiltered');
       assert2D(state.geometryCopies,0,'No synthetic stick geometry');
       if(state.clipped&&state.clipped!=='116%')
@@ -594,31 +600,43 @@ try{
     ['pure','soft','shadow'].every(k=>document.querySelector('.review-row[data-look="'+k+'"]')),
     null,{timeout:60000});
   await waitGhost();
-  const ghostState=await ghost.evaluate(()=>{
+  const ghostState=await ghost.evaluate(async()=>{
     const state=window.__exoGhostReview;
+    const response=await fetch(state.items[0].reference.layout.source);
+    if(!response.ok)throw Error('Original SVG unavailable for decorative path verification');
+    const original=new DOMParser().parseFromString(await response.text(),'image/svg+xml');
+    const originalPaths=[...original.querySelector('#body').children].filter(node=>
+      ['path','ellipse','rect'].includes(node.localName)&&node.id!=='outline-strong');
+    const originalMute=original.querySelector('#btn-mute-face');
     const results=[];
     for(const item of state.items){
       const paths=[...item.reference.bodyShape?.children||[]].filter(node=>
         ['path','ellipse','rect'].includes(node.localName)&&
         node.id!=='outline-strong'&&!node.id.endsWith('-outline-strong'));
-      const notTransparent=paths.filter(p=>{
-        const st=getComputedStyle(p);
-        return st.fill!=='none'&&Number(st.fillOpacity)>.0001;
+      const changedDecoration=paths.filter(p=>{
+        const source=originalPaths.find(n=>n.localName===p.localName&&
+          ['d','x','y','cx','cy','rx','ry','width','height','transform']
+            .every(attr=>n.getAttribute(attr)===p.getAttribute(attr)));
+        return !source||p.getAttribute('style')!==source.getAttribute('style');
       });
+      const mute=item.reference.svg.querySelector('[id$="-btn-mute-face"]');
       const touchpad=item.reference.controls.find(c=>c.layer.id==='btn-touchpad');
       const touchpadFilled=[...touchpad?.group.querySelectorAll('path,rect,ellipse')||[]]
         .filter(p=>!p.classList.contains('glyph')&&getComputedStyle(p).fill!=='none'&&
           Number(getComputedStyle(p).fillOpacity)>.0001);
       results.push({look:item.look,scene:item.scene,
-        body:notTransparent.map(p=>({id:p.id,className:p.getAttribute('class'),
+        body:changedDecoration.map(p=>({id:p.id,className:p.getAttribute('class'),
           fill:getComputedStyle(p).fill,alpha:getComputedStyle(p).fillOpacity,
           style:p.getAttribute('style')?.slice(0,180)})),
+        bodyCount:paths.length,sourceBodyCount:originalPaths.length,
+        muteStyle:mute?.getAttribute('style'),sourceMuteStyle:originalMute?.getAttribute('style'),
         touchpad:touchpadFilled.map(p=>p.id)});
     }
     return results;
   });
-  if(ghostState.some(r=>r.body.length||r.touchpad.length!==1))
-    throw Error('Ghost A/B/C: shell must be transparent; Touchpad must be one visible control: '+JSON.stringify(ghostState));
+  if(ghostState.some(r=>r.body.length||r.bodyCount!==r.sourceBodyCount||
+      r.muteStyle!==r.sourceMuteStyle||r.touchpad.length!==1))
+    throw Error('Ghost A/B/C: complete authored decorations must retain paint; Touchpad must be one visible control: '+JSON.stringify(ghostState));
   // Explicit shape contract: source-authorized R1/L1 surface, not its
   // decorative open rim, must be the fill that users actually see.
   const pressureRoles=await ghost.evaluate(()=>{
@@ -634,7 +652,7 @@ try{
     });
   });
   for(const role of pressureRoles){
-    if(role.pressure?.visible!=='1'||role.pressure.fill!=='rgb(168, 185, 199)'||
+    if(role.pressure?.visible!=='1'||role.pressure.fill!=='rgb(255, 255, 255)'||
       Math.abs(Number(role.pressure.alpha)-.26)>.001||role.other.some(x=>x!=='none'))
       throw Error('Authored L1/R1/trigger SURFACE must be painted, not open outline: '+
         JSON.stringify(role));
@@ -669,10 +687,13 @@ try{
     }
     return data;
   });
-  const first=neutralControls[0];
   for(const panel of neutralControls){
+    const sceneBaseline=neutralControls.find(x=>x.scene===panel.scene);
+    const sceneInk=panel.scene==='light'?'rgb(0, 0, 0)':'rgb(255, 255, 255)';
+    if(panel.values.face.fill!==sceneInk||Math.abs(panel.values.face.alpha-.26)>.001)
+      throw Error('Neutral controls lost achromatic scene contrast or .26 alpha: '+JSON.stringify(panel));
     for(const [name,actual] of Object.entries(panel.values)){
-      const expected=first.values.face;
+      const expected=sceneBaseline.values.face;
       // Trigger pressure and its source-authored structural border are
       // separate SVG elements. Compare the material, not a deliberately
       // absent duplicate stroke over the pressure texture.
@@ -687,8 +708,9 @@ try{
         throw Error('Inconsistent neutral '+name+' on '+panel.look+'/'+panel.scene+': '+
           JSON.stringify({actual,expected}));
     }
-    if(JSON.stringify(panel.glyph)!==JSON.stringify(first.glyph))
-      throw Error('Face glyph changed across backgrounds: '+JSON.stringify(panel));
+    if(panel.glyph?.color!==sceneInk||Math.abs(Number(panel.glyph?.alpha)-.86)>.001||
+       JSON.stringify(panel.glyph)!==JSON.stringify(sceneBaseline.glyph))
+      throw Error('Face glyph differs from the shared achromatic palette within its scene: '+JSON.stringify(panel));
   }
 
   // Pixel-level proof of visible control fills. A computed SVG style is
@@ -774,13 +796,18 @@ try{
         const style=p?getComputedStyle(p):null;
         return {id,fill:style?.fill,alpha:style?.fillOpacity};
       });
-      return {look:item.look,scene:item.scene,controls};
+      return {look:item.look,scene:item.scene,controls,
+        muteStyle:item.reference.svg.querySelector('[id$="-btn-mute-face"]')?.getAttribute('style')};
     });
   });
-  for(const panel of pressedControls)
+  for(const panel of pressedControls){
+    const neutral=ghostState.find(x=>x.look===panel.look&&x.scene===panel.scene);
+    if(panel.muteStyle!==neutral.muteStyle)
+      throw Error('Decorative mute received input-dependent paint: '+JSON.stringify(panel));
     for(const ctl of panel.controls)
       if(ctl.fill!=='rgb(255, 255, 255)'||Math.abs(Number(ctl.alpha)-.40)>.001)
         throw Error('Pressed 2D control is not uniformly translucent white: '+JSON.stringify({panel:panel.scene,look:panel.look,...ctl}));
+  }
   await ghost.locator('#allControls').uncheck();
   if(images.at(-1).sha256===images.find(x=>x.file==='2d-ghost-review-neutral.png').sha256)
     throw Error('Ghost review input activity produced identical pixels');
@@ -876,9 +903,9 @@ try{
   await sourceReviewPage.close();
 
   const manifest={revision,capturedAt:new Date().toISOString(),url:new URL('pbr-lab.html',base).href,
-    content:'Real Three.js/WebGL2 + original controller OBJ + authored SVG',looks:['solid','ghost','outline','identity'],
+    content:'Real Three.js/WebGL2 + original controller OBJ + authored SVG',looks:['white','cool'],
     viewports:['3D dark','3D light','3D mixed','2D dark','2D light','2D mixed'],images,
-    scenarios:{A:{genericModel:'GenericPro',parts:genericPartState.parts,neutralAndPressed:true},
+    scenarios:{consolidated,A:{genericModel:'GenericPro',parts:genericPartState.parts,neutralAndPressed:true},
       B:{coreSmoke,notCleared:['XboxSeries','SteamController2026'],fullTierABComplete:false}},
     visualAcceptance:'Pending human inspection; capture proves rendering, not visual quality'};
   await writeFile(path.join(output,'capture-manifest.json'),JSON.stringify(manifest,null,2)+'\n');

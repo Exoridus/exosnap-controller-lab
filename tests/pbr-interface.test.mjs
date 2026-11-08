@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 const html=await readFile(new URL('../pbr-lab.html',import.meta.url),'utf8');
 const js=await readFile(new URL('../pbr-lab.js',import.meta.url),'utf8');
-test('final PBR lab has one slider and exactly the two intended look rows',()=>{
+test('final PBR lab has one source 3D look and fixed 2D across three scenes',()=>{
   // Material opacity still has exactly one slider; the additional range input
   // is solely an explicit L2/R2 analog input simulator, not another material knob.
   assert.equal((html.match(/id="materialMix"/g)||[]).length,1);
@@ -11,12 +11,15 @@ test('final PBR lab has one slider and exactly the two intended look rows',()=>{
   assert.equal((html.match(/type="range"/g)||[]).length,2);
   assert.ok(html.includes('id="materialMix"'));
   assert.ok(html.includes('id="gallery"'));
-  assert.ok(js.includes('const variants=HERO_VARIANTS'));
+  assert.ok(js.includes('const variants=LAB_VARIANTS'));
   assert.ok(!html.includes('variants=all'));
   assert.ok(!html.includes('<iframe'));
-  assert.ok(html.includes('data-look="solid"'));
-  assert.ok(html.includes('data-look="ghost"'));
+  assert.ok(html.includes('Aktiv: Weiß'));
+  assert.ok(!html.includes('Blauweiß'));
   assert.ok(js.includes("['dark','light','mixed']"));
+  assert.deepEqual([...html.matchAll(/data-look="([^"]+)"/g)].map(m=>m[1]),[]);
+  assert.ok(js.indexOf("flatCard.className='flat-reference'")>js.indexOf('for(const variant of variants)'));
+  assert.match(js,/flatReferences\.set\(scene,ref\)/);
 });
 test('one WebGL context and original OBJ model rig, no synthetic 3D previews',()=>{
   assert.equal((js.match(/new THREE\.WebGLRenderer\(/g)||[]).length,1);

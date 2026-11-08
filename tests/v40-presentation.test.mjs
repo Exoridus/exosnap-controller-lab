@@ -17,7 +17,7 @@ test('transparent front cap writes depth before fixed well and rear trigger stay
  assert.ok(depthPriority('housing','top_shell.obj')<depthPriority('trigger','left_trigger.obj'));
 });
 
-test('rear triggers do not paint complete controls through the front of ghost shell; actual rear view restores them',async()=>{
+test('physical depth tests preserve exposed trigger fragments at every view angle',async()=>{
  const rig=await loadNativeRig(CONTROLLERS[0],read);
  try{
   prepareGhostOcclusion(rig);
@@ -25,8 +25,9 @@ test('rear triggers do not paint complete controls through the front of ghost sh
   assert.ok(trigger,'native trigger present');
   const recipe=resolveHeroRecipe('ghost',.7);
   hideOccludedRearControls(rig,recipe,{yaw:0});
-  assert.equal(trigger.material.colorWrite,false);
-  assert.equal(trigger.material.depthWrite,false);
+  assert.equal(trigger.material.colorWrite,true);
+  assert.equal(trigger.material.depthWrite,true);
+  assert.equal(trigger.material.depthTest,true);
   hideOccludedRearControls(rig,recipe,{yaw:Math.PI});
   assert.equal(trigger.material.colorWrite,true);
   hideOccludedRearControls(rig,resolveHeroRecipe('solid',0),{yaw:0});
@@ -60,10 +61,10 @@ test('2D light and mixed material keeps structural lines and readable control fi
  assert.equal(light.pressedBlue,dark.pressedBlue);
 });
 
-test('6-column grid scrolls horizontally while wheel over any viewer zooms, not vertically scrolls',()=>{
+test('three-background grid scrolls horizontally while wheel over any viewer zooms',()=>{
  const css=fs.readFileSync(new URL('../pbr-lab.css',import.meta.url),'utf8');
  const js=fs.readFileSync(new URL('../pbr-lab.js',import.meta.url),'utf8');
- assert.match(css,/grid-template-columns:\s*repeat\(6,var\(--panel-width\)\)/);
+ assert.match(css,/grid-template-columns:\s*repeat\(3,var\(--panel-width\)\)/);
  assert.match(css,/overflow-x:\s*auto/);
  assert.match(js,/gallery\.addEventListener\('wheel'/);
  assert.match(js,/e\.target\.closest\('\.sample'\)/);

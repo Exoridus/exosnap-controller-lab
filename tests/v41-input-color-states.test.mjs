@@ -9,6 +9,7 @@ import {resolve2DPaint} from '../material-paint.js';
 import {ActiveColorState} from '../active-color-state.js';
 import {EXO_PALETTE,blendHexColor,stickSurfaceColor,triggerSurfaceColor} from '../palette.js';
 import {normalizeStickInput} from '../stick-activity.js';
+import {readStandardGamepad} from '../gamepad-input.js';
 
 const read=async url=>readFile(new URL('../'+url.replace(/^\.\//,''),import.meta.url),'utf8');
 const neutral=()=>normalizeStickInput();
@@ -87,7 +88,12 @@ test('browser lab has no invented focus input state and one explicit trigger sli
  assert.ok(html.includes('id="triggerPressure"'));
  assert.ok(html.includes('id="colorSync" checked'));
  assert.ok(js.includes('state.triggerPressure=Number(e.target.value)/100'));
- assert.ok(js.includes('pad.buttons?.[6]?.value'));
- assert.ok(js.includes('pad.buttons?.[7]?.value'));
+ assert.match(js,/const input=readStandardGamepad\(pad\)/);
+ assert.match(js,/triggers:\{left:input\.values\.get\('l2'\)\|\|0,right:input\.values\.get\('r2'\)\|\|0\}/);
+ const buttons=Array.from({length:17},()=>({pressed:false,value:0}));
+ buttons[6]={pressed:true,value:.35};buttons[7]={pressed:true,value:.72};
+ const live=readStandardGamepad({connected:true,mapping:'standard',buttons,axes:[0,0,0,0]});
+ assert.equal(live.values.get('l2'),.35);
+ assert.equal(live.values.get('r2'),.72);
  assert.ok(!html.includes('Focused')&&!html.includes('Fokussiert'));
 });

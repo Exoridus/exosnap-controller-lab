@@ -5,7 +5,7 @@ import {OBJLoader} from 'three/addons/loaders/OBJLoader.js';
 import {modelPartSemantics} from './model-semantics.js';
 import {controllerPartTransform} from './thumbstick-geometry.js';
 import {frontFaceTransform} from './model-orientation.js';
-import {makeFaceGlyph} from './control-glyphs.js';
+import {makeControlGlyph} from './control-glyphs.js';
 import {disposeSilhouette} from './pbr-silhouette.js';
 
 async function httpText(url){
@@ -65,7 +65,7 @@ export async function loadNativeRig(model, readText=httpText){
       meshes.push(o);
     });
     if(parsed.children.every(c=>!c.isMesh && !c.children?.some(d=>d.isMesh)))throw new Error(`OBJLoader returned no triangles: ${source.file}`);
-    const glyph=makeFaceGlyph(source.file,model.source,sourceBounds,model);
+    const glyph=makeControlGlyph(source.file,model.source,sourceBounds,model);
     if(glyph)parsed.add(glyph);
     holder.add(parsed);partMap.set(source.index,holder);parts.push({file:source.file,meta:source.meta,holder});
   }
@@ -94,19 +94,27 @@ export async function loadNativeRig(model, readText=httpText){
 export function disposeNativeRig(native){
   if(!native)return;
   disposeSilhouette(native);
-  const geometries=new Set(),materials=new Set();
+  const geometries=new Set(),materials=new Set(),instances=new Set();
   for(const m of native.meshes){
+    if(m.isInstancedMesh)instances.add(m);
     if(m.geometry)geometries.add(m.geometry);
     for(const mat of [m.material,m.userData.pbrMaterial,m.userData.unlitMaterial])if(mat)materials.add(mat);
   }
   for(const hint of native.rearHintLines||[]){
+    const fill=hint.userData.hiddenFill;
+    fill?.parent?.remove(fill);fill?.material?.dispose();
+    const outline=hint.userData.hiddenOutline;
+    outline?.parent?.remove(outline);outline?.material?.dispose();
     hint.parent?.remove(hint);
     hint.geometry?.dispose();hint.material?.dispose();
   }
   native.group.traverse(o=>{
-    if(!o.userData?.buttonGlyph)return;
+    if(!o.userData?.surfaceArtwork)return;
     o.geometry?.dispose();o.material?.map?.dispose();o.material?.dispose();
   });
+  // InstancedMesh owns GPU instanceMatrix/instanceColor attributes separately
+  // from its shared geometry and material. Its dispose event releases those.
+  for(const instance of instances)instance.dispose();
   for(const geometry of geometries)geometry.dispose();
   for(const material of materials)material.dispose();
   native.group.parent?.remove(native.group);

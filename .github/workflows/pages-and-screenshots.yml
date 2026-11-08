@@ -1,7 +1,7 @@
 name: Verify, capture real WebGL screenshots, publish Pages
 on:
   push:
-    branches: [main]
+    branches: [main, feat/controller-consolidation]
   workflow_dispatch:
 permissions:
   contents: write
@@ -36,7 +36,7 @@ jobs:
           git add assets/
           if ! git diff --cached --quiet; then
             git commit -m 'chore(assets): vendor verified MIT gamepad OBJ assets [skip ci]'
-            git push origin HEAD:main
+            git push origin HEAD:"${GITHUB_REF_NAME}"
           fi
           echo "ASSET_SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
       - name: Install screenshot browser
@@ -54,6 +54,7 @@ jobs:
           CAPTURE_COMMIT_SHA: ${{ env.ASSET_SOURCE_SHA }}
         run: node tools/capture-pages.mjs --out .capture
       - name: Attach screenshots to this workflow run
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: visual-evidence-${{ env.ASSET_SOURCE_SHA }}
@@ -90,6 +91,8 @@ jobs:
         with:
           path: dist
   deploy:
+    # Feature branches produce review artifacts; the protected environment publishes main.
+    if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     environment:

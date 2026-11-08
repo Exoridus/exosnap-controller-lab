@@ -19,11 +19,13 @@ test('static Pages build exports a deployable offline-look viewer without source
 });
 test('screenshot proof rejects missing WebGL or missing 3D draw budgets',async()=>{
   const {verifyRenderedState}=await import('../tools/visual-capture-contract.mjs');
-  const source={status:'three-rendered',sampleCount:12,activeLooks:4,drawStats:Object.fromEntries(['solid','ghost','outline','identity'].map(x=>[x,{sourceCalls:20,calls:23}]))};
+  const source={status:'three-rendered',sampleCount:3,activeLooks:1,drawStats:{white:{sourceCalls:20,calls:23}}};
   assert.equal(verifyRenderedState({...source,nontransparentPixels:900}),true);
   assert.throws(()=>verifyRenderedState({...source,nontransparentPixels:0}),/nontransparent/);
   assert.throws(()=>verifyRenderedState({...source,status:'webgl-unavailable'}),/WebGL/);
   assert.throws(()=>verifyRenderedState({...source,drawStats:{}}),/draw/);
+  assert.throws(()=>verifyRenderedState({...source,sampleCount:5}),/three/);
+  assert.throws(()=>verifyRenderedState({...source,drawStats:{cool:source.drawStats.white}}),/white/);
 });
 test('visual history creates immutable commit-addressed references and rejects corrupted captures',async()=>{
   const {archiveSnapshots}=await import('../tools/archive-snapshots.mjs');
@@ -52,7 +54,7 @@ test('visual history creates immutable commit-addressed references and rejects c
   }finally{await rm(workspace,{recursive:true,force:true});}
 });
 
-test('visual history archives optional GameCube captures with immutable SHA links',async()=>{
+test('visual history archives optional GameCube and consolidated captures with immutable SHA links',async()=>{
   const {archiveSnapshots}=await import('../tools/archive-snapshots.mjs');
   const {createHash}=await import('node:crypto');
   const {mkdir,writeFile,readFile}=await import('node:fs/promises');
@@ -61,7 +63,7 @@ test('visual history archives optional GameCube captures with immutable SHA link
   try{
     await mkdir(cap,{recursive:true});
     const images=[];
-    for(const file of ['overview-neutral.png','overview-pressed.png','gamecube-neutral.png']){
+    for(const file of ['overview-neutral.png','overview-pressed.png','gamecube-neutral.png','3d-consolidated-hidden-l2.png']){
       const buf=Buffer.alloc(45000,file.length);
       Buffer.from('89504e470d0a1a0a','hex').copy(buf);
       await writeFile(path.join(cap,file),buf);
@@ -72,6 +74,10 @@ test('visual history archives optional GameCube captures with immutable SHA link
     assert.match(entry.gamecubeUrl,/gamecube-neutral\.png$/);
     assert.deepEqual(await readFile(path.join(arc,'snapshots',sha,'gamecube-neutral.png')),
       await readFile(path.join(cap,'gamecube-neutral.png')));
+    assert.deepEqual(await readFile(path.join(arc,'snapshots',sha,'3d-consolidated-hidden-l2.png')),
+      await readFile(path.join(cap,'3d-consolidated-hidden-l2.png')));
+    assert.deepEqual(entry.consolidatedScreenshots,[{name:'3d-consolidated-hidden-l2.png',
+      url:`https://raw.githubusercontent.com/Exoridus/exosnap-controller-lab/visual-history/snapshots/${sha}/3d-consolidated-hidden-l2.png`}]);
   }finally{await rm(w,{recursive:true,force:true});}
 });
 
@@ -91,7 +97,7 @@ test('3D/2D ready gate prevents partial SVG loads from passing browser CI',async
   const {readFile}=await import('node:fs/promises');
   const app=await readFile(path.join(root,'pbr-lab.js'),'utf8');
   const capture=await readFile(path.join(root,'tools/capture-pages.mjs'),'utf8');
-  assert.ok(app.includes('flatReferences.size===variants.length*scenes.length'));
+  assert.ok(app.includes('flatReferences.size===scenes.length'));
   assert.ok(app.includes("flatReady?'three-rendered':'incomplete'"));
-  assert.ok(capture.includes("sample--flat svg').length===12"));
+  assert.ok(capture.includes("sample--flat svg').length===3"));
 });

@@ -53,11 +53,11 @@ void main(){
   // Only faint transparent surfaces receive a background-specific ink correction.
   // Opaque pressed buttons retain exactly their source RGB and alpha.
   float fade=1.-smoothstep(.42,.92,src.a);
-  vec3 ink=vec3(.08,.16,.24);
+  vec3 ink=vec3(.12);
   vec3 rgb=mix(src.rgb,ink*src.a,inkGain*fade);
   float alpha=clamp(src.a*(1.+.58*inkGain*fade),0.,1.);
-  vec3 darkInk=vec3(.055,.115,.17);
-  vec3 lightInk=vec3(.83,.94,1.0);
+  vec3 darkInk=vec3(.08);
+  vec3 lightInk=vec3(.94);
   float darkA=darkStrength*wide;
   float lightA=lightStrength*(mode==2?narrow:wide);
   float combined=1.-(1.-darkA)*(1.-lightA);
