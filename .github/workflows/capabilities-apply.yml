@@ -1,0 +1,34 @@
+name: Apply verified layout capability guard
+on:
+  push:
+    branches: [fix/model-consistency]
+    paths: [.github/workflows/capabilities-apply.yml]
+permissions:
+  contents: write
+jobs:
+  apply:
+    if: github.ref == 'refs/heads/fix/model-consistency'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply exact checked change
+        run: |
+          set -euo pipefail
+          python .github/capabilities-transfer.py
+          rm .github/capabilities-transfer.py .github/workflows/capabilities-apply.yml
+          git add -A
+          test "$(git write-tree)" = c0312d5c6f8e6a55ffdaebd8d9e8c01a697df272
+          git restore --source=HEAD --staged --worktree .github/workflows
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run verify
+      - name: Commit verified shared input guard
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'fix(input): respect actual stick-click capabilities across shared demo state'
+          git push origin HEAD:fix/model-consistency
+          git rev-parse HEAD
+          git rev-parse HEAD^{tree}
