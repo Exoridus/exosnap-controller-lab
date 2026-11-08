@@ -1,0 +1,54 @@
+name: Apply exact verified model consistency source
+on:
+  push:
+    branches: [fix/model-consistency]
+    paths: [.github/workflows/consistency-apply.yml]
+permissions:
+  contents: write
+jobs:
+  apply:
+    if: github.ref == 'refs/heads/fix/model-consistency'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Apply hash-verified source and original assets
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts --no-audit --no-fund
+          python -m pip install fonttools==4.63.0 lxml==6.1.1
+          python .github/model-transfer-1.py
+          python .github/model-transfer-2a.py
+          python .github/model-transfer-2b.py
+          python .github/model-transfer-4.py
+          python .github/model-assets.py
+          python tools/extract-generic-profile.py
+          node tools/generate-generic-pro.mjs
+          rm .github/model-transfer-*.py .github/model-assets.py
+          rm .github/workflows/consistency-source.yml .github/workflows/consistency-baseline.yml .github/workflows/consistency-apply.yml
+          git add -A
+          test "$(git write-tree)" = 6730b90f91a8c78afa2785b3ef7ef1ad5cec92e6
+          # Workflow cleanup uses the authenticated connector, not GITHUB_TOKEN.
+          git restore --source=HEAD --staged --worktree .github/workflows
+          test -z "$(git diff --cached --name-only -- .github/workflows)"
+      - name: Verify full source suite and provenance
+        run: |
+          npm run verify
+          node tools/verify-licensed-assets.mjs
+      - name: Commit verified source to isolated task branch
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'fix(lab): unify control semantics and recover approved model source profiles'
+          git push origin HEAD:fix/model-consistency
+          git rev-parse HEAD
+          git rev-parse HEAD^{tree}
