@@ -64,7 +64,7 @@ function pathFrame(node){
  return {node,m,minX:Math.min(...points.map(p=>p.x)),maxX:Math.max(...points.map(p=>p.x)),
   minY:Math.min(...points.map(p=>p.y)),maxY:Math.max(...points.map(p=>p.y))};
 }
-function authoredTexture(paths){
+function authoredTexture(paths,{engraved=false}={}){
  const frames=paths.map(pathFrame);
  const minX=Math.min(...frames.map(x=>x.minX)),maxX=Math.max(...frames.map(x=>x.maxX));
  const minY=Math.min(...frames.map(x=>x.minY)),maxY=Math.max(...frames.map(x=>x.maxY));
@@ -79,7 +79,7 @@ function authoredTexture(paths){
   ctx.save();ctx.transform(m.a,m.b,m.c,m.d,m.e,m.f);
   ctx.lineJoin='round';ctx.lineCap='round';
   const scale=Math.max(Math.hypot(m.a,m.b),Math.hypot(m.c,m.d),1e-6);
-  ctx.lineWidth=extent*.055/scale;ctx.strokeStyle='#17212c';ctx.fillStyle='#ffffff';
+  ctx.lineWidth=extent*(engraved?.017:.055)/scale;ctx.strokeStyle='#17212c';ctx.fillStyle='#ffffff';
   const mark=new Path2D(node.getAttribute('d'));
   const style=node.style;
   const fill=style?.fill||node.getAttribute('fill');
@@ -87,7 +87,7 @@ function authoredTexture(paths){
   if(fill==='none'){
    // A stroked authored mark (e.g. outline symbol) retains its center path.
    const width=parseFloat(style?.strokeWidth||node.getAttribute('stroke-width'))||extent*.035/scale;
-   ctx.lineWidth=width+extent*.055/scale;ctx.stroke(mark);
+   ctx.lineWidth=width+extent*(engraved?.017:.055)/scale;ctx.stroke(mark);
    ctx.lineWidth=width;ctx.strokeStyle='#ffffff';ctx.stroke(mark);
   }else{ctx.stroke(mark);ctx.fill(mark,rule);}
   ctx.restore();
@@ -134,15 +134,20 @@ export function applyControllerArtwork(native,original2DSvg){
   const group=groupFor(original2DSvg,key);
   const paths=[...(group?.querySelectorAll('path.glyph')||[])].filter(n=>n.getAttribute('d'));
   if(!paths.length)return;
-  const source=authoredTexture(paths);if(!source)return;
+  const directional=/^(up|down|left|right)$/.test(key);
+  const source=authoredTexture(paths,{engraved:directional});if(!source)return;
   const face=group.querySelector(`[id="btn-${key}-face"],[id$="-btn-${key}-face"]`);
   const frame=face?pathFrame(face):null;
   const glyphBox={width:source.width,height:source.height};
   const faceBox=frame?{width:frame.maxX-frame.minX,height:frame.maxY-frame.minY}:glyphBox;
   const metrics=faceDecalSizeFrom2D(decal.userData.sourceFaceDimensions,faceBox,glyphBox);
   const small=decal.userData.aboveButton;
+  // The D-pad has small directional engravings, not face-sized triangles.
   const size=small?Math.max(decal.userData.sourceFaceDimensions.width,
-   decal.userData.sourceFaceDimensions.height)*1.25:metrics.size;
+   decal.userData.sourceFaceDimensions.height)*1.25:
+   directional?Math.min(decal.userData.sourceFaceDimensions.width,
+     decal.userData.sourceFaceDimensions.height)*.38:metrics.size;
+  if(directional)decal.material.opacity=.76;
   const oldGeometry=decal.geometry,oldTexture=decal.material.map;
   decal.geometry=new THREE.PlaneGeometry(size,size);decal.material.map=source.texture;
   decal.material.needsUpdate=true;decal.visible=true;
