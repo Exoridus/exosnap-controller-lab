@@ -7,6 +7,7 @@
 <header class="site-head">
  <div class="toolbar">
   <label class="field model-field"><span>Controller</span><select id="controller" aria-label="3D-Modell"></select></label>
+  <label class="field player-index-field" id="playerPreviewField" hidden><span>Spieler-LEDs · Vorschau</span><select id="playerPreview" aria-label="Nintendo-Spieler-LED-Muster nur als Vorschau"><option value="auto">Auto · Browser-Slot</option><option value="off">Aus</option><option value="0">P1</option><option value="1">P2</option><option value="2">P3</option><option value="3">P4</option><option value="4">P5</option><option value="5">P6</option><option value="6">P7</option><option value="7">P8</option></select></label>
   <label class="field view-field"><span>Kamera</span><select id="view" aria-label="Gemeinsame Kameraposition"><option value="front" selected>Front</option><option value="angled">3/4</option><option value="top">Schräg oben</option><option value="profile">Seite</option><option value="bottom">Von unten</option><option value="rear">Hinten</option></select></label>
   <label class="press-field"><input type="checkbox" id="demoToggle" checked> Demo</label>
   <label class="press-field"><input type="checkbox" id="markingsToggle" checked> Markings</label>
@@ -28,7 +29,7 @@
   <label class="press-field"><input type="checkbox" id="pressAll"> Alle drücken</label>
   <select id="renderMode" hidden><option value="shared">1× 3D + 3 Blits</option><option value="direct">3× 3D</option></select>
  </div></details>
- <div class="status-row"><span id="rendererStatus" role="status">Originalmodell wird geladen …</span><span id="modelInfo"></span><nav><a href="./artwork-source-review.html">SVG-Quelle</a> · <a href="./screenshots.html">Bildnachweise</a></nav></div>
+ <div class="status-row"><span id="playerIndexStatus">P1 · ohne verbundenes Gamepad · nur Vorschau</span><span id="rendererStatus" role="status">Originalmodell wird geladen …</span><span id="modelInfo"></span><nav><a href="./artwork-source-review.html">SVG-Quelle</a> · <a href="./screenshots.html">Bildnachweise</a></nav></div>
 </header>
 <main><div id="failureBanner" role="alert" hidden></div><div id="gallery" aria-label="Synchronisierte 3D- und 2D-Controller-Demo auf drei Hintergründen"></div></main>
 <script type="module" src="./pbr-lab.js"></script></body></html>
