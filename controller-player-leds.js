@@ -1,5 +1,6 @@
-// Nintendo HIDAPI player LED masks from SDL_hidapi_switch.c.
-// Browser Gamepad.index is an enumeration slot, NOT SDL's player index.
+// Nintendo player LED patterns are taken from SDL's Switch HIDAPI driver.
+// They represent assigned output patterns, never a measurement of physical LEDs.
+// Browser Gamepad.index is an enumeration slot, NOT a player index.
 export const SDL_SWITCH_LED_MASKS=Object.freeze([0x1,0x3,0x7,0xf,0x9,0x5,0xd,0x6]);
 export const NINTENDO_LED_LAYOUTS=Object.freeze({
   switch_pro:Object.freeze([Object.freeze(['body-led-1','body-led-2','body-led-3','body-led-4'])]),
@@ -13,11 +14,18 @@ export function ledMaskForPlayerIndex(index){
   if(!Number.isSafeInteger(index)||index<0)throw new RangeError('Invalid player index');
   return SDL_SWITCH_LED_MASKS[index%SDL_SWITCH_LED_MASKS.length];
 }
-export function previewPlayerIndex(selection='auto',browserSlot=null){
+// Browser-only presentation. "auto" MUST NOT guess a player from browserSlot.
+// A future read-only provider may supply a reportedPlayerIndex, but GameInput
+// currently does not provide it in ExoSnap's canonical GamepadReading.
+export function previewPlayerIndex(selection='demo',browserSlot=null,reportedPlayerIndex=null){
   const slot=Number.isSafeInteger(browserSlot)&&browserSlot>=0?browserSlot:null;
+  const reported=Number.isSafeInteger(reportedPlayerIndex)&&reportedPlayerIndex>=0?reportedPlayerIndex:null;
   let index,source;
-  if(selection==='auto'){index=slot??0;source=slot===null?'demo':'browser-slot';}
-  else if(selection==='off'){index=-1;source='preview-off';}
+  if(selection==='demo'){index=0;source='demo';}
+  else if(selection==='auto'){
+    index=reported??-1;
+    source=reported===null?'unavailable':'reported';
+  }else if(selection==='off'){index=-1;source='preview-off';}
   else if(typeof selection==='string'&&/^[0-7]$/.test(selection)){
     index=Number(selection);source='manual-preview';
   }else throw new RangeError('Invalid preview selection');
@@ -28,8 +36,9 @@ export function ledStates(mask){
   return Array.from({length:4},(_,i)=>Boolean(mask&(1<<i)));
 }
 export function previewLabel(preview){
-  if(preview.index===-1)return 'Spieler-LEDs aus · nur Vorschau';
-  const origin=preview.source==='browser-slot'?'Browser-Slot '+preview.browserSlot:
-    preview.source==='demo'?'ohne verbundenes Gamepad':'manuell';
-  return 'P'+(preview.index+1)+' · '+origin+' · nur Vorschau';
+  if(preview.source==='preview-off')return 'LED-Vorschau ausgeschaltet';
+  if(preview.source==='unavailable')return 'Spielerindex unbekannt · keine Schätzung aus Browser-Slots';
+  if(preview.source==='demo')return 'Demo P1 · keine Hardware-Abfrage';
+  if(preview.source==='reported')return 'Gemeldeter Spieler P'+(preview.index+1)+' · keine LED-Rückmessung';
+  return 'Vorschau P'+(preview.index+1)+' · nur Overlay, keine Hardware-Steuerung';
 }
