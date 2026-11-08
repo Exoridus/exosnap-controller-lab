@@ -1,41 +1,48 @@
-name: Native portability audit inputs
+name: Apply verified visual polish and native probes
 on:
   push:
     branches: [fix/visual-finish-qt-gate]
     paths: [.github/workflows/visual-audit-source.yml]
 permissions:
-  contents: read
+  contents: write
 jobs:
-  snapshot:
+  verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - name: Snapshot actual native controller, atlas and geometry code
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply exact verified source delta
         run: |
-          mkdir -p .capture/native-source
-          git clone --depth 1 --single-branch --branch next https://github.com/Exoridus/exosnap.git /tmp/exosnap-audit
-          python3 - <<'PY'
-          import pathlib,subprocess,shutil,json
-          src=pathlib.Path('/tmp/exosnap-audit');out=pathlib.Path('.capture/native-source')
-          sha=subprocess.check_output(['git','-C',str(src),'rev-parse','HEAD'],text=True).strip()
-          names=('Gamepad','Controller','gamepad_sprite','controller_')
-          paths=[]
-          for p in src.rglob('*'):
-            if not p.is_file() or '.git' in p.parts:continue
-            if p.suffix not in ('.cpp','.h','.qml','.frag','.vert','.py','.md'):continue
-            if not any(n in p.name for n in names):continue
-            rel=p.relative_to(src);dest=out/rel;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(p,dest);paths.append(str(rel))
-          (out/'provenance.json').write_text(json.dumps({'repository':'Exoridus/exosnap','branch':'next','commit':sha,'qt':(src/'.qt-version').read_text().strip(),'files':paths},indent=2))
-          print('Native source:',sha,'files:',len(paths))
-          PY
-      - name: Check current native Qt version availability
+          python3 .github/visual-delta.py
+          rm .github/visual-delta.py
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run verify
+          git add controller-lab-style.js pbr-appearance.js polish-2d-style.js tests/consolidated-2d.test.mjs tools/capture-pages.mjs .github/visual-delta.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'fix(lab): integrate original stick supports and separate 2D surface and legend inks'
+          git push origin HEAD:fix/visual-finish-qt-gate
+          echo "CAPTURE_COMMIT_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Real Chromium acceptance
         run: |
-          python3 -m venv /tmp/qt-probe
-          /tmp/qt-probe/bin/pip install --disable-pip-version-check PySide6==6.12.0
-          QT_QPA_PLATFORM=offscreen /tmp/qt-probe/bin/python -c 'from PySide6.QtCore import qVersion; from PySide6 import QtSvg,QtQuick,QtQuick3D; print("Native Qt runtime:",qVersion())' | tee .capture/native-source/qt-runtime.txt
+          npm install --no-save --package-lock=false --ignore-scripts playwright@1.64.1
+          npx playwright install ffmpeg
+          node server.mjs > /tmp/lab.log 2>&1 &
+          EXO_BROWSER_CHANNEL=chrome node tools/capture-pages.mjs --out .capture
+      - name: Native Qt probes
+        run: |
+          python3 -m venv "$RUNNER_TEMP/qt-probe"
+          "$RUNNER_TEMP/qt-probe/bin/pip" install --disable-pip-version-check PySide6==6.12.0
+          QSG_RHI_BACKEND=opengl LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a "$RUNNER_TEMP/qt-probe/bin/python" qt-port-example/verify_portability.py --fixtures .capture/qt-fixtures --out .capture/qt-native
+      - name: Export static page
+        run: node tools/build-pages.mjs --out dist --capture .capture
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: native-portability-inputs
-          path: .capture/native-source
+          name: visual-finish-review
+          path: .capture/
+          include-hidden-files: true
           retention-days: 30
