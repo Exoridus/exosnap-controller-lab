@@ -172,3 +172,21 @@ test('active light-scene controls retain dark authored contours while moving rin
   const radius=Number(filter.querySelector('feMorphology').getAttribute('radius').split(' ')[0]);
   assert.equal(radius*2,1,'ring counter-edge remains one rendered pixel');
 });
+
+test('current 2D Lab uses matching body/control/glyph ink and no thick mixed filters',async()=>{
+  const expected={dark:'#ffffff',light:'#858585',mixed:'#b9c5ce'};
+  for(const [scene,ink] of Object.entries(expected)){
+    const r=await reference();
+    const values=new Map([['b1',1],['l1',1],['l2',1]]);
+    paintPolished2D(r,'ghost',scene,{coherentContours:true,values,left:{x:.8,y:0}});
+    const face=r.svg.querySelector('[id="btn-cross-face"]');
+    const glyph=r.svg.querySelector('[id="btn-cross"]').querySelector('.glyph');
+    const outer=r.svg.querySelector('[id="outline-strong"]');
+    assert.equal(value(face,'stroke'),ink,scene+' face');
+    assert.equal(value(glyph,'fill'),ink,scene+' glyph');
+    assert.equal(value(outer,'stroke')||value(outer,'fill'),ink,scene+' shell');
+    assert.equal(value(face,'filter'),'','no per-control black filter');
+    assert.equal(value(glyph,'filter'),'','no oversized shadow around glyphs');
+    assert.equal(value(outer,'filter'),'','no double hull outline');
+  }
+});

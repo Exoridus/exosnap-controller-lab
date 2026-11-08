@@ -19,14 +19,13 @@ test('static Pages build exports a deployable offline-look viewer without source
 });
 test('screenshot proof rejects missing WebGL or missing 3D draw budgets',async()=>{
   const {verifyRenderedState}=await import('../tools/visual-capture-contract.mjs');
-  const source={status:'three-rendered',sampleCount:6,activeLooks:2,drawStats:Object.fromEntries(['white','cool'].map(x=>[x,{sourceCalls:20,calls:23}]))};
+  const source={status:'three-rendered',sampleCount:3,activeLooks:1,drawStats:{white:{sourceCalls:20,calls:23}}};
   assert.equal(verifyRenderedState({...source,nontransparentPixels:900}),true);
   assert.throws(()=>verifyRenderedState({...source,nontransparentPixels:0}),/nontransparent/);
   assert.throws(()=>verifyRenderedState({...source,status:'webgl-unavailable'}),/WebGL/);
   assert.throws(()=>verifyRenderedState({...source,drawStats:{}}),/draw/);
-  assert.throws(()=>verifyRenderedState({...source,sampleCount:5}),/six/);
-  assert.throws(()=>verifyRenderedState({...source,drawStats:{white:source.drawStats.white}}),/cool/);
-  assert.throws(()=>verifyRenderedState({...source,drawStats:{solid:source.drawStats.white,ghost:source.drawStats.cool}}),/white/);
+  assert.throws(()=>verifyRenderedState({...source,sampleCount:5}),/three/);
+  assert.throws(()=>verifyRenderedState({...source,drawStats:{cool:source.drawStats.white}}),/white/);
 });
 test('visual history creates immutable commit-addressed references and rejects corrupted captures',async()=>{
   const {archiveSnapshots}=await import('../tools/archive-snapshots.mjs');

@@ -25,12 +25,6 @@ export async function captureConsolidated(page,{output,images,shotProof}){
     renderer.readRenderTargetPixels(target,0,0,target.width,target.height,pixels);
     return Array.from(pixels);
   })));
-  const feedbackHashes=async()=>{
-    await frame(()=>page.locator('#toggleCool').uncheck());
-    const white=await sourceHash();
-    await frame(()=>page.locator('#toggleCool').check());
-    return {white,cool:await sourceHash()};
-  };
   const capture=async(file,scenario)=>{
     const proof=await shotProof();
     const bytes=await page.screenshot({path:path.join(output,file),fullPage:true,animations:'disabled'});
@@ -43,11 +37,9 @@ export async function captureConsolidated(page,{output,images,shotProof}){
   await frame(()=>page.setViewportSize({width:1600,height:1400}));
   await select('panelSize','480');
   await mix(0);
-  const neutral=await feedbackHashes();
   const neutralFlat=hash(await page.locator('.flat-reference').screenshot());
-  const neutral3D=neutral.white;
-  if(neutral3D!==neutral.cool)throw Error('White/cool source pixels differ without an active input');
-  await capture('3d-consolidated-original.png','Materialmix 0%, neutral; same two 3D recipes');
+  const neutral3D=await sourceHash();
+  await capture('3d-consolidated-original.png','Materialmix 0%, neutral; one source-colored 3D recipe');
   const artwork=await page.evaluate(()=>{
     const marks=[];window.__exoPbrLab.model.group.traverse(mesh=>{
       if(mesh.userData.artworkSource==='2d-svg')marks.push(mesh.userData.artworkKey);
@@ -96,9 +88,9 @@ export async function captureConsolidated(page,{output,images,shotProof}){
   await select('view','front');
   await mix(0);
   await select('testControl','b1');
-  const {white,cool}=await feedbackHashes();
-  if(white===cool)throw Error('White/cool feedback is not visible on the active DualSense face button');
-  await capture('3d-consolidated-feedback.png','Materialmix 0%, only cross active: white versus cool white');
+  const activeWhite=await sourceHash();
+  if(activeWhite===neutral3D)throw Error('White feedback does not react to an individually active face button');
+  await capture('3d-consolidated-feedback.png','Materialmix 0%, only cross active: white feedback');
   await select('testControl','ls');
   const clicks=await page.evaluate(()=>window.__exoPbrLab.model.meshes
     .filter(mesh=>mesh.userData.role==='stick-cap'&&!mesh.isInstancedMesh).map(mesh=>({
@@ -116,7 +108,6 @@ export async function captureConsolidated(page,{output,images,shotProof}){
   await select('panelSize','320');
   await frame(()=>page.setViewportSize({width:1200,height:1120}));
   console.log('Consolidated browser checks: '+JSON.stringify({artwork,flatMixInvariant:true,
-    neutralVariantsIdentical:true,activeVariantsDistinct:true,independent,angles,clicks}));
-  return {artwork,flatMixInvariant:true,neutralVariantsIdentical:true,activeVariantsDistinct:true,
-    independent,angles,clicks};
+    singleWhiteFeedback:true,independent,angles,clicks}));
+  return {artwork,flatMixInvariant:true,singleWhiteFeedback:true,independent,angles,clicks};
 }

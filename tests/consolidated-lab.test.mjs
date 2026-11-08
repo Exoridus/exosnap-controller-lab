@@ -3,14 +3,13 @@ import assert from 'node:assert/strict';
 
 const lab=await import('../controller-lab-style.js').catch(()=>({}));
 
-test('the final comparison changes active feedback only, not neutral controller materials',()=>{
+test('the final lab has one physical 3D recipe and white feedback only',()=>{
   assert.equal(typeof lab.resolveLabRecipe,'function','final lab recipe must exist');
-  assert.deepEqual(lab.LAB_VARIANTS.map(x=>x.key),['white','cool']);
+  assert.deepEqual(lab.LAB_VARIANTS.map(x=>x.key),['white']);
+  assert.throws(()=>lab.resolveLabRecipe('cool',1),/Unknown/);
   for(const mix of [0,.5,1]){
-    const white=lab.resolveLabRecipe('white',mix),cool=lab.resolveLabRecipe('cool',mix);
-    assert.deepEqual(white.material,cool.material);
+    const white=lab.resolveLabRecipe('white',mix);
     assert.equal(white.activeContrast,'white');
-    assert.equal(cool.activeContrast,'cool');
     assert.equal(white.material.shell.originalColorWeight,1);
     assert.equal(white.material.controls.idleTintWeight,0);
     assert.equal(white.ghostFresnel.strength,0,'portable base does not patch the PBR shader');

@@ -99,7 +99,11 @@ test('general controller artwork API exists and sizes native planes from actual 
   const glyphs=[];rig.group.traverse(o=>{if(o.userData.buttonGlyph)glyphs.push(o)});
   for(const glyph of glyphs){
    const d=glyph.userData.sourceFaceDimensions;
-   assert.ok(glyph.geometry.parameters.width>=Math.min(d.width,d.height)*.6,'native face-relative glyph size');
+   const diameter=Math.min(d.width,d.height),width=glyph.geometry.parameters.width;
+   if(/^(up|down|left|right)$/.test(glyph.userData.artworkKey)){
+     assert.ok(width>=diameter*.37&&width<=diameter*.39,'D-pad has original-scale engraving');
+     assert.equal(glyph.material.opacity,.76);
+   }else assert.ok(width>=diameter*.6,'native face-relative glyph size');
   }
  }finally{disposeNativeRig(rig)}
 });
