@@ -332,7 +332,7 @@ function paintStick(reference,entry,colors,values,axes,variant){
     paintControl(center,colors,level);
     // Preserve a dark existing center boundary during white L3/R3.
     paint(center,'stroke',colors.controlStroke);
-    paint(center,'stroke-opacity','1');
+    paint(center,'stroke-opacity',String(colors.controlStrokeAlpha));
     // Keep the exact source cap boundary visible, including during white L3.
     const attr='data-exo-authored-stroke-width';
     if(!center.hasAttribute(attr)){
