@@ -16,6 +16,21 @@ export async function captureConsolidated(page,{output,images,shotProof}){
     input.value=String(value);input.dispatchEvent(new Event('input',{bubbles:true}));
   },value));
   const select=(id,value)=>frame(()=>page.locator('#'+id).selectOption(value));
+  // Compare the same offscreen pixel grid. DOM rows may start at different
+  // fractional CSS y positions, so hashes of two clipped PNGs are not a valid
+  // test of equal materials. Readback is confined to this CI evidence harness.
+  const sourceHash=async()=>hash(Buffer.from(await page.evaluate(()=>{
+    const {renderer,renderTarget:target}=window.__exoPbrLab;
+    const pixels=new Uint8Array(target.width*target.height*4);
+    renderer.readRenderTargetPixels(target,0,0,target.width,target.height,pixels);
+    return Array.from(pixels);
+  })));
+  const feedbackHashes=async()=>{
+    await frame(()=>page.locator('#toggleCool').uncheck());
+    const white=await sourceHash();
+    await frame(()=>page.locator('#toggleCool').check());
+    return {white,cool:await sourceHash()};
+  };
   const capture=async(file,scenario)=>{
     const proof=await shotProof();
     const bytes=await page.screenshot({path:path.join(output,file),fullPage:true,animations:'disabled'});
@@ -24,10 +39,10 @@ export async function captureConsolidated(page,{output,images,shotProof}){
   };
   await frame(()=>page.locator('#pressAll').uncheck());
   await mix(0);
+  const neutral=await feedbackHashes();
   const neutralFlat=hash(await page.locator('.flat-reference').screenshot());
-  const neutral3D=hash(await page.locator('.variant[data-variant="white"] .sample[data-scene="dark"]').screenshot());
-  const sameNeutral=hash(await page.locator('.variant[data-variant="cool"] .sample[data-scene="dark"]').screenshot());
-  if(neutral3D!==sameNeutral)throw Error('White/cool variants differ without an active input');
+  const neutral3D=neutral.white;
+  if(neutral3D!==neutral.cool)throw Error('White/cool source pixels differ without an active input');
   await capture('3d-consolidated-original.png','Materialmix 0%, neutral; same two 3D recipes');
   const artwork=await page.evaluate(()=>{
     const marks=[];window.__exoPbrLab.model.group.traverse(mesh=>{
@@ -42,7 +57,7 @@ export async function captureConsolidated(page,{output,images,shotProof}){
   await mix(100);
   if(hash(await page.locator('.flat-reference').screenshot())!==neutralFlat)
     throw Error('3D material mix changed 2D pixels at 100%');
-  if(hash(await page.locator('.variant[data-variant="white"] .sample[data-scene="dark"]').screenshot())===neutral3D)
+  if(await sourceHash()===neutral3D)
     throw Error('Original and Ghost 3D endpoints produce identical pixels');
   await capture('3d-consolidated-ghost.png','Materialmix 100%, neutral; independent 2D');
   const independent=[];
@@ -77,8 +92,7 @@ export async function captureConsolidated(page,{output,images,shotProof}){
   await select('view','front');
   await mix(0);
   await select('testControl','b1');
-  const white=hash(await page.locator('.variant[data-variant="white"] .sample[data-scene="dark"]').screenshot());
-  const cool=hash(await page.locator('.variant[data-variant="cool"] .sample[data-scene="dark"]').screenshot());
+  const {white,cool}=await feedbackHashes();
   if(white===cool)throw Error('White/cool feedback is not visible on the active DualSense face button');
   await capture('3d-consolidated-feedback.png','Materialmix 0%, only cross active: white versus cool white');
   await select('testControl','ls');

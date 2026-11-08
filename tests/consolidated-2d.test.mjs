@@ -112,3 +112,41 @@ test('returning to fixed Ghost restores original decorative body paint after a l
   paintPolished2D(r,'solid','dark');paintPolished2D(r,'ghost','light');
   assert.deepEqual(detail.style.values,original);
 });
+
+test('Ghost housing outline and relief inks are achromatic on every background',async()=>{
+  const {edgeReliefProfile}=await import('../polish-2d-style.js');
+  for(const scene of ['dark','light','mixed']){
+    assert.ok(grayscale(lookPalette('dualsense','ghost',scene).line));
+    const relief=edgeReliefProfile('ghost',scene,.38,.45);
+    assert.ok(grayscale(relief.lightColor));assert.ok(grayscale(relief.shadowColor));
+  }
+  assert.equal(lookPalette('dualsense','solid','dark').line,'#50687b','legacy Solid silhouette unchanged');
+});
+
+test('mixed counter-edge remains subpixel in rendered space under authored glyph transforms',async()=>{
+  const r=await reference();
+  const glyph=r.svg.querySelector('[id="btn-cross"]').querySelector('.glyph');
+  // Original tiny glyph paths use a large authored transform; applying root
+  // SVG units to them magnifies a narrow outline into a filled dark plate.
+  glyph.getScreenCTM=()=>({a:10,b:0,c:0,d:8});
+  paintPolished2D(r,'ghost','mixed');
+  const filterId=value(glyph,'filter').slice(5,-1);
+  const filter=r.svg.querySelector('[id="'+filterId+'"]');
+  const radius=filter.querySelector('feMorphology').getAttribute('radius').split(/\s+/).map(Number);
+  assert.ok(Math.abs(radius[0]*10-.48)<.006,'horizontal edge is .48 rendered pixels');
+  assert.ok(Math.abs((radius[1]??radius[0])*8-.48)<.006,'vertical edge is .48 rendered pixels');
+});
+
+test('analog activity reuses the same contrast definitions for each authored transform',async()=>{
+  const r=await reference();
+  const glyph=r.svg.querySelector('[id="btn-cross"]').querySelector('.glyph');
+  glyph.getScreenCTM=()=>({a:10,b:0,c:0,d:10});
+  paintPolished2D(r,'ghost','mixed');
+  const initial=r.svg.querySelectorAll('[data-exo-control-contrast]').length;
+  assert.equal(initial,2,'root-scale controls and transformed glyph need separate definitions');
+  for(const level of [.1,.25,.5,.75,1,0]){
+    const values=new Map(r.controls.filter(e=>e.control).map(e=>[e.control,level]));
+    paintPolished2D(r,'ghost','mixed',{values,left:{x:level,y:0},right:{x:level,y:0}});
+    assert.equal(r.svg.querySelectorAll('[data-exo-control-contrast]').length,initial,'analog '+level+' must reuse definitions');
+  }
+});

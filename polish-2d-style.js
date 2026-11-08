@@ -74,8 +74,8 @@ export function lookPalette(id,mode,scene,colorway='auto'){
     ghost,light,colorway:chosen,
     shellAlpha:ghost?0:.99,coreAlpha:ghost?0:.96,
     detailAlpha:ghost?0:.26,
-    // Housing relief keeps its historical look; interactive ink follows the scene.
-    line:ghost?'#718b9d':'#50687b',
+    // Ghost housing and controls use achromatic ink; Solid retains its source-era palette.
+    line:ghost?'#858585':'#50687b',
     lineAlpha:ghost?.91:.86,
     controlAlpha:ghost?CONTROL_PALETTE.neutralAlpha:.96,
     activeAlpha:ghost?CONTROL_PALETTE.activeAlpha:.98,
@@ -176,18 +176,28 @@ function activeEdgeFilter(node,level){
 }
 // On a mixed frame, a narrow dark counter-edge preserves the authored light
 // contours across both bright and dark image regions. Also support a white
-// active surface on a light scene. Filters are shared per SVG/state, cached by
-// rendered unit and alpha; no texture readback or source-path clipping is used.
+// active surface on a light scene. Filters are shared per authored transform
+// and rendered size; no texture readback or source-path clipping is used.
 function controlContrastFilter(node,colors,level){
   if(!colors.ghost){activeEdgeFilter(node,level);return;}
   const svg=node?.ownerSVGElement;
   if(!svg)return;
   const needsEdge=colors.contrastEdge||colors.light&&level>0;
   if(!needsEdge){node.style.removeProperty('filter');return;}
-  const state=controlSurfaceState(colors,level);
-  const alpha=state.strokeAlpha.toFixed(3);
+  // The counter-edge is structural contrast, not another input signal.
+  // Keep its alpha fixed so analog travel never accumulates filter variants.
+  const alpha=CONTROL_PALETTE.borderAlpha.toFixed(3);
   const unit=(svg.viewBox.baseVal.width||480)/(svg.getBoundingClientRect().width||320);
-  const key=[unit.toFixed(4),alpha].join('-');
+  // Filter primitives use the target element's own coordinate system. Tiny
+  // authored glyphs commonly have a 10x transform, so root-SVG units would
+  // expand their counter-edge into dark plates. Normalize each local axis
+  // to rendered pixels, including the SVG viewBox and ancestor transforms.
+  const matrix=node.getScreenCTM?.();
+  const scaleX=matrix?Math.hypot(matrix.a,matrix.b):0;
+  const scaleY=matrix?Math.hypot(matrix.c,matrix.d):0;
+  const radiusX=scaleX>1e-6?.48/scaleX:unit*.48;
+  const radiusY=scaleY>1e-6?.48/scaleY:unit*.48;
+  const key=[radiusX.toFixed(4),radiusY.toFixed(4),alpha].join('-');
   let defs=svg.querySelector('defs');
   if(!defs){defs=filterNode('defs');svg.insertBefore(defs,svg.firstChild);}
   let filter=defs.querySelector('[data-exo-control-contrast="'+key+'"]');
@@ -199,7 +209,8 @@ function controlContrastFilter(node,colors,level){
       'color-interpolation-filters':'sRGB','data-exo-control-contrast':key});
     const opaque=filterNode('feComponentTransfer',{in:'SourceAlpha',result:'contour-alpha'});
     opaque.append(filterNode('feFuncA',{type:'linear',slope:100,intercept:0}));
-    const grow=filterNode('feMorphology',{in:'contour-alpha',operator:'dilate',radius:(unit*.48).toFixed(3),result:'expanded'});
+    const grow=filterNode('feMorphology',{in:'contour-alpha',operator:'dilate',
+      radius:radiusX.toFixed(4)+' '+radiusY.toFixed(4),result:'expanded'});
     const edge=filterNode('feComposite',{in:'expanded',in2:'contour-alpha',operator:'out',result:'counter-edge'});
     const ink=filterNode('feFlood',{'flood-color':'#000000','flood-opacity':alpha,result:'contrast-ink'});
     const shade=filterNode('feComposite',{in:'contrast-ink',in2:'counter-edge',operator:'in',result:'contrast-edge'});
@@ -417,7 +428,7 @@ function paintGlyphs(entry,colors,showFaceSymbols,level=0){
 // Backgrounds are TEST SCENES, not separate product profiles. In the native
 // compositor the game pixels are unknown; identical settings must survive all.
 const FIXED_EDGE_SCENE=Object.freeze({
-  light:.62,shadow:1,lightColor:'#eaf4fc',shadowColor:'#07121d'
+  light:.62,shadow:1,lightColor:'#f4f4f4',shadowColor:'#111111'
 });
 const EDGE_SCENES=Object.freeze({
   dark:FIXED_EDGE_SCENE,light:FIXED_EDGE_SCENE,mixed:FIXED_EDGE_SCENE

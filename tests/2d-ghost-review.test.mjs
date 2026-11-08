@@ -39,7 +39,7 @@ test('A/B/C only change edge relief and always leave shell 100% transparent',()=
   assert.equal(active.stroke,'#ffffff');
   assert.equal(active.strokeAlpha,CONTROL_PALETTE.activeBorderAlpha);
   assert.ok(active.alpha<=.42);
-  assert.equal(settings[0].line,'#718b9d');
+  assert.equal(settings[0].line,'#858585');
 
   assert.throws(()=>ghostReviewSettings('other','dark'),TypeError);
 });
