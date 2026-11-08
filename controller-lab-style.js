@@ -3,8 +3,7 @@
 import {resolveHeroRecipe,qtQuickDescriptor} from './pbr-recipes.js';
 
 export const LAB_VARIANTS=Object.freeze([
-  Object.freeze({key:'white',name:'Weiß',description:'Originalfarben · weiße aktive Eingaben'}),
-  Object.freeze({key:'cool',name:'Blauweiß',description:'Gleicher Controller · kühler Akzent auf hellen aktiven Tasten'})
+  Object.freeze({key:'white',name:'Weiß',description:'Originalfarben · weiße aktive Eingaben'})
 ]);
 const clamp=x=>Math.max(0,Math.min(1,Number.isFinite(Number(x))?Number(x):0));
 const blend=(a,b,t)=>a+(b-a)*t;
@@ -52,14 +51,14 @@ export function qtLabDescriptor(recipe,{activeColor2D='#ffffff'}={}){
       pose:'rotate authored parent; cap and stem inherit the same motion'},
     flat2D:{mode:'ghost',independentOf3DMix:true,shellOpacity:0,
       controlOpacity:.26,activeOpacity:.40,activeColor:activeColor2D,
-      contrast:'achromatic controls: light on dark, dark on light, paired edges on mixed',
+      contrast:'same grayscale contour ink for shell, controls and glyphs; no black double-edges',
       decoration:'authored paths, no input feedback'},
     hiddenControls:{visibility:'physical-depth',dashed:true,individualInput:true,
       ...recipe.hiddenIndicators,
       qtPort:'requires a depth-aware overlay pass/custom material; not a built-in PrincipledMaterial toggle'},
     geometryReuse:'share proven equivalent buffers; instance only equal final material states',
     calibrationNotes:[...base.calibrationNotes,
-      'A single standard PBR recipe serves both feedback choices; no Fresnel shader patch.',
+      'A single standard PBR recipe serves white feedback; no Fresnel shader patch.',
       'Hidden-line depth comparison and the shared alpha-edge compositor need explicit Qt implementations and native visual validation.']
   };
 }

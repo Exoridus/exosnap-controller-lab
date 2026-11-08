@@ -77,7 +77,7 @@ function makeGallery(){
   setVisibleLooks();
 }
 function setVisibleLooks(){
-  const enabled=new Set([...document.querySelectorAll('[data-look]')].filter(x=>x.checked).map(x=>x.dataset.look));
+  const enabled=new Set(variants.map(({key})=>key));
   for(const card of gallery.querySelectorAll('.variant'))card.hidden=!enabled.has(card.dataset.variant);
   document.body.dataset.visibleLooks=[...enabled].join(',');
   scheduleRender();
@@ -138,6 +138,10 @@ async function loadFlatReferences(model){
     if(serial!==flatLoadSerial)return;
     if(!ref.svg){stage.textContent=`2D-Vorlage für ${layout.name} nicht ladbar`;return;}
     isolateReferenceIds(ref.svg,`pbr-${serial}-${index}`);
+    // Ensure a real margin around the authored full-width shell and triggers.
+    const vb=ref.svg.viewBox.baseVal;
+    const mx=vb.width*.055,my=vb.height*.035;
+    ref.svg.setAttribute('viewBox',[vb.x-mx,vb.y-my,vb.width+2*mx,vb.height+2*my].join(' '));
     stage.replaceChildren(ref.svg);ref.container=stage;
     flatReferences.set(scene,ref);
   }));
@@ -183,7 +187,7 @@ function updateFlatReferences(){
     const ref=flatReferences.get(sceneName);
     if(!ref)continue;
     paintPolished2D(ref,'ghost',sceneName,{...input,activeColor:activeColors.color2D,
-      stickFeedback:'ring',showFaceSymbols:true,edgeLight:.38,edgeShadow:.45});
+      stickFeedback:'ring',showFaceSymbols:true,edgeLight:0,edgeShadow:0,coherentContours:true});
   }
   flatPaintKey=key;
 }
@@ -323,7 +327,7 @@ function render(){
   document.body.dataset.renderReady=rendered===expected&&flatReady?'three-rendered':'incomplete';
   if(rendered===expected)document.body.dataset.renderRevision=String(1+(Number(document.body.dataset.renderRevision)||0));
   $('modelInfo').textContent=`${state.native.partCount} Originalteile · ${state.native.geometryReuse?.pairs||0} Mesh-Buffers geteilt`;
-  setStatus(`${state.native.model.name} · ${rendered} 3D-Ansichten + 3 feste 2D-Ansichten · ${state.stickPose==='live'?'Live-Gamepad':'Eingabe testen: Weiß und Blauweiß vergleichen'}`);
+  setStatus(`${state.native.model.name} · ${rendered} 3D-Ansichten + 3 feste 2D-Ansichten · ${state.stickPose==='live'?'Live-Gamepad':'Aktives Eingabefeedback: Weiß'}`);
 }
 function getLiveStickPose(){
   const pads=typeof navigator.getGamepads==='function'?navigator.getGamepads():[];

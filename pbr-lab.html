@@ -16,8 +16,7 @@
     <label class="field trigger-field"><span>Trigger L2/R2 <output id="triggerValue">0 %</output></span><input id="triggerPressure" type="range" min="0" max="100" step="1" value="0" aria-label="Analogen Druck der Trigger L2 und R2 simulieren"></label>
     <label class="field"><span>Einzeln testen</span><select id="testControl" aria-label="Einzelne Eingabe testen"><option value="">Keine</option><option value="l1">L1 / LB</option><option value="r1">R1 / RB</option><option value="l2">L2 / LT</option><option value="r2">R2 / RT</option><option value="ls">L3</option><option value="rs">R3</option><option value="b1">Kreuz / A</option><option value="b2">Kreis / B</option><option value="b3">Quadrat / X</option><option value="b4">Dreieck / Y</option><option value="up">D-Pad oben</option><option value="home">PS / Home</option><option value="touchpad">Touchpad</option></select></label>
     <label class="press-field"><input type="checkbox" id="pressAll"> Alle drücken</label>
-    <label class="press-field" title="Weiße Eingabeanzeige"><input type="checkbox" id="toggleWhite" data-look="white" checked> Weiß</label>
-    <label class="press-field" title="Blauweiß auf hellen aktiven 3D-Tasten; nimmt zum Ghost-Ende ab"><input type="checkbox" id="toggleCool" data-look="cool" checked> Blauweiß</label>
+    <span class="press-field" aria-label="Weißes Aktivfeedback">Aktiv: Weiß</span>
   </div>
   <details class="settings"><summary>Aktivfarben &amp; Qt-Parameter</summary><div class="toolbar">
     <label class="press-field" title="Optional beide Press-Farben koppeln"><input type="checkbox" id="colorSync" checked> Sync</label>
@@ -27,5 +26,5 @@
   </div></details>
   <div class="status-row"><span id="rendererStatus" role="status">Originalmodell wird geladen …</span><span id="modelInfo"></span><nav><a href="./artwork-source-review.html">SVG-Quelle</a> · <a href="./screenshots.html">Bildnachweise</a></nav></div>
 </header>
-<main><div id="failureBanner" role="alert" hidden></div><div id="gallery" aria-label="Weiß und Blauweiß in 3D; ein unabhängiger transparenter 2D-Stil"></div></main>
+<main><div id="failureBanner" role="alert" hidden></div><div id="gallery" aria-label="Ein einheitlicher 3D-Look und ein unabhängiger transparenter 2D-Look"></div></main>
 <script type="module" src="./pbr-lab.js"></script></body></html>
