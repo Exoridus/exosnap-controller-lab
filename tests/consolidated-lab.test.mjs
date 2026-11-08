@@ -54,4 +54,7 @@ test('Qt export describes one source rig, independent 2D and explicit hidden-con
   assert.equal(descriptor.renderReuse.requiresCpuReadback,false);
   assert.equal(descriptor.hiddenControls.visibility,'physical-depth');
   assert.equal(descriptor.nativeValidated,false);
+  assert.equal(descriptor.stickPolicy.cap,'L3/R3 click only');
+  assert.equal(lab.qtLabDescriptor(lab.resolveLabRecipe('white',1),
+    {activeColor2D:'#ff4400'}).flat2D.activeColor,'#ff4400');
 });

@@ -64,7 +64,7 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
     if(!unlit&&!control&&(!recipe.consolidated||m.userData.exoGhostFresnelUniform))
       setGhostFresnel(m,recipe.consolidated?0:recipe.ghostFresnel?.strength||0);
     if(!unlit){
-      m.roughness=control?Math.min(1,spec.roughness+.06):spec.roughness;
+      m.roughness=control&&!recipe.consolidated?Math.min(1,spec.roughness+.06):spec.roughness;
       m.metalness=spec.metalness;
       m.clearcoat=spec.clearcoat;
       m.clearcoatRoughness=spec.clearcoatRoughness;

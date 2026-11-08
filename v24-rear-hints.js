@@ -31,7 +31,7 @@ export function makeRearHint(mesh,role,key,alpha=.32,{contrastLayers=false}={}){
   // geometry and appears solely in hidden active fragments, under the dashes.
   const fill=new THREE.Mesh(mesh.geometry,new THREE.MeshBasicMaterial({
     color:'#ffffff',transparent:true,opacity:0,depthTest:true,depthWrite:false,
-    depthFunc:THREE.GreaterDepth,side:THREE.DoubleSide,toneMapped:false
+    depthFunc:THREE.GreaterDepth,side:THREE.FrontSide,toneMapped:false
   }));
   fill.userData.rearHintFill=true;fill.visible=false;fill.renderOrder=29;
   line.userData.hiddenFill=fill;

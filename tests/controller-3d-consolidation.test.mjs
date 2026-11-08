@@ -8,6 +8,8 @@ import {applyPbrRecipeToRig,applyStickPoseToRig} from '../pbr-appearance.js';
 import {prepareGhostOcclusion,hideOccludedRearControls} from '../ghost-depth-policy.js';
 import {resolveHeroRecipe} from '../pbr-recipes.js';
 import * as artwork from '../control-glyphs.js';
+import {instantiateStickPairs} from '../pbr-optimizer.js';
+import {resolveLabRecipe} from '../controller-lab-style.js';
 
 const read=async url=>fs.readFile(new URL('../'+url.replace(/^\.\//,''),import.meta.url),'utf8');
 const recipe=(mix=1,activeContrast='white')=>{
@@ -145,4 +147,54 @@ test('source SVG paths and full transforms paint face, D-pad and above-button Cr
  }finally{
   disposeNativeRig(rig);globalThis.document=oldDocument;globalThis.Path2D=oldPath;
  }
+});
+
+test('hidden active fill rejects back faces so exposed controls cannot fill against their own front depth',async()=>{
+ const rig=await rigFor('DualSenseCompact');
+ try{
+  prepareGhostOcclusion(rig);
+  applyPbrRecipeToRig(rig,resolveLabRecipe('white',1),{triggers:{left:1}});
+  const left=rig.rearHintLines.find(h=>h.parent.userData.sourceFile==='left_trigger.obj');
+  assert.ok(left.userData.hiddenFill.visible);
+  assert.equal(left.userData.hiddenFill.material.depthFunc,THREE.GreaterDepth);
+  assert.equal(left.userData.hiddenFill.material.side,left.parent.material.side);
+  assert.equal(left.userData.hiddenFill.material.side,THREE.FrontSide);
+ }finally{disposeNativeRig(rig)}
+});
+
+test('consolidated physical control roughness equals its portable recipe while archived roughness keeps its offset',async()=>{
+ const rig=await rigFor('DualSenseCompact');
+ try{
+  const current=resolveLabRecipe('white',1);
+  applyPbrRecipeToRig(rig,current,{});
+  assert.equal(mesh(rig,'a_button.obj').material.roughness,.64);
+  assert.equal(mesh(rig,'left_cap.obj').material.roughness,current.material.controls.roughness);
+  assert.equal(mesh(rig,'top_shell.obj').material.roughness,current.material.shell.roughness);
+  const archived=resolveHeroRecipe('ghost',1);
+  applyPbrRecipeToRig(rig,archived,{});
+  assert.equal(mesh(rig,'a_button.obj').material.roughness,Math.min(1,archived.material.controls.roughness+.06));
+ }finally{disposeNativeRig(rig)}
+});
+
+test('disposing a real instanced rig dispatches exactly one dispose event per instance and shared resource',async()=>{
+ const rig=await rigFor('DualSenseCompact');
+ instantiateStickPairs(rig);
+ const instances=rig.stickInstances.map(p=>p.instance);
+ assert.ok(instances.length>0,'actual native stick pairs must be instanced');
+ const counts=new Map();
+ const track=resource=>{
+  if(counts.has(resource))return;
+  counts.set(resource,0);resource.addEventListener('dispose',()=>counts.set(resource,counts.get(resource)+1));
+ };
+ for(const instance of instances){
+  instance.setColorAt(0,new THREE.Color('#ffffff'));
+  track(instance);
+ }
+ for(const m of rig.meshes){track(m.geometry);track(m.material);}
+ // A rig's bookkeeping can reference the same live instance more than once.
+ // GPU-owned instance attributes and shared geometry/material must each free once.
+ rig.meshes.push(instances[0]);
+ disposeNativeRig(rig);
+ for(const instance of instances)assert.equal(counts.get(instance),1,'instance GPU resource dispose event');
+ for(const [resource,count]of counts)assert.equal(count,1,`${resource.type} disposed exactly once`);
 });

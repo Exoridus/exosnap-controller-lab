@@ -42,7 +42,7 @@ export function flatAppearanceKey(pose,color='#ffffff'){
   return JSON.stringify([color,values,axis(pose?.left),axis(pose?.right)]);
 }
 
-export function qtLabDescriptor(recipe){
+export function qtLabDescriptor(recipe,{activeColor2D='#ffffff'}={}){
   const base=qtQuickDescriptor(recipe);
   return {...base,
     comparisonVariant:recipe.comparisonVariant,
@@ -51,7 +51,7 @@ export function qtLabDescriptor(recipe){
     stickPolicy:{ring:'analog magnitude',cap:'L3/R3 click only',support:'neutral shell opacity',
       pose:'rotate authored parent; cap and stem inherit the same motion'},
     flat2D:{mode:'ghost',independentOf3DMix:true,shellOpacity:0,
-      controlOpacity:.26,activeOpacity:.40,activeColor:'#ffffff',
+      controlOpacity:.26,activeOpacity:.40,activeColor:activeColor2D,
       contrast:'achromatic controls: light on dark, dark on light, paired edges on mixed',
       decoration:'authored paths, no input feedback'},
     hiddenControls:{visibility:'physical-depth',dashed:true,individualInput:true,

@@ -94,8 +94,9 @@ export async function loadNativeRig(model, readText=httpText){
 export function disposeNativeRig(native){
   if(!native)return;
   disposeSilhouette(native);
-  const geometries=new Set(),materials=new Set();
+  const geometries=new Set(),materials=new Set(),instances=new Set();
   for(const m of native.meshes){
+    if(m.isInstancedMesh)instances.add(m);
     if(m.geometry)geometries.add(m.geometry);
     for(const mat of [m.material,m.userData.pbrMaterial,m.userData.unlitMaterial])if(mat)materials.add(mat);
   }
@@ -111,6 +112,9 @@ export function disposeNativeRig(native){
     if(!o.userData?.surfaceArtwork)return;
     o.geometry?.dispose();o.material?.map?.dispose();o.material?.dispose();
   });
+  // InstancedMesh owns GPU instanceMatrix/instanceColor attributes separately
+  // from its shared geometry and material. Its dispose event releases those.
+  for(const instance of instances)instance.dispose();
   for(const geometry of geometries)geometry.dispose();
   for(const material of materials)material.dispose();
   native.group.parent?.remove(native.group);

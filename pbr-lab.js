@@ -381,7 +381,7 @@ async function exportQtRecipe(){
   const output={generator:'ExoSnap consolidated controller lab',date:'2026-11-08',
     modelId:state.modelId,view:state.view,camera:{fov:state.camera?.fov||35,position:state.camera?.position.toArray()||[0,0,7]},
     geometryReuse:state.native?.geometryReuse,
-    feedback:Object.fromEntries(variants.map(({key})=>{const recipe=recipeFor3D(key);return [key,{recipe,qtQuick3D:qtLabDescriptor(recipe)}]}))};
+    feedback:Object.fromEntries(variants.map(({key})=>{const recipe=recipeFor3D(key);return [key,{recipe,qtQuick3D:qtLabDescriptor(recipe,{activeColor2D:activeColors.color2D})}]}))};
   const blob=new Blob([JSON.stringify(output,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob),a=document.createElement('a');
   a.href=url;a.download=`exosnap-controller-${Math.round(state.mix*100)}-qt.json`;a.click();
