@@ -14,6 +14,7 @@ main{padding:10px 12px 16px;overflow-x:auto;overflow-y:visible;overscroll-behavi
 #failureBanner{background:#30282e;border:1px solid #9d655b;color:#ffe0d4;border-radius:8px;padding:10px 14px;margin-bottom:10px}#failureBanner[hidden]{display:none}
 #gallery{position:relative;width:max-content;min-width:100%;display:grid;grid-template-columns:1fr;gap:10px;--panel-width:320px;--panel-height:214px}
 .variant{position:relative;background:transparent;border:0;border-radius:0;padding:0;margin:0}
+.player-index-field[hidden]{display:none}.player-index-field select{min-width:148px}
 .variant[hidden]{display:none}.variant-top,.sample-title,.corner-note,.sample-stats{display:none !important}
 .look-label{font-size:11px;font-weight:650;line-height:1.4;margin:0 0 5px;color:#b7c5d0;letter-spacing:.015em}.look-views{display:grid;grid-template-columns:repeat(3,var(--panel-width));gap:8px;position:relative}
 .sample-wrap{display:block;min-width:0}.sample{position:relative;overflow:hidden;width:var(--panel-width);aspect-ratio:320/214;height:auto;min-height:0;border:1px solid #46657e6e;border-radius:6px;background-size:cover;background-position:center;cursor:grab;touch-action:none}
