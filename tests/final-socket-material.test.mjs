@@ -5,6 +5,7 @@ import {CONTROLLERS} from '../models.js';
 import {loadNativeRig,disposeNativeRig} from '../pbr-model.js';
 import {applyPbrRecipeToRig,applyControlPoseToRig} from '../pbr-appearance.js';
 import {resolveLabRecipe} from '../controller-lab-style.js';
+import {instantiateStickPairs} from '../pbr-optimizer.js';
 import {prepareGhostOcclusion} from '../ghost-depth-policy.js';
 const read=url=>fs.readFile(new URL('../'+url.replace(/^\.\//,''),import.meta.url),'utf8');
 test('both original DualSense support domes blend toward shell material without changing moving rings, geometry or depth',async()=>{
@@ -20,7 +21,8 @@ test('both original DualSense support domes blend toward shell material without 
    for(const m of supports){
     const expected=m.userData.sourceColor.clone().lerp(shell.userData.sourceColor,amount);
     assert.ok(m.material.color.equals(expected),'socket uses gradual shell color, not isolated gray');
-    assert.equal(m.material.opacity,recipe.material.shell.opacity);
+    assert.equal(m.material.opacity,recipe.material.supportOpacity);
+    if(mix>0)assert.ok(m.material.opacity<recipe.material.shell.opacity,'support overlay is quieter than the shell');
     assert.equal(m.material.roughness,recipe.material.controls.roughness+(recipe.material.shell.roughness-recipe.material.controls.roughness)*amount);
     assert.equal(m.material.depthTest,true);assert.equal(m.material.depthWrite,true);
    }
@@ -28,11 +30,16 @@ test('both original DualSense support domes blend toward shell material without 
     assert.ok(m.material.color.equals(m.userData.sourceColor),'moving lip and cap stay source-authored at rest');
   }
   const recipe=resolveLabRecipe('white',.7);applyPbrRecipeToRig(rig,recipe,{left:{x:.7,y:.3,click:true},right:{x:-.7,y:.3,click:true}});
-  for(const m of supports){assert.equal(m.material.emissiveIntensity,0);assert.equal(m.material.opacity,recipe.material.shell.opacity);}
+  for(const m of supports){assert.equal(m.material.emissiveIntensity,0);assert.equal(m.material.opacity,recipe.material.supportOpacity);}
   rig.group.updateMatrixWorld(true);const rest=supports.map(m=>m.matrixWorld.clone());
   applyControlPoseToRig(rig,{left:{x:.7,y:.3,click:true},right:{x:-.7,y:.3,click:true}});rig.group.updateMatrixWorld(true);
   supports.forEach((m,i)=>assert.ok(!m.matrixWorld.equals(rest[i]),'original moving support still follows its rig'));
   applyControlPoseToRig(rig,{});rig.group.updateMatrixWorld(true);supports.forEach((m,i)=>assert.ok(m.matrixWorld.equals(rest[i])));
   for(const o of original){assert.equal(o.mesh.geometry,o.geometry);assert.equal(o.mesh.parent,o.parent);assert.deepEqual(Array.from(o.geometry.attributes.position.array),o.positions);}
+  instantiateStickPairs(rig);applyPbrRecipeToRig(rig,recipe,{});
+  const pair=rig.stickInstances.find(g=>g.role==='stick-stem');
+  assert.ok(pair?.instance.visible,'identical quiet supports keep GPU instancing');
+  assert.equal(pair.instance.material,pair.originals[0].material);
+  assert.equal(pair.instance.material.opacity,recipe.material.supportOpacity);
  }finally{disposeNativeRig(rig);}
 });

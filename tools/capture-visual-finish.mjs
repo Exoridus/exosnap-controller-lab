@@ -20,9 +20,9 @@ export async function captureVisualFinish(page,{output,images}){
  const socketChecks=[];
  for(const view of ['front','angled','top','profile']){
   await set('view',view);await shot(`3d-final-socket-${view}.png`,'Both original support domes, shell-linked material, neutral '+view);
-  socketChecks.push(await page.evaluate(()=>window.__exoPbrLab.model.meshes.filter(m=>m.userData.role==='stick-stem').map(m=>({file:m.userData.sourceFile,color:m.material.color.getHexString(),alpha:m.material.opacity,depthWrite:m.material.depthWrite,vertices:m.geometry.attributes.position.count}))));
+  socketChecks.push(await page.evaluate(()=>window.__exoPbrLab.model.meshes.filter(m=>m.userData.role==='stick-stem'&&!m.isInstancedMesh).map(m=>({file:m.userData.sourceFile,color:m.material.color.getHexString(),alpha:m.material.opacity,depthWrite:m.material.depthWrite,vertices:m.geometry.attributes.position.count}))));
  }
- for(const checks of socketChecks)if(checks.length!==2||checks[0].color!==checks[1].color||checks[0].alpha!==checks[1].alpha||checks.some(m=>!m.depthWrite))throw Error('Asymmetric socket material or depth regression');
+ for(const checks of socketChecks)if(checks.length!==2||checks[0].color!==checks[1].color||checks[0].alpha!==checks[1].alpha||checks.some(m=>!m.depthWrite))throw Error('Asymmetric socket material or depth regression: '+JSON.stringify(checks));
  await set('materialMix',0);await shot('3d-final-socket-original.png','Original opaque source colors retained at 0% Ghost mix');await set('materialMix',70);await set('view','front');
  const fixtures=[];
  for(const transparency of [0,30,70,90])for(const state of ['neutral','pressed','move','move-click']){

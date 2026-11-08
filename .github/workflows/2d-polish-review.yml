@@ -45,6 +45,11 @@ jobs:
         env:
           CAPTURE_COMMIT_SHA: ${{ github.sha }}
         run: node tools/capture-pages.mjs --out .capture
+      - name: Native Qt capability probes (not ExoSnap parity)
+        run: |
+          python3 -m venv "$RUNNER_TEMP/qt-probe"
+          "$RUNNER_TEMP/qt-probe/bin/pip" install --disable-pip-version-check PySide6==6.12.0
+          QSG_RHI_BACKEND=opengl LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a "$RUNNER_TEMP/qt-probe/bin/python" qt-port-example/verify_portability.py --fixtures .capture/qt-fixtures --out .capture/qt-native
       - name: Ensure static Pages export preserves 3D gallery and all 2D screenshots
         run: node tools/build-pages.mjs --out dist --capture .capture
       - name: Publish real browser evidence as PR artifact (no deployment)

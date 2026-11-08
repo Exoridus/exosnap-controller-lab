@@ -16,19 +16,23 @@ test('the final lab has one physical 3D recipe and white feedback only',()=>{
   }
 });
 
-test('mix has true opaque and ghost endpoints with structural support following shell',()=>{
+test('mix has true opaque and ghost endpoints with structural support fading consistently below shell',()=>{
   assert.equal(typeof lab.resolveLabRecipe,'function');
   const start=lab.resolveLabRecipe('white',0),end=lab.resolveLabRecipe('white',1);
   assert.equal(start.material.shell.opacity,1);
   assert.equal(start.material.controls.opacity,1);
   assert.ok(Math.abs(end.material.shell.opacity-.10)<1e-9);
   assert.ok(Math.abs(end.material.controls.opacity-.25)<1e-9);
+  assert.equal(start.material.supportOpacity,1);
+  assert.ok(Math.abs(end.material.supportOpacity-.028)<1e-9);
   let previous=start;
   for(let i=0;i<=20;i++){
     const recipe=lab.resolveLabRecipe('white',i/20);
     assert.ok(recipe.material.shell.opacity<=previous.material.shell.opacity);
     assert.ok(recipe.material.controls.opacity<=previous.material.controls.opacity);
-    assert.equal(recipe.material.supportOpacity,recipe.material.shell.opacity);
+    assert.ok(recipe.material.supportOpacity<=recipe.material.shell.opacity);
+    assert.ok(recipe.material.supportOpacity<=previous.material.supportOpacity);
+    assert.ok(recipe.material.supportOpacity>0);
     assert.ok(recipe.material.controls.opacity>=recipe.material.shell.opacity);
     previous=recipe;
   }
