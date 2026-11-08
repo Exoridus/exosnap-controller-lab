@@ -182,6 +182,7 @@ function activeEdgeFilter(node,level){
 // active surface on a light scene. Filters are shared per authored transform
 // and rendered size; no texture readback or source-path clipping is used.
 function controlContrastFilter(node,colors,level,movingRing=false){
+  if(colors.coherentContours){node?.style?.removeProperty('filter');return;}
   if(!colors.ghost){activeEdgeFilter(node,level);return;}
   const svg=node?.ownerSVGElement;
   if(!svg)return;
@@ -367,7 +368,7 @@ function paintStick(reference,entry,colors,values,axes,variant){
     colors.controlAlpha+(colors.activeAlpha-colors.controlAlpha)*ring:0));
   // The Solid annulus has one constant dark boundary even when its moving
   // material turns white. No extra graphic ring is created.
-  paint(outer,'stroke',solid?colors.controlStroke:mixColor(colors.controlStroke,colors.activeColor||PRESS_WHITE,ring));
+  paint(outer,'stroke',solid||colors.coherentContours?colors.controlStroke:mixColor(colors.controlStroke,colors.activeColor||PRESS_WHITE,ring));
   controlContrastFilter(outer,colors,ring,true);
   paint(outer,'stroke-opacity',
     String(colors.controlStrokeAlpha+(CONTROL_PALETTE.activeBorderAlpha-colors.controlStrokeAlpha)*ring));
@@ -515,7 +516,8 @@ function paintEdgeRelief(reference,mode,scene,edgeLight,edgeShadow){
 }
 export function paintPolished2D(reference,mode,scene,{
   values=new Map(),left=null,right=null,colorway='auto',
-  stickFeedback='ring',showFaceSymbols=true,edgeLight=0,edgeShadow=0,reviewLook=null,activeColor=PRESS_WHITE
+  stickFeedback='ring',showFaceSymbols=true,edgeLight=0,edgeShadow=0,reviewLook=null,activeColor=PRESS_WHITE,
+  coherentContours=false
 }={}){
   if(!reference?.svg)return;
   const colors=reviewLook?
@@ -523,6 +525,18 @@ export function paintPolished2D(reference,mode,scene,{
       ...ghostReviewSettings(reviewLook,scene)}:
     lookPalette(reference.layout.id,mode,scene,colorway);
   colors.activeColor=/^#[\da-f]{6}$/i.test(activeColor)?activeColor:PRESS_WHITE;
+  if(coherentContours&&mode==='ghost'&&!reviewLook){
+    // A single scene-specific ink shared by the outer housing, interior
+    // paths, shoulders, sticks, face/directional controls and glyphs.
+    // No opaque black and no extra control-specific filter passes.
+    const ink={dark:'#ffffff',light:'#858585',mixed:'#b9c5ce'}[scene];
+    colors.coherentContours=true;
+    colors.line=colors.control=colors.cap=colors.trigger=colors.controlStroke=
+      colors.glyph=colors.pressedOutline=ink;
+    colors.lineAlpha=.88;colors.controlStrokeAlpha=.88;colors.glyphAlpha=.88;
+    colors.detailAlpha=.64;colors.contrastEdge=null;
+    edgeLight=0;edgeShadow=0;
+  }
   if(reviewLook&&mode!=='ghost')throw new TypeError('Review look requires Ghost mode');
   if(reviewLook){
     const preset=ghostReviewSettings(reviewLook,scene);
@@ -554,8 +568,31 @@ export function paintPolished2D(reference,mode,scene,{
       if(colors.ghost){
         if(child.polishAuthoredBodyStyle===null)child.removeAttribute('style');
         else child.setAttribute('style',child.polishAuthoredBodyStyle);
+        if(colors.coherentContours&&!child.id.endsWith('speaker-grille')){
+          // Preserve all original paths. Their filled linework often carries
+          // interior casing seams that became invisible on white scenes.
+          if(visibleFill(child)){
+            paint(child,'fill',colors.line);
+            paint(child,'fill-opacity',detail?'.64':'.76');
+          }
+          if(visibleStroke(child)){
+            paint(child,'stroke',colors.line);
+            paint(child,'stroke-opacity',String(colors.lineAlpha));
+          }
+        }
         continue;
       }
+    }
+    if(colors.coherentContours&&colors.ghost){
+      if(visibleFill(child)){
+        paint(child,'fill',colors.line);
+        paint(child,'fill-opacity','.88');
+      }
+      if(visibleStroke(child)){
+        paint(child,'stroke',colors.line);
+        paint(child,'stroke-opacity',String(colors.lineAlpha));
+      }
+      continue;
     }
     // An SVG shape without an explicit fill still inherits SVG's black
     // default. Ghost review must remove the paint itself, not just set alpha
