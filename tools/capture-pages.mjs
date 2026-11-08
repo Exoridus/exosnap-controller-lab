@@ -207,6 +207,40 @@ try{
         source:'Real WebGL/OBJ neutral material, not native Qt 3D'});
     }
   }
+  // Focused 3D final-polish evidence. Screenshot ONLY the 3D panel, not the
+  // 2D LEDs or status text, so a P1/P4 change must affect real PBR pixels.
+  await page.locator('#demoToggle').uncheck();
+  await page.locator('#pressAll').uncheck();
+  await page.locator('#view').selectOption('front');
+  await page.locator('#materialMix').fill('70');
+  await page.locator('#outerContour').check();
+  for(const [model,expectedCount] of [['SwitchPro',4],['JoyconGrip',8]]){
+    await page.locator('#controller').selectOption(model);
+    await page.waitForFunction(id=>document.body.dataset.renderReady==='three-rendered'&&
+      window.__exoPbrLab?.model?.model?.id===id&&
+      window.__exoPbrLab?.playerLedSurface3D?.count===(id==='SwitchPro'?4:8),
+      model,{timeout:60000});
+    let prior=null;
+    for(const [playerIndex,mask] of [['0',1],['3',15]]){
+      await page.locator('#playerPreview').selectOption(playerIndex);
+      await page.waitForFunction(mask=>window.__exoPbrLab?.playerLedSurface3D?.mask===mask,mask,{timeout:60000});
+      await shotProof();
+      const rect=await page.locator('.variant[data-variant="white"] .sample[data-scene="light"]')
+        .boundingBox();
+      if(!rect)throw Error('Missing visible 3D light panel for '+model);
+      const name='final-3d-player-led-'+model.toLowerCase()+'-p'+(Number(playerIndex)+1)+'.png';
+      const bytes=await page.screenshot({path:path.join(output,name),
+        clip:{x:Math.max(0,rect.x),y:Math.max(0,rect.y),width:rect.width,height:rect.height},
+        animations:'disabled',timeout:60000});
+      const sha256=createHash('sha256').update(bytes).digest('hex');
+      if(bytes.length<4000||sha256===prior)throw Error('3D player LEDs must actually change WebGL pixels: '+model+' '+name);
+      prior=sha256;
+      images.push({file:name,modelId:model,playerMask:mask,bytes:bytes.length,sha256,
+        source:'Actual WebGL2 source OBJ material LEDs; no physical LED readback'});
+    }
+  }
+  await page.locator('#controller').selectOption('DualSenseCompact');
+  await shotProof();
   // Browser-only visual acceptance matrix: genuine Chromium renderings of
   // the same authored SVGs. Fail the release for missing shapes or bad states.
   const polishErrors=[];
