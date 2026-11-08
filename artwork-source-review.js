@@ -1,14 +1,16 @@
 import {LAYOUTS,layoutForId} from './controller-catalog.js';
 import {ControllerReference,isolateReferenceIds} from './controller-reference.js';
 import {paintPolished2D} from './polish-2d-style.js';
+import {attachStickDrag} from './stick-drag.js';
 
 const $=id=>document.getElementById(id),clamp=n=>Math.max(0,Math.min(1,Number(n)||0));
 const sceneValues=['dark','light','mixed'];
 const stages=[...document.querySelectorAll('.stage[data-view]')];
 const refs=stages.map(stage=>({mode:stage.dataset.view,stage,
-  reference:new ControllerReference(stage,{onPress:key=>togglePress(key)})}));
+  reference:new ControllerReference(stage,{onPress:key=>{if(!['ls','rs'].includes(key))togglePress(key);}})}));
 const query=new URLSearchParams(location.search),manual=new Set();
 let selected=null,actual=null,serial=0;
+const drag={left:null,right:null};let clearDrags=[];
 for(const layout of LAYOUTS.filter(x=>x.has2D)){
   const option=document.createElement('option');option.value=layout.id;
   option.textContent=layout.name;$('layout').append(option);
@@ -25,10 +27,11 @@ function state(){
     for(const key of ['b1','b2','b3','b4','up','down','left','right'])values.set(key,1);
   if($('allControls').checked)
     for(const key of ['l1','r1','start','select','home','share','touchpad'])values.set(key,1);
-  if($('clicks').checked){values.set('ls',1);values.set('rs',1);}
+  if($('clicks').checked||$('clickLeft').checked)values.set('ls',1);
+  if($('clicks').checked||$('clickRight').checked)values.set('rs',1);
   if(trigger>0){values.set('l2',trigger);values.set('r2',trigger);}
   for(const key of manual)values.set(key,1);
-  return {values,left:{x:axis,y:-axis},right:{x:-axis,y:axis}};
+  return {values,left:drag.left||{x:axis,y:-axis},right:drag.right||{x:-axis,y:axis}};
 }
 function togglePress(key){
   if(!key)return;
@@ -88,7 +91,9 @@ async function load(id){
   // Never load the NC-derived alternative geometry for this device.
   actual=selected.id==='steam_controller_2026'?layoutForId('generic'):selected;
   $('layout').value=selected.id;
-  manual.clear();document.body.dataset.sourceReviewReady='loading';
+  manual.clear();clearDrags.forEach(fn=>fn());clearDrags=[];
+  drag.left=null;drag.right=null;
+  document.body.dataset.sourceReviewReady='loading';
   $('status').textContent='Lade '+selected.name+' …';
   await Promise.all(refs.map(async(item,index)=>{
     await item.reference.load(actual);
@@ -96,6 +101,11 @@ async function load(id){
       isolateReferenceIds(item.reference.svg,'src-review-'+token+'-'+index);
   }));
   if(token!==serial)return;
+  for(const item of refs)clearDrags.push(attachStickDrag(item.reference,{
+    start:side=>{$('stick').value='0';$('stickValue').textContent='0 %';drag[side]={x:0,y:0};render();},
+    move:(side,axes)=>{drag[side]=axes;render();},
+    end:side=>{drag[side]=null;render();}
+  }));
   render();
 }
 function address(){
@@ -111,10 +121,10 @@ for(const id of ['scene','size','colorway'])$(id).addEventListener('change',()=>
 for(const id of ['stick','trigger'])$(id).addEventListener('input',()=>{
   $(id+'Value').textContent=$(id).value+' %';render();
 });
-for(const id of ['clicks','faces','allControls','faceSymbols'])$(id).addEventListener('change',render);
+for(const id of ['clicks','clickLeft','clickRight','faces','allControls','faceSymbols'])$(id).addEventListener('change',render);
 const fromQuery=(id,allowed)=>{if(allowed.includes(query.get(id)))$(id).value=query.get(id);};
 fromQuery('scene',sceneValues);fromQuery('size',['320','480']);updateDimensions();
 void load(query.get('id')||'dualsense');
 window.__exoSourceReview={get status(){return document.body.dataset.sourceReviewReady},
   get refs(){return refs},get selected(){return selected?.id},get actual(){return actual?.id},
-  load,render,state};
+  load,render,state,get drag(){return {...drag}}};

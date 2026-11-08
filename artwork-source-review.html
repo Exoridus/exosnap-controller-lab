@@ -28,7 +28,7 @@ figcaption small{font-size:11px;color:#a4bcd0;font-weight:400}
 .stage[data-scene=dark]::before{background-color:#07101c;background-image:linear-gradient(#040914ac,#040914ac),url('./backgrounds/arena.svg')}
 .stage[data-scene=light]::before{background:#eef2f5}
 .stage[data-scene=mixed]::before{background-image:url('./backgrounds/racing.svg');background-color:#537b91}
-.stage>svg{width:100%;height:100%;display:block;position:relative}
+.stage>svg{touch-action:none;width:100%;height:100%;display:block;position:relative}
 #metadata{margin:12px 0 0;background:#132131;border:1px solid #304c65;border-radius:9px;padding:12px 15px;font-size:12px}
 #metadata strong{color:#f4faff}#metadata .summary{display:flex;flex-wrap:wrap;column-gap:18px;row-gap:8px}
 #metadata .warning{color:#f5c99e;margin-top:9px}
@@ -40,15 +40,17 @@ footer p{max-width:1350px}
 <header>
 <div class="kicker">ExoSnap Controller Lab · 2D-Asset-Prüfung</div>
 <h1>Quell-SVG / Solid / Ghost</h1>
-<p class="lead">Derselbe Controller aus den bereits eingebundenen <code>references/controllers</code>-Quellen: links die unbehandelte SVG-Geometrie, daneben unsere Material- und Transparenzdarstellungen. Kein Austausch der Produktassets. Die neue ZIP-Anlage wurde nicht bytegenau als zweite Dateiversion verifiziert.</p>
+<p class="lead">Derselbe Controller aus den bereits eingebundenen <code>references/controllers</code>-Quellen: links die unbehandelte SVG-Geometrie, daneben unsere Material- und Transparenzdarstellungen. Kein Austausch der Produktassets. Stick-Kappen frei mit Maus/Finger bewegen; L3 und R3 unabhängig schalten. Die ZIP-Anlage wurde nicht bytegenau als zweite Dateiversion verifiziert.</p>
 <div class="controls">
 <label>Controller<select id="layout" aria-label="Controller"></select></label>
 <label>Hintergrund<select id="scene" aria-label="Hintergrund"><option value="dark">Dunkel</option><option value="light">Hell</option><option value="mixed" selected>Gemischt / Gameplay</option></select></label>
 <label>Farbvariante<select id="colorway" aria-label="Farbvariante"><option value="auto">Auto</option><option value="light">Hell</option><option value="dark">Dunkel</option></select></label>
 <label>Größe<select id="size" aria-label="Größe"><option value="320">320 px</option><option value="480" selected>480 px</option></select></label>
-<label>Stick <output id="stickValue">0 %</output><input type="range" id="stick" min="0" max="100" value="0"></label>
+<label>Demo-Diagonale (beide) <output id="stickValue">0 %</output><input type="range" id="stick" min="0" max="100" value="0"></label>
 <label>Trigger <output id="triggerValue">0 %</output><input type="range" id="trigger" min="0" max="100" value="0"></label>
-<label class="check"><input id="clicks" type="checkbox"> L3 / R3</label>
+<label class="check"><input id="clickLeft" type="checkbox"> L3-Klick</label>
+<label class="check"><input id="clickRight" type="checkbox"> R3-Klick</label>
+<label class="check"><input id="clicks" type="checkbox"> Beide Klicks (Test)</label>
 <label class="check"><input id="faces" type="checkbox"> Face / D-Pad</label>
 <label class="check"><input id="allControls" type="checkbox"> Alle Tasten</label>
 <label class="check"><input id="faceSymbols" type="checkbox" checked> Face-Symbole</label>
