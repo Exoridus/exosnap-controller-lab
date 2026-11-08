@@ -1,4 +1,4 @@
-name: Visual audit source snapshot
+name: Visual baseline diagnosis
 on:
   push:
     branches: [fix/visual-finish-qt-gate]
@@ -10,20 +10,40 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: Package exact repository and test dependency
+      - run: npm install --no-save --package-lock=false --ignore-scripts playwright@1.64.1
+      - name: Capture untouched baseline and source-part identification
         run: |
-          git bundle create "$RUNNER_TEMP/visual-audit.bundle" HEAD
-          tar -czf "$RUNNER_TEMP/visual-audit-deps.tar.gz" node_modules
+          node server.mjs > /tmp/lab.log 2>&1 &
+          mkdir -p .capture/before
+          node --input-type=module <<'JS'
+          import {chromium} from 'playwright';
+          import fs from 'node:fs/promises';
+          const browser=await chromium.launch({channel:'chrome',headless:true,args:['--use-gl=angle','--use-angle=swiftshader-webgl','--enable-unsafe-swiftshader','--disable-dev-shm-usage']});
+          const page=await browser.newPage({viewport:{width:1600,height:1050}});
+          await page.goto('http://127.0.0.1:8792/pbr-lab.html');
+          await page.waitForFunction(()=>document.body.dataset.renderReady==='three-rendered');
+          const input=async(id,value)=>{await page.locator('#'+id).evaluate((e,v)=>{if(e.type==='checkbox')e.checked=v;else e.value=v;e.dispatchEvent(new Event(e.type==='range'?'input':'change',{bubbles:true}));},value);await page.waitForTimeout(150);};
+          await input('demoToggle',false);await input('panelSize',480);
+          for(const view of ['front','angled','top','profile']){await input('view',view);await page.screenshot({path:'.capture/before/socket-'+view+'.png'});}
+          await input('view','front');
+          for(const alpha of [0,30,70,90])for(const active of [false,true]){await input('flatTransparency',alpha);await input('pressAll',active);await page.screenshot({path:'.capture/before/flat-'+alpha+'-'+(active?'pressed':'neutral')+'.png'});}
+          await input('pressAll',false);await input('flatTransparency',70);await input('view','angled');
+          const meshes=await page.evaluate(()=>window.__exoPbrLab.model.meshes.map((m,i)=>({i,file:m.userData.sourceFile,name:m.name,role:m.userData.role,visible:m.visible,color:m.userData.sourceColor.getHexString(),alpha:m.material.opacity})));
+          await fs.writeFile('.capture/before/meshes.json',JSON.stringify(meshes,null,2));
+          for(const target of ['top_shell','bottom_shell','stick-stem','stick-pivot']){
+           await page.evaluate(({target,meshes})=>{for(let i=0;i<meshes.length;i++){const m=window.__exoPbrLab.model.meshes[i];m.userData.sourceColor.set(m.userData.sourceFile.includes(target)||m.userData.role===target?'#ff0000':'#'+meshes[i].color);}}, {target,meshes});
+           await input('materialMix',70);await page.screenshot({path:'.capture/before/identify-'+target+'.png'});
+          }
+          await browser.close();
+          JS
+          apt-cache policy qt6-base-dev qt6-svg-dev qt6-quick3d-dev | head -50
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: visual-audit-source
-          path: |
-            ${{ runner.temp }}/visual-audit.bundle
-            ${{ runner.temp }}/visual-audit-deps.tar.gz
-          retention-days: 7
+          name: visual-untouched-baseline
+          path: .capture/before
+          retention-days: 30
