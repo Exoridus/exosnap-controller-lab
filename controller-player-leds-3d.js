@@ -40,14 +40,14 @@ function shaderSource(){
     float inside=step(d.x,insideExt.x)*step(d.y,insideExt.y);
     float rim=(outside-inside)*playerLedFacing;
     float face=inside*playerLedFacing;
-    float active=playerLedActive[led];
+    float ledOn=playerLedActive[led];
     diffuseColor.rgb=mix(diffuseColor.rgb,vec3(0.34,0.39,0.44),rim*0.92);
     diffuseColor.rgb=mix(diffuseColor.rgb,
-      mix(vec3(0.19,0.24,0.28),vec3(0.95,0.97,1.0),active),
-      face*(0.30+active*0.70));
+      mix(vec3(0.19,0.24,0.28),vec3(0.95,0.97,1.0),ledOn),
+      face*(0.30+ledOn*0.70));
     // Only tiny indicators receive local coverage; shell/control alpha stays
     // untouched. Off outlines remain visible in transparent Ghost on white.
-    diffuseColor.a=max(diffuseColor.a,rim*0.75+face*(0.36+active*0.60));
+    diffuseColor.a=max(diffuseColor.a,rim*0.75+face*(0.36+ledOn*0.60));
   }`;
 }
 export function prepare3DPlayerLedSurface(native){
