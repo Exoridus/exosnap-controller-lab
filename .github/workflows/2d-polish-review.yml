@@ -51,6 +51,8 @@ jobs:
       - name: Native Qt capability probes (not ExoSnap parity)
         run: |
           set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libegl1 libopengl0 libgl1-mesa-dri libxkbcommon-x11-0 libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-shape0 libxcb-xinerama0 libxcb-randr0 libxcb-render-util0 libxcb-image0 libdbus-1-3
           python3 -m venv "$RUNNER_TEMP/qt-probe"
           "$RUNNER_TEMP/qt-probe/bin/pip" install --disable-pip-version-check PySide6==6.12.0
           QSG_RHI_BACKEND=opengl LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a "$RUNNER_TEMP/qt-probe/bin/python" qt-port-example/verify_portability.py --fixtures .capture/qt-fixtures --out .capture/qt-native 2>&1 | tee .capture/native-probe.log

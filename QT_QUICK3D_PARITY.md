@@ -1,5 +1,7 @@
 # ExoSnap – echtes 3D-PBR-Variantenlabor / Three.js ↔ Qt Quick 3D
 
+> Historischer Referenzstand. Für die aktuelle konsolidierte Lab gilt das [Visual-Finish-/Qt-Portabilitäts-Gate](docs/VISUAL_FINISH_QT_GATE.md). Insbesondere Aufdruckshader, verdeckte Konturen und Alpha-Edge-Compositor sind nicht durch Standard-PBR allein abgedeckt; native Teilproben sind keine vollständige ExoSnap-Parität.
+
 ## Was implementiert ist
 
 `pbr-lab.html` ist eine separate **echte Three.js/WebGL-3D-Vergleichsseite** mit sechs unterschiedlichen, aus `pbr-recipes.js` parametrierten PBR- und Beleuchtungsrezepten A–F. Für jede Variante sind Dark, Light und Mixed sichtbar; der gemeinsame Materialmix steuert Normal (0), Glass (50), Ghost (100). Kamera, Controllerpose und Modellgröße sind identisch; jeder Rezeptwechsel variiert bewusst Material und **Lichtstärke**. Kamera Front/3/4/Profil, Panelgrößen und alle Controls aktiv sind zusätzliche Diagnosefunktionen und keine weiteren Effekt-Slider.

@@ -1,5 +1,7 @@
 # Qt Material Lab – v29.1 (diagnostische Erweiterung)
 
+> Historischer Referenzstand. Für die aktuelle konsolidierte Lab gilt das [Visual-Finish-/Qt-Portabilitäts-Gate](docs/VISUAL_FINISH_QT_GATE.md). Insbesondere Aufdruckshader, verdeckte Konturen und Alpha-Edge-Compositor sind nicht durch Standard-PBR allein abgedeckt; native Teilproben sind keine vollständige ExoSnap-Parität.
+
 ## Ziel
 
 Acht **echte 2D-SVG**-Materialvarianten mit **einem** Materialmix-Regler 0–100,

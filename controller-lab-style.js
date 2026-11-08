@@ -48,7 +48,7 @@ export function qtLabDescriptor(recipe,{activeColor2D='#ffffff'}={}){
     activeContrast:recipe.activeContrast,
     nativeValidated:false,demoDefault:true,markingsDefault:true,
     markings:{technique:'alpha mask in existing button material',extraDrawCalls:0,floatingMenuLabels:false},
-    stickPolicy:{ring:'analog magnitude',cap:'L3/R3 click only',support:'source-to-shell material blend; shell-linked, reduced Ghost opacity',
+    stickPolicy:{supportModel:'DualSenseCompact',ring:'analog magnitude',cap:'L3/R3 click only',support:'source-to-shell material blend; shell-linked, reduced Ghost opacity',
       pose:'rotate authored parent; cap and stem inherit the same motion'},
     flat2D:{mode:'ghost',independentOf3DMix:true,shellOpacity:0,
       controlOpacity:.30,activeOpacity:.96,activeColor:activeColor2D,
