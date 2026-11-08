@@ -1,5 +1,7 @@
 # Controller Lab consolidation — browser contract and Qt handoff
 
+**Superseded interaction/marking details:** see [final polish](FINAL_POLISH.md). The current Lab starts Demo/Markings enabled, uses .30/.96 2D opacity and real ring fills, restored button mechanics and surface-material ink. No floating 3D Create/Options labels remain.
+
 The main Lab has one 3D presentation with **White** (`white`) active input feedback and one independent transparent 2D appearance. The old cool-white comparison is removed. The source controller, neutral colors, materials, camera and HDR lighting remain unchanged. This is a browser implementation and a specification for a later Qt port: **`nativeValidated: false`**. No native ExoSnap renderer change or Qt visual parity is established.
 
 The executable contract is [controller-lab-style.js](../controller-lab-style.js), with state application in [pbr-appearance.js](../pbr-appearance.js). Historical A–H/Hero comparisons and earlier Qt notes describe their own archived behavior.

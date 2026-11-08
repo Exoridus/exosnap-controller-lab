@@ -84,7 +84,7 @@ export class ControllerReference{
         if(typeof this.onPress!=='function')return;
         const clicked=event.target.closest('g[id]');
         const entry=this.controls.find(x=>x.group===clicked||x.group.contains(event.target));
-        if(entry?.control)this.onPress(entry.control);
+        if(entry?.control)this.onPress(entry.control,event);
       });
     }catch(error){
       if(token!==this.serial)return;

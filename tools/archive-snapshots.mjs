@@ -20,7 +20,7 @@ export async function archiveSnapshots(captureDir,archiveDir,repository,commit){
   }
   // Save the complete 2D matrix and consolidated 3D cases alongside each SHA.
   // Every file is verified against its capture hash.
-  targets.push(...manifest.images.filter(x=>/^(?:2d-|3d-consolidated-)[a-z0-9-]+\.png$/.test(x.file)).map(x=>x.file));
+  targets.push(...manifest.images.filter(x=>/^(?:2d-|3d-(?:consolidated|final)-)[a-z0-9-]+\.png$/.test(x.file)).map(x=>x.file));
   if(targets.some(name=>!manifest.images.some(x=>x.file===name&&
        x.bytes>=(name.startsWith('2d-')?8000:40000))))
     throw Error('Required verified screenshots are missing');

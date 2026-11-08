@@ -20,7 +20,7 @@ test('one 3D look uses one shared renderer and truthful per-view statistics',()=
   // is solely an explicit L2/R2 analog input simulator, not another material knob.
   assert.equal((html.match(/id="materialMix"/g)||[]).length,1);
   assert.equal((html.match(/id="triggerPressure"/g)||[]).length,1);
-  assert.equal((html.match(/type="range"/g)||[]).length,2);
+  assert.equal((html.match(/type="range"/g)||[]).length,3);
 });
 
 test('Qt example explicitly supports no-light and key-light standard materials',()=>{

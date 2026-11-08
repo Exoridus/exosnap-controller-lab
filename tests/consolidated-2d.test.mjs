@@ -8,6 +8,7 @@ import {lookPalette,controlSurfaceState,paintPolished2D} from '../polish-2d-styl
 // geometry and mapping come unchanged from the actual authored SVG assets.
 class SvgNode{
   constructor(tag,attrs={}){this.localName=tag;this.attrs=new Map();this.children=[];this.parentNode=null;this.style={values:new Map(),setProperty:(k,v)=>this.style.values.set(k,String(v)),getPropertyValue:k=>this.style.values.get(k)||'',removeProperty:k=>this.style.values.delete(k)};for(const [k,v]of Object.entries(attrs))this.setAttribute(k,v);this.classList={contains:k=>(this.getAttribute('class')||'').split(/\s+/).includes(k)};}
+  cloneNode(deep=false){const n=new SvgNode(this.localName,Object.fromEntries(this.attrs));if(deep)for(const c of this.children)n.append(c.cloneNode(true));return n;}
   get id(){return this.getAttribute('id')||'';}get firstChild(){return this.children[0]||null;}get ownerSVGElement(){let n=this.parentNode;while(n&&n.localName!=='svg')n=n.parentNode;return n;}get isConnected(){return Boolean(this.ownerSVGElement||this.localName==='svg');}
   getAttribute(k){return this.attrs.get(k)??null;}hasAttribute(k){return this.attrs.has(k);}removeAttribute(k){this.attrs.delete(k);if(k==='style')this.style.values.clear();}
   setAttribute(k,v){this.attrs.set(k,String(v));if(k==='style'){this.style.values.clear();for(const entry of String(v).split(';')){const i=entry.indexOf(':');if(i>0)this.style.values.set(entry.slice(0,i).trim(),entry.slice(i+1).trim());}}}
@@ -189,4 +190,24 @@ test('current 2D Lab uses matching body/control/glyph ink and no thick mixed fil
     assert.equal(value(glyph,'filter'),'','no oversized shadow around glyphs');
     assert.equal(value(outer,'filter'),'','no double hull outline');
   }
+});
+
+test('final 2D uses a filled masked annulus for motion and an independent click center',async()=>{
+ const r=await reference();
+ const options={coherentContours:true,ringSurface:true,material2D:{neutralOpacity:.3,activeOpacity:.96}};
+ paintPolished2D(r,'ghost','dark',options);
+ const outer=r.svg.querySelector('[id="stick-l-cap-outline"]'),center=r.svg.querySelector('[id="stick-l-cap-top"]');
+ const originalStroke=value(outer,'stroke'),originalAlpha=value(outer,'stroke-opacity');
+ paintPolished2D(r,'ghost','dark',{...options,left:{x:1,y:0}});
+ const ring=r.svg.querySelector('[id="stick-l-cap"]').querySelector('[data-exo-stick-annulus-fill]');
+ assert.ok(ring,'real annulus surface exists');
+ assert.equal(value(ring,'fill'),'#ffffff');assert.equal(Number(value(ring,'fill-opacity')),.96);
+ assert.equal(Number(value(center,'fill-opacity')),.3,'motion does not click center');
+ assert.equal(value(outer,'stroke'),originalStroke);assert.equal(value(outer,'stroke-opacity'),originalAlpha);
+ paintPolished2D(r,'ghost','dark',{...options,left:{x:1,y:0},values:new Map([['ls',1]])});
+ assert.equal(Number(value(center,'fill-opacity')),.96);
+ paintPolished2D(r,'ghost','dark',{...options,markings:false});
+ for(const glyph of r.svg.querySelectorAll('.glyph'))assert.equal(value(glyph,'display'),'none');
+ paintPolished2D(r,'ghost','dark',{...options,markings:true});
+ for(const glyph of r.svg.querySelectorAll('.glyph'))assert.notEqual(value(glyph,'display'),'none');
 });

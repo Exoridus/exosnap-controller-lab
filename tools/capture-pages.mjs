@@ -9,6 +9,7 @@ import {createHash} from 'node:crypto';
 import path from 'node:path';
 import {verifyRenderedState} from './visual-capture-contract.mjs';
 import {captureConsolidated} from './capture-consolidated.mjs';
+import {captureFinalPolish} from './capture-final-polish.mjs';
 const args=process.argv.slice(2);
 const arg=(name,def)=>{const i=args.indexOf(name);return i<0?def:args[i+1]};
 const base=arg('--base',process.env.CAPTURE_BASE_URL||'http://127.0.0.1:8792/');
@@ -71,6 +72,9 @@ try{
   };
   await mkdir(output,{recursive:true});
   const images=[];
+  const finalPolish=await captureFinalPolish(page,{output,images,base});
+  await page.locator('#demoToggle').uncheck();
+  await page.evaluate(()=>{document.querySelector('#appearanceSettings').open=true;document.querySelector('#inputDebug').open=true;});
   let before=await shotProof();
   for(const [filename,pressed] of [['overview-neutral.png',false],['overview-pressed.png',true]]){
     if(pressed){

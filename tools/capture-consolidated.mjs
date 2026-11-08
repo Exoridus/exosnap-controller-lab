@@ -72,7 +72,7 @@ export async function captureConsolidated(page,{output,images,shotProof}){
       if(mesh.userData.artworkSource==='2d-svg')marks.push(mesh.userData.artworkKey);
     });return marks.sort();
   });
-  if(artwork.join(',')!==['circle','cross','down','left','menu','right','square','triangle','up','view'].sort().join(','))
+  if(artwork.join(',')!==['circle','cross','down','left','right','square','triangle','up'].sort().join(','))
     throw Error('DualSense is missing original source artwork: '+JSON.stringify(artwork));
   await mix(50);
   if(hash(await page.locator('.flat-reference').screenshot())!==neutralFlat)

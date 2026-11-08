@@ -7,19 +7,20 @@ import {prepareGhostOcclusion,setRearHintViewport,hideOccludedRearControls} from
 import {createContrastCompositeMaterial,updateContrastComposite} from './silhouette-composite.js';
 import {isHousingRole} from './model-semantics.js';
 import {loadNativeRig,disposeNativeRig} from './pbr-model.js';
-import {applyPbrRecipeToRig,applyStickPoseToRig} from './pbr-appearance.js';
+import {applyPbrRecipeToRig,applyControlPoseToRig} from './pbr-appearance.js';
 import {fitControllerRadius} from './pbr-camera-fit.js';
 import {shareEquivalentControlGeometry,optimizeStaticHousing,instantiateStickPairs} from './pbr-optimizer.js';
 import {poseForStickDemo,normalizeStickInput} from './stick-activity.js';
 import {summarizePanelBudget} from './render-budget.js';
 import {HERO_ENVIRONMENT} from './pbr-recipes.js';
-import {LAB_VARIANTS,resolveLabRecipe,flatAppearanceKey,qtLabDescriptor} from './controller-lab-style.js';
+import {LAB_VARIANTS,resolveLabRecipe,flatAppearanceKey,qtLabDescriptor,resolveFlatMaterial} from './controller-lab-style.js';
 import {prepareSilhouette,updateSilhouette} from './pbr-silhouette.js';
 import {ActiveColorState} from './active-color-state.js';
-import {applyControllerArtwork} from './control-glyphs.js';
+import {applyControllerArtwork,setControllerMarkings} from './control-glyphs.js';
 import {paintPolished2D} from './polish-2d-style.js';
 import {attachStickDrag} from './stick-drag.js';
 import {readStandardGamepad} from './gamepad-input.js';
+import {ControllerDemo,createControllerState} from './controller-demo.js';
 
 const $=id=>document.getElementById(id);
 const scenes=['dark','light','mixed']; // all three share the same THREE.Scene, model and camera.
@@ -34,6 +35,11 @@ const state={mix:.70,modelId:'DualSenseCompact',selected:'white',view:'front',pa
   pressed:false,native:null,renderer:null,renderPending:false,camera:null,scene:null,drawStats:{},
   yaw:0,pitch:0,radius:7.8,fitRadius:7.8,error:null,drag:null,renderTarget:null,blitScene:null,blitCamera:null,
   environmentMap:null};
+const demo=new ControllerDemo();
+const manualInput=createControllerState();
+state.frameInput=createControllerState();state.markings=true;state.flatTransparency=.70;
+state.manualButtons=new Map();state.manualHeld=new Set();
+const demoPresets={neutral:poseForStickDemo('neutral'),move:poseForStickDemo('move'),click:poseForStickDemo('click')};
 const sampleNodes=[];
 const flatSampleNodes=[];
 let flatLoadSerial=0;
@@ -42,11 +48,14 @@ let flatPaintKey='';
 let clearStickDrags=[];
 const flatReferences=new Map();
 const activeColors=new ActiveColorState({color2D:'#ffffff',color3D:'#ffffff'});
+let cachedRecipe=null,cachedRecipeKey='';
 function recipeFor3D(variantKey){
+  const key=variantKey+':'+state.mix+':'+activeColors.color3D;
+  if(key===cachedRecipeKey)return cachedRecipe;
   const recipe=activeColors.overrideRecipe(resolveLabRecipe(variantKey,state.mix),'3d');
   recipe.material.customActiveColor=activeColors.color3D!=='#ffffff';
   recipe.material.pressEmissiveIntensity=.16;
-  return recipe;
+  cachedRecipeKey=key;cachedRecipe=recipe;return recipe;
 }
 function makeGallery(){
   for(const variant of variants){
@@ -133,7 +142,11 @@ async function loadFlatReferences(model){
     // Load into a separate container. An older fetch may finish after a newer
     // model selection; it must never replace the currently mounted source SVG.
     const pending=document.createElement('div');
-    const ref=new ControllerReference(pending);
+    const ref=new ControllerReference(pending,{onPress:(key,event)=>{
+      if(key==='ls'||key==='rs')return; // dragging a stick must not invent a click
+      state.manualHeld.add(key);state.manualButtons.set(key,performance.now()+100);
+      event?.currentTarget?.setPointerCapture?.(event.pointerId);scheduleRender();
+    }});
     await ref.load(layout);
     if(serial!==flatLoadSerial)return;
     if(!ref.svg){stage.textContent=`2D-Vorlage für ${layout.name} nicht ladbar`;return;}
@@ -143,6 +156,10 @@ async function loadFlatReferences(model){
     const mx=vb.width*.055,my=vb.height*.035;
     ref.svg.setAttribute('viewBox',[vb.x-mx,vb.y-my,vb.width+2*mx,vb.height+2*my].join(' '));
     stage.replaceChildren(ref.svg);ref.container=stage;
+    ref.svg.addEventListener('dblclick',event=>{
+      const entry=ref.controls.find(c=>c.stickSide&&c.group.contains(event.target));
+      if(entry){state.manualButtons.set(entry.control,performance.now()+180);scheduleRender();}
+    });
     flatReferences.set(scene,ref);
   }));
   if(serial===flatLoadSerial){
@@ -150,6 +167,7 @@ async function loadFlatReferences(model){
     const reference=[...flatReferences.values()][0];
     if(state.native?.model?.id===model.id&&reference?.svg)
       applyControllerArtwork(state.native,reference.svg);
+    setControllerMarkings(state.native,state.markings);
     for(const ref of flatReferences.values())clearStickDrags.push(attachStickDrag(ref,{
       start:side=>{state.stickPose='neutral';$('stickPose').value='neutral';state.manualSticks[side]={x:0,y:0};scheduleRender();},
       move:(side,axes)=>{state.manualSticks[side]=axes;scheduleRender();},
@@ -157,37 +175,41 @@ async function loadFlatReferences(model){
     }));
   }
 }
-function visualInput(){
-  const inputs=state.stickPose==='live'?getLiveStickPose():poseForStickDemo(state.stickPose);
-  const values=new Map(state.pressed?CONTROL_IDS.map(id=>[id,1]):inputs.values||[]);
-  if(state.testControl)values.set(state.testControl,1);
-  const triggers=state.stickPose==='live'?(inputs.triggers||{left:0,right:0}):
-    {left:state.triggerPressure,right:state.triggerPressure};
-  for(const [side,key] of [['left','l2'],['right','r2']]){
-    triggers[side]=state.pressed?1:Math.max(triggers[side],values.get(key)||0);
-    values.set(key,triggers[side]);
+function visualInput(now=performance.now()){
+  for(const [key,until]of state.manualButtons)if(until<=now)state.manualButtons.delete(key);
+  const manual=state.pressed||state.testControl||state.triggerPressure>0||
+    state.manualSticks.left||state.manualSticks.right||state.manualButtons.size||state.manualHeld.size||
+    (state.stickPose!=='neutral'&&state.stickPose!=='live');
+  if(manual){
+    manualInput.values.clear();manualInput.allPressed=state.pressed;
+    if(state.pressed)for(const id of CONTROL_IDS)manualInput.values.set(id,1);
+    for(const key of state.manualButtons.keys())manualInput.values.set(key,1);
+    for(const key of state.manualHeld)manualInput.values.set(key,1);
+    if(state.testControl)manualInput.values.set(state.testControl,1);
+    const preset=demoPresets[state.stickPose]||demoPresets.neutral;
+    for(const [side,key]of [['left','ls'],['right','rs']]){
+      const stick=state.manualSticks[side]||preset[side];
+      manualInput[side].x=stick.x||0;manualInput[side].y=stick.y||0;
+      manualInput[side].click=Boolean(stick.click)||Boolean(manualInput.values.get(key));
+      if(manualInput[side].click)manualInput.values.set(key,1);
+    }
+    manualInput.triggers.left=manualInput.triggers.right=state.triggerPressure;
   }
-  const sticks={};
-  for(const [side,key] of [['left','ls'],['right','rs']]){
-    const source=state.manualSticks[side]||inputs[side];
-    sticks[side]=normalizeStickInput({...source,click:Boolean(inputs[side]?.click)||Boolean(values.get(key))});
-    if(sticks[side].click)values.set(key,1);
-  }
-  return {...sticks,values,triggers,allPressed:state.pressed};
+  return demo.sample(now,{manual:manual?manualInput:null,live:getLiveStickPose()});
 }
-function updateFlatReferences(){
+function updateFlatReferences(input=state.frameInput){
   // A wheel over either 3D or 2D changes the common apparent size.
   const flatZoom=THREE.MathUtils.clamp(state.fitRadius/state.radius,.67,1.55);
   for(const item of flatSampleNodes)item.stage.style.transform=`scale(${flatZoom.toFixed(4)})`;
   if(!flatReferences.size)return;
-  const input=visualInput();
-  const key=flatAppearanceKey(input,activeColors.color2D)+`:${flatLoadSerial}:${flatReferences.size}:${state.panelWidth}`;
+  const key=flatAppearanceKey(input,activeColors.color2D)+`:${flatLoadSerial}:${flatReferences.size}:${state.panelWidth}:${state.flatTransparency}:${state.markings}`;
   if(key===flatPaintKey)return;
   for(const sceneName of scenes){
     const ref=flatReferences.get(sceneName);
     if(!ref)continue;
     paintPolished2D(ref,'ghost',sceneName,{...input,activeColor:activeColors.color2D,
-      stickFeedback:'ring',showFaceSymbols:true,edgeLight:0,edgeShadow:0,coherentContours:true});
+      stickFeedback:'ring',showFaceSymbols:true,edgeLight:0,edgeShadow:0,coherentContours:true,
+      ringSurface:true,material2D:resolveFlatMaterial(state.flatTransparency),markings:state.markings});
   }
   flatPaintKey=key;
 }
@@ -217,7 +239,7 @@ function updateCamera(){
 }
 function setView(view){
   state.view=view;
-  const poses={front:[0,0],angled:[.52,.30],top:[.28,.70],profile:[1.5,.04],rear:[Math.PI,.12]};
+  const poses={front:[0,0],angled:[.52,.30],top:[.28,.70],profile:[1.5,.04],bottom:[.24,-.65],rear:[Math.PI,.12]};
   [state.yaw,state.pitch]=poses[view]||poses.angled;
   if(state.native){state.fitRadius=fitControllerRadius(new THREE.Box3().setFromObject(state.native.group).getSize(new THREE.Vector3()),{yaw:state.yaw,pitch:state.pitch});state.radius=state.fitRadius;}
   updateCamera();
@@ -235,10 +257,17 @@ function rectangleFor(node,frame,ratio){
     bottom:Math.max(0,Math.round((frame.bottom-rect.bottom)*ratio)),
     width:Math.max(1,Math.round(rect.width*ratio)),height:Math.max(1,Math.round(rect.height*ratio)),rect};
 }
-function render(){
+function render(now=performance.now()){
   state.renderPending=false;
-  updateFlatReferences();
-  if(!state.renderer||!state.native||!state.environmentMap)return;
+  const dirty=state.paintDirty;state.paintDirty=false;
+  if(document.hidden)return;
+  const pose=visualInput(now);state.frameInput=pose;
+  const animate=()=>{if(demo.enabled||state.manualButtons.size||state.frameInput.source==='live'||state.stickPose==='live'||Array.from(navigator.getGamepads?.()||[]).some(p=>p?.connected))scheduleRender(false);};
+  const inputKey=flatAppearanceKey(pose);
+  if(!dirty&&inputKey===state.lastFrameKey){animate();return;}
+  state.lastFrameKey=inputKey;
+  updateFlatReferences(pose);
+  if(!state.renderer||!state.native||!state.environmentMap){if(flatReferences.size)animate();return;}
   const renderer=state.renderer,camera=state.camera;
   const width=Math.max(1,Math.round(gallery.clientWidth));
   const height=Math.max(1,Math.round(gallery.clientHeight));
@@ -252,8 +281,8 @@ function render(){
   renderer.setRenderTarget(null);
   renderer.clear(true,true,true);
   renderer.setScissorTest(true);
-  const pose=visualInput();
-  applyStickPoseToRig(state.native,pose);
+  applyControlPoseToRig(state.native,pose);
+  setControllerMarkings(state.native,state.markings);
   state.native.group.updateMatrixWorld(true);
   for(const variant of variants){
     const card=gallery.querySelector(`.variant[data-variant="${variant.key}"]`);
@@ -327,21 +356,22 @@ function render(){
   document.body.dataset.renderReady=rendered===expected&&flatReady?'three-rendered':'incomplete';
   if(rendered===expected)document.body.dataset.renderRevision=String(1+(Number(document.body.dataset.renderRevision)||0));
   $('modelInfo').textContent=`${state.native.partCount} Originalteile · ${state.native.geometryReuse?.pairs||0} Mesh-Buffers geteilt`;
-  setStatus(`${state.native.model.name} · ${rendered} 3D-Ansichten + 3 feste 2D-Ansichten · ${state.stickPose==='live'?'Live-Gamepad':'Aktives Eingabefeedback: Weiß'}`);
+  setStatus(`${state.native.model.name} · 2D + 3D synchron · ${pose.source==='demo'?'Demo':pose.source==='live'?'Live-Gamepad':pose.source==='manual'?'Manuelle Eingabe':'Neutral'}`);
+  animate();
 }
 function getLiveStickPose(){
   const pads=typeof navigator.getGamepads==='function'?navigator.getGamepads():[];
   const pad=Array.from(pads).find(p=>p?.connected&&p.mapping==='standard');
   const input=readStandardGamepad(pad);
-  if(!input)return poseForStickDemo('neutral');
+  if(!input)return null;
   return {left:normalizeStickInput({...input.left,click:input.values.get('ls')>.5}),
     right:normalizeStickInput({...input.right,click:input.values.get('rs')>.5}),values:input.values,
     triggers:{left:input.values.get('l2')||0,right:input.values.get('r2')||0}};
 }
 
-function scheduleRender(){
-  if(!state.renderer){updateFlatReferences();return;}
-  if(state.renderPending)return;
+function scheduleRender(dirty=true){
+  state.paintDirty=state.paintDirty||Boolean(dirty);
+  if(state.renderPending||document.hidden)return;
   state.renderPending=true;requestAnimationFrame(render);
 }
 async function loadModel(id){
@@ -384,7 +414,7 @@ async function loadModel(id){
 async function exportQtRecipe(){
   const output={generator:'ExoSnap consolidated controller lab',date:'2026-11-08',
     modelId:state.modelId,view:state.view,camera:{fov:state.camera?.fov||35,position:state.camera?.position.toArray()||[0,0,7]},
-    geometryReuse:state.native?.geometryReuse,
+    geometryReuse:state.native?.geometryReuse,demo:demo.enabled,markings:state.markings,flatMaterial:resolveFlatMaterial(state.flatTransparency),
     feedback:Object.fromEntries(variants.map(({key})=>{const recipe=recipeFor3D(key);return [key,{recipe,qtQuick3D:qtLabDescriptor(recipe,{activeColor2D:activeColors.color2D})}]}))};
   const blob=new Blob([JSON.stringify(output,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob),a=document.createElement('a');
@@ -406,6 +436,9 @@ function bindUI(){
     gallery.style.setProperty('--panel-height',`${exactHeights[state.panelWidth]??214}px`);
     scheduleRender();
   });
+  $('demoToggle').addEventListener('change',e=>{demo.setEnabled(e.target.checked);scheduleRender();});
+  $('markingsToggle').addEventListener('change',e=>{state.markings=e.target.checked;scheduleRender();});
+  $('flatTransparency').addEventListener('input',e=>{state.flatTransparency=Number(e.target.value)/100;$('flatValue').textContent=e.target.value+' %';scheduleRender();});
   $('materialMix').addEventListener('input',e=>{state.mix=Number(e.target.value)/100;$('mixValue').textContent=`${e.target.value} %`;scheduleRender();});
   for(const toggle of document.querySelectorAll('[data-look]'))toggle.addEventListener('change',setVisibleLooks);
   const sync=$('colorSync'), color2D=$('color2D'), color3D=$('color3D');
@@ -425,7 +458,7 @@ function bindUI(){
     scheduleRender();
   });
   $('renderMode').addEventListener('change',e=>{state.renderMode=e.target.value;scheduleRender();});
-  $('stickPose').addEventListener('change',e=>{state.stickPose=e.target.value;scheduleRender();});
+  $('stickPose').addEventListener('change',e=>{state.stickPose=e.target.value;if(state.stickPose==='live'){demo.setEnabled(false);$('demoToggle').checked=false;}scheduleRender();});
   $('testControl').addEventListener('change',e=>{state.testControl=e.target.value;scheduleRender();});
   $('exportRecipe').addEventListener('click',exportQtRecipe);
   gallery.addEventListener('pointerdown',e=>{
@@ -439,7 +472,9 @@ function bindUI(){
     state.pitch=Math.max(-.9,Math.min(.9,state.drag.pitch+(state.drag.y-e.clientY)*.008));
     updateCamera();
   });
-  window.addEventListener('pointerup',()=>state.drag=null);
+  window.addEventListener('pointerup',()=>{state.drag=null;state.manualHeld.clear();scheduleRender();});
+  window.addEventListener('pointercancel',()=>{state.manualHeld.clear();scheduleRender();});
+  window.addEventListener('blur',()=>{state.drag=null;state.manualHeld.clear();state.manualButtons.clear();scheduleRender();});
   gallery.addEventListener('wheel',e=>{
     if(!e.target.closest('.sample'))return;
     e.preventDefault();
@@ -450,8 +485,9 @@ function bindUI(){
     if(!state.renderer)updateFlatReferences();
   },{passive:false});
   window.addEventListener('resize',scheduleRender);
-  let lastInput='';
-  setInterval(()=>{if(state.stickPose!=='live')return;const v=getLiveStickPose();const id=flatAppearanceKey(v,activeColors.color2D);if(id!==lastInput){lastInput=id;scheduleRender();}},33);
+  window.addEventListener('gamepadconnected',scheduleRender);
+  window.addEventListener('gamepaddisconnected',scheduleRender);
+  document.addEventListener('visibilitychange',()=>{demo.resetClock();if(!document.hidden)scheduleRender();});
   if(typeof ResizeObserver!=='undefined')new ResizeObserver(scheduleRender).observe(gallery);
 }
 async function main(){
@@ -459,6 +495,6 @@ async function main(){
   createRenderer();
   if(state.renderer){try{await loadEnvironmentProbe();}catch(e){setFail(`HDR-Lichtprobe konnte nicht geladen werden: ${e.message}`);}}
   await loadModel(state.modelId);
-  window.__exoPbrLab={get flatReferences(){return flatReferences},get status(){return document.body.dataset.renderReady},get model(){return state.native},get variant(){return state.selected},get mix(){return state.mix},get renderer(){return state.renderer},get renderTarget(){return state.renderTarget},get drawStats(){return {...state.drawStats}},get renderMode(){return state.renderMode},get colors(){return {color2D:activeColors.color2D,color3D:activeColors.color3D,sync:activeColors.sync}},get triggerPressure(){return state.triggerPressure}};
+  window.__exoPbrLab={get input(){return state.frameInput},get demo(){return demo},get markings(){return state.markings},get flatReferences(){return flatReferences},get status(){return document.body.dataset.renderReady},get model(){return state.native},get variant(){return state.selected},get mix(){return state.mix},get renderer(){return state.renderer},get renderTarget(){return state.renderTarget},get drawStats(){return {...state.drawStats}},get renderMode(){return state.renderMode},get colors(){return {color2D:activeColors.color2D,color3D:activeColors.color3D,sync:activeColors.sync}},get triggerPressure(){return state.triggerPressure}};
 }
 main().catch(error=>{console.error(error);setFail(`Startfehler: ${error.message}`);});
