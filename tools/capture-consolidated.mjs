@@ -55,7 +55,10 @@ export async function captureConsolidated(page,{output,images,shotProof}){
   }));
   for(const item of flatAudit){
     const expected={dark:'#ffffff',light:'#858585',mixed:'#8c98a3'}[item.scene];
-    if(!expected||item.housing!==expected||item.button!==expected||item.glyph!==expected)
+    // SVG style serialization can normalize hex colors to rgb() in Chromium.
+    const normalized=hex=>'rgb('+[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)).join(', ')+')';
+    const matches=c=>c===expected||c===normalized(expected);
+    if(!expected||!matches(item.housing)||!matches(item.button)||!matches(item.glyph))
       throw Error('2D body/control/glyph inks diverge: '+JSON.stringify(item));
     if(item.filter||item.glyphFilter||item.outerFilter||item.leftMargin<1||item.rightMargin<1)
       throw Error('2D black plate, double rim or clipped housing: '+JSON.stringify(item));
