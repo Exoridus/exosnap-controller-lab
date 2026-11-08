@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Read public native source at an immutable revision
+      - name: Snapshot actual native controller, atlas and geometry code
         run: |
           mkdir -p .capture/native-source
           git clone --depth 1 --single-branch --branch next https://github.com/Exoridus/exosnap.git /tmp/exosnap-audit
@@ -18,7 +18,7 @@ jobs:
           import pathlib,subprocess,shutil,json
           src=pathlib.Path('/tmp/exosnap-audit');out=pathlib.Path('.capture/native-source')
           sha=subprocess.check_output(['git','-C',str(src),'rev-parse','HEAD'],text=True).strip()
-          names=('GamepadSprites','Controller2D','Controller3D','controller3d','controller2d')
+          names=('Gamepad','Controller','gamepad_sprite','controller_')
           paths=[]
           for p in src.rglob('*'):
             if not p.is_file() or '.git' in p.parts:continue
@@ -28,10 +28,10 @@ jobs:
           (out/'provenance.json').write_text(json.dumps({'repository':'Exoridus/exosnap','branch':'next','commit':sha,'qt':(src/'.qt-version').read_text().strip(),'files':paths},indent=2))
           print('Native source:',sha,'files:',len(paths))
           PY
-      - name: Check matching Qt runtime availability
+      - name: Check current native Qt version availability
         run: |
           python3 -m venv /tmp/qt-probe
-          /tmp/qt-probe/bin/pip install --disable-pip-version-check PySide6==6.10.2
+          /tmp/qt-probe/bin/pip install --disable-pip-version-check PySide6==6.12.0
           QT_QPA_PLATFORM=offscreen /tmp/qt-probe/bin/python -c 'from PySide6.QtCore import qVersion; from PySide6 import QtSvg,QtQuick,QtQuick3D; print("Native Qt runtime:",qVersion())' | tee .capture/native-source/qt-runtime.txt
       - uses: actions/upload-artifact@v4
         if: always()
