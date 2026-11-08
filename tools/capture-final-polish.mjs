@@ -29,7 +29,10 @@ export async function captureFinalPolish(page,{output,images,base}){
  assert(await page.evaluate(t=>window.__exoPbrLab.demo.demoTime>t,clock),'Default demo did not advance');
  await shot('3d-final-demo-default.png','Automatic demo and collapsed controls at startup');
  await input('demoToggle',false);
- await frame(()=>page.evaluate(()=>{document.querySelector('#appearanceSettings').open=true;document.querySelector('#inputDebug').open=true;}));
+ // Opening details changes document layout, not controller pixels; wait for
+ // layout rather than requiring a deliberately skipped idle GPU redraw.
+ await page.evaluate(()=>{document.querySelector('#appearanceSettings').open=true;document.querySelector('#inputDebug').open=true;});
+ await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));
  await input('panelSize',480);await frame(()=>page.setViewportSize({width:1600,height:1150}));
  await input('materialMix',50);
  const meshState=()=>page.evaluate(()=>{
