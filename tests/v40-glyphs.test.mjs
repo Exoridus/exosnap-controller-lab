@@ -6,13 +6,13 @@ import {CONTROLLERS} from '../models.js';
 import {loadNativeRig,disposeNativeRig} from '../pbr-model.js';
 import {faceButtonGlyph,faceDecalSizeFrom2D} from '../control-glyphs.js';
 const read=async url=>fs.readFile(new URL('../'+url.replace(/^\.\//,''),import.meta.url),'utf8');
-test('DualSense physical face buttons have actual front-facing PlayStation glyph planes without replacing their authored geometry',async()=>{
+test('DualSense physical face buttons have PlayStation ink UVs on the original button geometry',async()=>{
  const rig=await loadNativeRig(CONTROLLERS.find(x=>x.id==='DualSenseCompact'),read);
  try{
   const glyphs=[];rig.group.traverse(o=>{if(o.userData?.buttonGlyph)glyphs.push(o)});
   assert.deepEqual(glyphs.map(o=>o.userData.buttonGlyph).sort(),['circle','cross','square','triangle']);
-  assert.ok(glyphs.every(o=>o.geometry.attributes.position.count===4));
-  assert.ok(glyphs.every(o=>o.material.depthTest&&!o.material.depthWrite));
+  assert.ok(glyphs.every(o=>o.geometry.attributes.controllerMarkUv.count===o.geometry.attributes.position.count));
+  assert.ok(glyphs.every(o=>o.material.depthTest&&o.material.depthWrite));
   assert.ok(glyphs.every(o=>o.material.transparent));
   assert.ok(rig.triangles>=7000,'original native triangles still retained');
  }finally{disposeNativeRig(rig)}
@@ -33,7 +33,7 @@ test('functional labels on GameCube/Xbox/Nintendo do not become PlayStation symb
  try{
    const glyphs=[];rig.group.traverse(o=>{if(o.userData?.buttonGlyph)glyphs.push(o)});
    assert.deepEqual(glyphs.map(o=>o.userData.buttonGlyph).sort(),['A','B','X','Y']);
-   assert.ok(glyphs.every(o=>o.userData.surfaceArtwork==='button-face'));
+   assert.ok(glyphs.every(o=>o.userData.surfaceArtwork==='button-material'));
    // Real source palette is used: shell purple, A green, B red, C-stick yellow.
    const color=file=>rig.meshes.find(x=>x.userData.sourceFile===file).userData.sourceColor;
    assert.ok(color('top_shell.obj').b>color('top_shell.obj').g);

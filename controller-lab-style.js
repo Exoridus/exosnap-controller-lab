@@ -46,11 +46,12 @@ export function qtLabDescriptor(recipe,{activeColor2D='#ffffff'}={}){
   return {...base,
     comparisonVariant:recipe.comparisonVariant,
     activeContrast:recipe.activeContrast,
-    nativeValidated:false,
+    nativeValidated:false,demoDefault:true,markingsDefault:true,
+    markings:{technique:'alpha mask in existing button material',extraDrawCalls:0,floatingMenuLabels:false},
     stickPolicy:{ring:'analog magnitude',cap:'L3/R3 click only',support:'neutral shell opacity',
       pose:'rotate authored parent; cap and stem inherit the same motion'},
     flat2D:{mode:'ghost',independentOf3DMix:true,shellOpacity:0,
-      controlOpacity:.26,activeOpacity:.40,activeColor:activeColor2D,
+      controlOpacity:.30,activeOpacity:.96,activeColor:activeColor2D,
       contrast:'same grayscale contour ink for shell, controls and glyphs; no black double-edges',
       decoration:'authored paths, no input feedback'},
     hiddenControls:{visibility:'physical-depth',dashed:true,individualInput:true,
@@ -61,4 +62,10 @@ export function qtLabDescriptor(recipe,{activeColor2D='#ffffff'}={}){
       'A single standard PBR recipe serves white feedback; no Fresnel shader patch.',
       'Hidden-line depth comparison and the shared alpha-edge compositor need explicit Qt implementations and native visual validation.']
   };
+}
+
+// Independent 2D material control. 70% transparency -> 30% resting coverage;
+// inputs can still reach nearly opaque white at every neutral setting.
+export function resolveFlatMaterial(transparency=.70){
+ return {neutralOpacity:1-clamp(transparency),activeOpacity:.96};
 }

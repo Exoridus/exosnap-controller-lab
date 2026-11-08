@@ -92,18 +92,15 @@ test('cool feedback is inverse mix, bright-source-only, while custom active colo
  }finally{disposeNativeRig(rig)}
 });
 
-test('general controller artwork API exists and sizes native planes from actual button geometry',async()=>{
+test('controller artwork is UV-bound to existing geometry with no floating planes',async()=>{
  assert.equal(typeof artwork.applyControllerArtwork,'function');
  const rig=await rigFor('DualSenseCompact');
  try{
-  const glyphs=[];rig.group.traverse(o=>{if(o.userData.buttonGlyph)glyphs.push(o)});
-  for(const glyph of glyphs){
-   const d=glyph.userData.sourceFaceDimensions;
-   const diameter=Math.min(d.width,d.height),width=glyph.geometry.parameters.width;
-   if(/^(up|down|left|right)$/.test(glyph.userData.artworkKey)){
-     assert.ok(width>=diameter*.37&&width<=diameter*.39,'D-pad has original-scale engraving');
-     assert.equal(glyph.material.opacity,.76);
-   }else assert.ok(width>=diameter*.6,'native face-relative glyph size');
+  const marks=rig.meshes.filter(m=>m.userData.artworkKey);
+  assert.equal(marks.length,8);
+  for(const mesh of marks){
+   assert.equal(mesh.userData.surfaceArtwork,'button-material');
+   assert.equal(mesh.geometry.getAttribute('controllerMarkUv').count,mesh.geometry.getAttribute('position').count);
   }
  }finally{disposeNativeRig(rig)}
 });
@@ -116,7 +113,7 @@ test('consolidated material stays on the standard physical shader on fresh sourc
  }finally{disposeNativeRig(rig)}
 });
 
-test('source SVG paths and full transforms paint face, D-pad and above-button Create/Options artwork',async()=>{
+test('source SVG paths and full transforms paint faces and D-pad without floating menu labels',async()=>{
  const text=await fs.readFile(new URL('../references/controllers/dualsense/source.svg',import.meta.url),'utf8');
  const paths=new Map(),matrices=[];
  const groups=new Map();
@@ -142,12 +139,12 @@ test('source SVG paths and full transforms paint face, D-pad and above-button Cr
  const rig=await rigFor('DualSenseCompact');
  try{
   const count=artwork.applyControllerArtwork(rig,{querySelector:s=>groups.get(s.match(/btn-([^"\]]+)/)?.[1])});
-  assert.equal(count,10,'all 4 face, 4 D-pad and 2 menu source paths');
-  for(const key of ['cross','circle','square','triangle','up','left','right','down','view','menu'])
+  assert.equal(count,8,'all four faces and D-pad directions, no floating menus');
+  for(const key of ['cross','circle','square','triangle','up','left','right','down'])
    assert.ok(paths.get(key).every(d=>recorded.includes(d)),key+' unchanged authored path');
   assert.ok(matrices.some(m=>m[0]>10&&m[4]<-1300),'source CTM reaches canvas');
   const labels=[];rig.group.traverse(n=>{if(n.userData.aboveButton)labels.push(n)});
-  assert.equal(labels.length,2);
+  assert.equal(labels.length,0);
   assert.ok(labels.every(n=>n.visible&&n.userData.artworkSource==='2d-svg'));
  }finally{
   disposeNativeRig(rig);globalThis.document=oldDocument;globalThis.Path2D=oldPath;

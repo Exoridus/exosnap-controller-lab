@@ -7,16 +7,19 @@ import {updateStickInstances} from './pbr-optimizer.js';
 import {depthPriority,updateGhostRearHints} from './ghost-depth-policy.js';
 import {EXO_PALETTE} from './palette.js';
 import {setGhostFresnel} from './pbr-fresnel.js';
-import {stickMechanics} from './model-mechanics.js';
+import {stickMechanics,triggerMechanics} from './model-mechanics.js';
+import {pressTravelFor} from './v24-policy.js';
 import {frontFaceTransform} from './model-orientation.js';
 const pressedBlue=new THREE.Color(EXO_PALETTE.pressedBlue);
 const ghostColor=new THREE.Color();
 const idleColor=new THREE.Color();
 const tmpEuler=new THREE.Euler();
 const feedbackColor=new THREE.Color();
+const stickPoseRotation=new THREE.Quaternion();
 const white=new THREE.Color('#ffffff');
 const clamp01=x=>Math.max(0,Math.min(1,Number.isFinite(Number(x))?Number(x):0));
 function normalizeVisualInput(input){
+  if(input?.normalized===true)return input;
   if(typeof input==='boolean')return {allPressed:input,left:normalizeStickInput(),right:normalizeStickInput(),
     triggers:{left:input?1:0,right:input?1:0}};
   const allPressed=!!input?.allPressed;
@@ -102,6 +105,8 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
           m.emissiveIntensity=(recipe.material.pressEmissiveIntensity??.16)*amount;
         }
       }
+      const marking=m.userData.surfaceMarking;
+      if(marking)marking.ink.value.copy(marking.idle).lerp(marking.active,amount*.35);
       continue;
     }
     const physicalShoulder=mesh.userData.role==='trigger'||
@@ -186,9 +191,37 @@ export function applyStickPoseToRig(native,input){
     // Raw input is screen X right / Y down. The source front-face rotation
     // maps screen Y rotation to local -Z for CO/Exo (+PI/2), +Z for PadForge.
     // Positive screen Y rotates around +X, moving the cap down in front view.
-    const q=new THREE.Quaternion().setFromEuler(tmpEuler.set(s.y*tilt,0,-s.x*tilt*frontSign));
+    const q=stickPoseRotation.setFromEuler(tmpEuler.set(s.y*tilt,0,-s.x*tilt*frontSign));
     holder.quaternion.copy(holder.userData.restQuaternion).multiply(q);
     holder.position.copy(holder.userData.restPosition);
     if(s.click)holder.position.y-=mechanics.clickTravel;
+  }
+}
+
+// Restore the v40 artifact's highlightPart mechanics in the existing PBR rig.
+// Pose only: materials and child-attached contours/markings remain independent.
+const controlRotation=new THREE.Quaternion();
+export function applyControlPoseToRig(native,input={}){
+  if(!native?.parts)return;
+  applyStickPoseToRig(native,input);
+  if(!native.controlMotionBindings){
+    const mechanism=triggerMechanics(native.model?.id);
+    native.controlMotionBindings=native.parts.filter(p=>p.holder.userData.control&&
+      !p.holder.userData.role.startsWith('stick-')).map(p=>{
+      const key=p.holder.userData.control,trigger=key==='l2'||key==='r2';
+      const travel=trigger?{x:0,y:0,z:0}:pressTravelFor(key,native.model.source==='padforge'?'padforge':'co');
+      if(trigger&&mechanism.translation)[travel.x,travel.y,travel.z]=mechanism.translation;
+      return {holder:p.holder,key,trigger,travel,
+        angle:trigger?-mechanism.maxRotationDeg*Math.PI/180:0,
+        rest:p.holder.position.clone(),rotation:p.holder.quaternion.clone()};
+    });
+  }
+  for(const b of native.controlMotionBindings){
+    const raw=input?.values instanceof Map?input.values.get(b.key):input?.values?.[b.key];
+    const analog=b.key==='l2'?input?.triggers?.left:b.key==='r2'?input?.triggers?.right:0;
+    const amount=input===true||input?.allPressed?1:Math.max(clamp01(raw),clamp01(analog));
+    b.holder.position.set(b.rest.x+b.travel.x*amount,b.rest.y+b.travel.y*amount,b.rest.z+b.travel.z*amount);
+    b.holder.quaternion.copy(b.rotation);
+    if(b.angle)b.holder.quaternion.multiply(controlRotation.setFromEuler(tmpEuler.set(b.angle*amount,0,0)));
   }
 }

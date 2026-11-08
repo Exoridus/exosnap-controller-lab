@@ -5,7 +5,7 @@ import {OBJLoader} from 'three/addons/loaders/OBJLoader.js';
 import {modelPartSemantics} from './model-semantics.js';
 import {controllerPartTransform} from './thumbstick-geometry.js';
 import {frontFaceTransform} from './model-orientation.js';
-import {makeControlGlyph} from './control-glyphs.js';
+import {prepareSurfaceArtwork} from './control-glyphs.js';
 import {disposeSilhouette} from './pbr-silhouette.js';
 
 async function httpText(url){
@@ -43,6 +43,12 @@ export async function loadNativeRig(model, readText=httpText){
     const sourceBounds=new THREE.Box3().setFromObject(parsed);
     const localCenter=sourceBounds.getCenter(new THREE.Vector3());
     const transform=controllerPartTransform(model.source,source.meta,localCenter.toArray());
+    // Generated Generic Pro parts have global vertices and no authored hinge.
+    // Rebase its trigger at the front/top attachment, preserving its rest pose.
+    if(model.source==='exo'&&role.role==='trigger'){
+      transform.pivot=[localCenter.x,sourceBounds.max.y,sourceBounds.max.z];
+      transform.geometryOffset=transform.pivot.map(v=>-v);
+    }
     parsed.position.set(...transform.geometryOffset);
     holder.position.set(...transform.pivot);
     holder.userData={file:source.file,control:role.control||role.pickControl||null,role:role.role,sourceIndex:source.index};
@@ -62,11 +68,10 @@ export async function loadNativeRig(model, readText=httpText){
         transparent:true,opacity:1,depthTest:true,depthWrite:true,side:THREE.FrontSide
       });
       if(role.role==='touch-contact')o.visible=false;
+      prepareSurfaceArtwork(o,model.source,sourceBounds,model);
       meshes.push(o);
     });
     if(parsed.children.every(c=>!c.isMesh && !c.children?.some(d=>d.isMesh)))throw new Error(`OBJLoader returned no triangles: ${source.file}`);
-    const glyph=makeControlGlyph(source.file,model.source,sourceBounds,model);
-    if(glyph)parsed.add(glyph);
     holder.add(parsed);partMap.set(source.index,holder);parts.push({file:source.file,meta:source.meta,holder});
   }
   for(const source of sources){
@@ -108,10 +113,7 @@ export function disposeNativeRig(native){
     hint.parent?.remove(hint);
     hint.geometry?.dispose();hint.material?.dispose();
   }
-  native.group.traverse(o=>{
-    if(!o.userData?.surfaceArtwork)return;
-    o.geometry?.dispose();o.material?.map?.dispose();o.material?.dispose();
-  });
+  for(const texture of native.artworkTextures||[])texture.dispose();
   // InstancedMesh owns GPU instanceMatrix/instanceColor attributes separately
   // from its shared geometry and material. Its dispose event releases those.
   for(const instance of instances)instance.dispose();

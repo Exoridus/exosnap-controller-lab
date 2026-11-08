@@ -44,7 +44,7 @@ test('main comparison uses white feedback and fixed authored 2D with separate ac
   assert.match(html,/id="color3D"/);
   assert.match(js,/paintPolished2D\(ref,'ghost',sceneName/);
   assert.doesNotMatch(js,/recipeFor2D|applyMaterialAppearance/);
-  const flatPaint=js.split('function updateFlatReferences(){')[1].split('function makeScene(){')[0];
+  const flatPaint=js.split('function updateFlatReferences(input=state.frameInput){')[1].split('function makeScene(){')[0];
   assert.match(flatPaint,/flatAppearanceKey\(input,activeColors\.color2D\)/);
   assert.doesNotMatch(flatPaint,/state\.mix|recipeFor3D/);
   assert.match(js,/recipeFor3D\(variant\.key\)/);
@@ -64,6 +64,6 @@ test('real HDR environment is provided for both Three.js and Qt Quick 3D',()=>{
 
 test('row toggles clear the full shared canvas before redrawing so hidden rows leave no old pixels',()=>{
  const js=fs.readFileSync(new URL('../pbr-lab.js',import.meta.url),'utf8');
- const body=js.split('function render(){')[1]?.split('function getLiveStickPose()')[0]||'';
+ const body=js.split('function render(now=performance.now()){')[1]?.split('function getLiveStickPose()')[0]||'';
  assert.match(body,/renderer\.setScissorTest\(false\);\s*renderer\.setRenderTarget\(null\);\s*renderer\.clear\(true,true,true\);\s*renderer\.setScissorTest\(true\);/);
 });

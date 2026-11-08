@@ -117,7 +117,7 @@ const visibleStroke=node=>{
   const value=node.style.getPropertyValue('stroke')||node.getAttribute('stroke')||'';
   return value.trim().toLowerCase()!=='none'&&value!=='';
 };
-function paint(node,name,value){node.style.setProperty(name,String(value),'important');}
+function paint(node,name,value){const v=String(value);if(node.style.getPropertyValue(name)!==v)node.style.setProperty(name,v,'important');}
 // Every moving or pressed control goes through this one alpha-safe transition.
 // The selected white stays white in the SVG paint; opacity is intentionally
 // limited to avoid hiding the gameplay underneath the overlay.
@@ -347,6 +347,28 @@ function ensureBaseFill(reference,colors){
 // second ring mask: getBBox() does not include authored ellipse transforms,
 // so a user-space mask clipped off parts of the cap and produced crescents.
 // Reuse the original two ellipses directly; do not touch the static socket.
+// One source-shaped annulus per stick, with the original center cut out.
+// The mask is applied to an untransformed wrapper in the stick GROUP frame.
+// Both cloned shapes retain their authored transforms; no getBBox-on-ellipse
+// shortcut, no cut-off crescents, and no second alpha layer under the center.
+function ensureStickAnnulus(reference,entry,outer,center){
+ if(entry.polishAnnulusFill)return entry.polishAnnulusFill;
+ const svg=reference.svg;
+ let defs=svg.querySelector('defs');
+ if(!defs){defs=document.createElementNS(svgNs,'defs');svg.insertBefore(defs,svg.firstChild);}
+ const box=entry.group.getBBox(),id=outer.id+'-annulus-mask';
+ const mask=filterNode('mask',{id,maskUnits:'userSpaceOnUse',maskContentUnits:'userSpaceOnUse',
+  x:box.x-2,y:box.y-2,width:box.width+4,height:box.height+4});
+ mask.appendChild(filterNode('rect',{x:box.x-2,y:box.y-2,width:box.width+4,height:box.height+4,fill:'white'}));
+ const cutout=center.cloneNode(true);cutout.removeAttribute('id');cutout.removeAttribute('style');
+ for(const [k,v]of Object.entries({fill:'black',stroke:'none',opacity:1,'fill-opacity':1}))cutout.setAttribute(k,String(v));
+ mask.appendChild(cutout);defs.appendChild(mask);
+ const wrapper=filterNode('g',{mask:'url(#'+id+')','pointer-events':'none','data-exo-stick-annulus':'1'});
+ const ring=outer.cloneNode(true);ring.removeAttribute('id');ring.removeAttribute('style');
+ ring.setAttribute('data-exo-stick-annulus-fill','1');ring.setAttribute('stroke','none');ring.setAttribute('opacity','1');
+ wrapper.appendChild(ring);entry.group.insertBefore(wrapper,outer);
+ entry.polishAnnulusFill=ring;return ring;
+}
 function paintStick(reference,entry,colors,values,axes,variant){
   const group=entry.group;
   const outer=group.querySelector('[id$="-outline"]');
@@ -363,6 +385,18 @@ function paintStick(reference,entry,colors,values,axes,variant){
   // showing the game. Ghost remains outline-based, with no double alpha layer.
   // The smaller source-authored center covers the middle in Solid.
   const solid=!colors.ghost;
+  if(colors.ringSurface&&center){
+    const annulus=ensureStickAnnulus(reference,entry,outer,center);
+    const state=controlSurfaceState(colors,ring);
+    paint(annulus,'fill',state.fill);paint(annulus,'fill-opacity',state.alpha);
+    paint(annulus,'stroke','none');
+    paint(outer,'fill','none');paint(outer,'fill-opacity',0);
+    paint(outer,'stroke',colors.controlStroke);paint(outer,'stroke-opacity',colors.controlStrokeAlpha);
+    outer.style.removeProperty('filter');
+    paintControl(center,colors,levels.center);
+    paint(center,'stroke',colors.controlStroke);paint(center,'stroke-opacity',colors.controlStrokeAlpha);
+    return;
+  }
   paint(outer,'fill',solid?mixColor(colors.control,colors.activeColor||PRESS_WHITE,ring):'none');
   paint(outer,'fill-opacity',String(solid?
     colors.controlAlpha+(colors.activeAlpha-colors.controlAlpha)*ring:0));
@@ -413,10 +447,8 @@ function paintGlyphs(entry,colors,showFaceSymbols,level=0){
   if(face&&glyphs.some(node=>Boolean(node.compareDocumentPosition(face)&Node.DOCUMENT_POSITION_FOLLOWING)))
     for(const glyph of glyphs)entry.group.appendChild(glyph);
   for(const glyph of glyphs){
-    if(isFace){
-      if(showFaceSymbols)glyph.style.removeProperty('display');
-      else paint(glyph,'display','none');
-    }
+    if(colors.markingsVisible!==false&&(!isFace||showFaceSymbols))glyph.style.removeProperty('display');
+    else paint(glyph,'display','none');
     // Authored symbols use the same scene ink and contour alpha as inputs.
     if(visibleFill(glyph))paint(glyph,'fill',colors.glyph);
     if(visibleStroke(glyph))paint(glyph,'stroke',colors.glyph);
@@ -517,7 +549,7 @@ function paintEdgeRelief(reference,mode,scene,edgeLight,edgeShadow){
 export function paintPolished2D(reference,mode,scene,{
   values=new Map(),left=null,right=null,colorway='auto',
   stickFeedback='ring',showFaceSymbols=true,edgeLight=0,edgeShadow=0,reviewLook=null,activeColor=PRESS_WHITE,
-  coherentContours=false
+  coherentContours=false,ringSurface=false,material2D=null,markings=true
 }={}){
   if(!reference?.svg)return;
   const colors=reviewLook?
@@ -525,6 +557,8 @@ export function paintPolished2D(reference,mode,scene,{
       ...ghostReviewSettings(reviewLook,scene)}:
     lookPalette(reference.layout.id,mode,scene,colorway);
   colors.activeColor=/^#[\da-f]{6}$/i.test(activeColor)?activeColor:PRESS_WHITE;
+  colors.markingsVisible=markings;colors.ringSurface=ringSurface;
+  if(material2D){colors.controlAlpha=clamp(material2D.neutralOpacity);colors.activeAlpha=clamp(material2D.activeOpacity);}
   if(coherentContours&&mode==='ghost'&&!reviewLook){
     // A single scene-specific ink shared by the outer housing, interior
     // paths, shoulders, sticks, face/directional controls and glyphs.

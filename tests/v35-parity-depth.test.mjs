@@ -84,7 +84,7 @@ test('material lab exposes synchronized flat 2D rows, retains only one mix slide
   // is solely an explicit L2/R2 analog input simulator, not another material knob.
   assert.equal((html.match(/id="materialMix"/g)||[]).length,1);
   assert.equal((html.match(/id="triggerPressure"/g)||[]).length,1);
-  assert.equal((html.match(/type="range"/g)||[]).length,2);
+  assert.equal((html.match(/type="range"/g)||[]).length,3);
   assert.ok(js.includes('ControllerReference'), 'same renderer for all 2D layouts');
   assert.ok(js.includes('flatSampleNodes'), 'one 2D sample per 3D viewport');
   assert.ok(reference.includes('applyMaterialAppearance'), 'same material recipe sent to 2D');
