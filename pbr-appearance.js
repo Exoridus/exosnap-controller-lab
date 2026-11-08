@@ -95,7 +95,7 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
           m.color.copy(mesh.userData.sourceColor).lerp(pressedBlue,state.moving);
           m.opacity=Math.min(1,Math.max(spec.opacity,.52)+(1-Math.max(spec.opacity,.52))*state.moving);
         }else{
-          m.color.copy(neutralSocketColor);m.opacity=restAlpha;
+          m.color.copy(mesh.userData.sourceColor);m.opacity=restAlpha;
         }
         if(state.click||pose.allPressed){
           m.color.copy(pressedBlue);m.opacity=1;

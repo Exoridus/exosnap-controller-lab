@@ -19,7 +19,7 @@ for(const id of ['JoyconLeft','JoyconRight','JoyconGrip','SwitchPro']){
         'left_bumper.obj','right_bumper.obj'];
       const parts=rig.meshes.filter(m=>filenames.includes(m.userData.sourceFile));
       assert.ok(parts.length>=3,'expected real authored stick/shoulder geometry');
-      const colors=new ActiveColorState();
+      const colors=new ActiveColorState({color2D:'#ffffff',color3D:'#ffffff'});
       for(const key of ['solid','ghost','identity']){
         const recipe=colors.overrideRecipe(resolveHeroRecipe(key,.7),'3d');
         applyPbrRecipeToRig(rig,recipe,neutral());
