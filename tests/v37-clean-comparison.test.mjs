@@ -43,14 +43,14 @@ test('off button stays translucent in Ghost and restores without new geometry',(
   assert.equal(native.meshes[0].material.emissiveIntensity,0);
 });
 
-test('main comparison has two feedback variants and one independent authored 2D row',()=>{
-  assert.deepEqual(LAB_VARIANTS.map(x=>x.key),['white','cool']);
+test('main comparison has one white 3D feedback and one independent authored 2D row',()=>{
+  assert.deepEqual(LAB_VARIANTS.map(x=>x.key),['white']);
   assert.deepEqual(HERO_VARIANTS.map(x=>x.key),['solid','ghost','outline','identity'],'historical recipes remain available');
   assert.doesNotMatch(html,/<iframe\b/i);
   assert.doesNotMatch(matrix,/<iframe\b/i);
   assert.match(html,/id="gallery"/);
-  assert.match(html,/data-look="white"/);
-  assert.match(html,/data-look="cool"/);
+  assert.match(html,/Aktiv: Weiß/);
+   assert.doesNotMatch(html,/Blauweiß|data-look="cool"/);
   assert.match(gallery,/className='look-views'/);
   assert.match(gallery,/className='sample sample--flat'/);
   assert.match(gallery,/canvas.id='threeCanvas'/);

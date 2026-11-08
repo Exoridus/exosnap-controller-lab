@@ -17,6 +17,6 @@ test('lab explicitly distinguishes L3/R3 clicks and restores stick on release',a
   assert.ok(script.includes("attachStickDrag(item.reference"));
   assert.ok(script.includes("end:side=>{drag[side]=null;paint();}"));
   assert.ok(style.includes("paint(center,'stroke',colors.controlStroke)"));
-  assert.ok(style.includes("solid?colors.controlStroke:mixColor("));
+  assert.ok(style.includes("solid||colors.coherentContours?colors.controlStroke:mixColor("));
   assert.ok(style.includes("paint(center,'stroke-opacity',String(colors.controlStrokeAlpha))"));
 });
