@@ -29,6 +29,12 @@ Ein originales Rig, ein WebGL-Kontext, eine Kamera und eine HDR-Probe versorgen 
 
 Der Qt-Port verwendet einen kleinen, rendererneutralen Materialvertrag. Das Lab installiert keinen zusätzlichen Fresnel-Patch auf den PBR-Materialien. Die verdeckten Linien und der Hintergrund-Compositor benötigen dennoch eine eigene native Umsetzung und Bildprüfung; `nativeValidated` bleibt `false`. Details stehen im [aktuellen Handoff](docs/CONTROLLER_CONSOLIDATION.md).
 
+## Nintendo-Spieler-LEDs: nur Anzeige
+
+Die Lab nutzt die vorhandenen Original-SVG-LEDs von Switch Pro und Joy-Con-Grip. Standard ist **Demo P1**. P1 bis P8 können manuell für das Overlay gewählt werden. Bei Joy-Con-Grip zeigen beide Seiten denselben Anzeigeindex. **Auto** zeigt nur dann einen tatsächlichen Spielerindex, wenn ein ausdrücklich angebundener Provider diesen verlässlich liefert; andernfalls erscheinen keine aktiven LEDs. Die Browser-Gamepad-Enumeration ist keine Spielerzuordnung und wird nicht als solche ausgegeben. Diese Browser-Lab liest keine physischen LED-Zustände und ändert keine Hardware-Einstellungen.
+
+ExoSnap nutzt auf `next` aktuell GameInput v4; die SDL3-Migration läuft separat in [ExoSnap PR #530](https://github.com/Exoridus/exosnap/pull/530). Der Lab-Draft implementiert daher keinen nativen Controller-Provider.
+
 ## Prüfung und Veröffentlichung
 
 `npm run verify` prüft Syntax und die vollständige Node-Suite. `tools/capture-pages.mjs` erzeugt echte Chromium-WebGL2-/SVG-Bilder und prüft zusätzlich Mix-Unabhängigkeit, einzelne verdeckte Eingaben, Originalsymbole, Kamerapositionen und Aktivfarben. Zusätzlich prüft die echte Browser-Abnahme Demo, mechanische Druckbewegung, Oberflächentexturen und den globalen Markings-Schalter und zeichnet eine Demo als WebM auf. Ein Fehler verhindert die Pages-Veröffentlichung. Bilder sind Rendernachweise; die finale ästhetische Auswahl trifft der Nutzer.

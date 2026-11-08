@@ -20,6 +20,7 @@ import {applyControllerArtwork,setControllerMarkings} from './control-glyphs.js'
 import {paintPolished2D} from './polish-2d-style.js';
 import {attachStickDrag} from './stick-drag.js';
 import {readStandardGamepad} from './gamepad-input.js';
+import {previewPlayerIndex,previewLabel} from './controller-player-leds.js';
 import {ControllerDemo,createControllerState,stickClickCapabilities,applyStickClickCapabilities} from './controller-demo.js';
 
 const $=id=>document.getElementById(id);
@@ -38,6 +39,7 @@ const state={mix:.70,modelId:'DualSenseCompact',selected:'white',view:'front',pa
 const demo=new ControllerDemo();
 const manualInput=createControllerState();
 state.frameInput=createControllerState();state.markings=true;state.flatTransparency=.70;
+state.playerPreviewSelection='demo';state.playerPreview=previewPlayerIndex('demo');
 state.manualButtons=new Map();state.manualHeld=new Set();
 const demoPresets={neutral:poseForStickDemo('neutral'),move:poseForStickDemo('move'),click:poseForStickDemo('click')};
 const sampleNodes=[];
@@ -203,14 +205,14 @@ function updateFlatReferences(input=state.frameInput){
   const flatZoom=THREE.MathUtils.clamp(state.fitRadius/state.radius,.67,1.55);
   for(const item of flatSampleNodes)item.stage.style.transform=`scale(${flatZoom.toFixed(4)})`;
   if(!flatReferences.size)return;
-  const key=flatAppearanceKey(input,activeColors.color2D)+`:${flatLoadSerial}:${flatReferences.size}:${state.panelWidth}:${state.flatTransparency}:${state.markings}`;
+  const key=flatAppearanceKey(input,activeColors.color2D)+`:${flatLoadSerial}:${flatReferences.size}:${state.panelWidth}:${state.flatTransparency}:${state.markings}:led:${state.playerPreview.mask}`;
   if(key===flatPaintKey)return;
   for(const sceneName of scenes){
     const ref=flatReferences.get(sceneName);
     if(!ref)continue;
     paintPolished2D(ref,'ghost',sceneName,{...input,activeColor:activeColors.color2D,
       stickFeedback:'ring',showFaceSymbols:true,edgeLight:0,edgeShadow:0,coherentContours:true,
-      ringSurface:true,material2D:resolveFlatMaterial(state.flatTransparency),markings:state.markings});
+      ringSurface:true,material2D:resolveFlatMaterial(state.flatTransparency),markings:state.markings,playerPreview:state.playerPreview});
   }
   flatPaintKey=key;
 }
@@ -263,8 +265,12 @@ function render(now=performance.now()){
   const dirty=state.paintDirty;state.paintDirty=false;
   if(document.hidden)return;
   const pose=visualInput(now);state.frameInput=pose;
+  const pad=firstStandardGamepad();
+  state.playerPreview=previewPlayerIndex(state.playerPreviewSelection,pad?.index??null);
+  const info=previewLabel(state.playerPreview);
+  if($('playerIndexStatus').textContent!==info)$('playerIndexStatus').textContent=info;
   const animate=()=>{if(demo.enabled||state.manualButtons.size||state.frameInput.source==='live'||state.stickPose==='live'||Array.from(navigator.getGamepads?.()||[]).some(p=>p?.connected))scheduleRender(false);};
-  const inputKey=flatAppearanceKey(pose);
+  const inputKey=flatAppearanceKey(pose)+':led:'+state.playerPreview.mask+':'+state.playerPreview.index;
   if(!dirty&&inputKey===state.lastFrameKey){animate();return;}
   state.lastFrameKey=inputKey;
   updateFlatReferences(pose);
@@ -360,9 +366,12 @@ function render(now=performance.now()){
   setStatus(`${state.native.model.name} · 2D + 3D synchron · ${pose.source==='demo'?'Demo':pose.source==='live'?'Live-Gamepad':pose.source==='manual'?'Manuelle Eingabe':'Neutral'}`);
   animate();
 }
-function getLiveStickPose(){
+function firstStandardGamepad(){
   const pads=typeof navigator.getGamepads==='function'?navigator.getGamepads():[];
-  const pad=Array.from(pads).find(p=>p?.connected&&p.mapping==='standard');
+  return Array.from(pads).find(p=>p?.connected&&p.mapping==='standard')||null;
+}
+function getLiveStickPose(){
+  const pad=firstStandardGamepad();
   const input=readStandardGamepad(pad);
   if(!input)return null;
   return {left:normalizeStickInput({...input.left,click:input.values.get('ls')>.5}),
@@ -393,6 +402,9 @@ async function loadModel(id){
     prepareSilhouette(next);
     disposeNativeRig(state.native);
     state.native=next;state.modelId=id;
+    const authoredPlayerLeds=['SwitchPro','JoyconGrip'].includes(id);
+    $('playerPreviewField').hidden=!authoredPlayerLeds;
+    $('playerIndexStatus').hidden=!authoredPlayerLeds;
     state.fitRadius=fitControllerRadius(new THREE.Box3().setFromObject(next.group).getSize(new THREE.Vector3()),{yaw:state.yaw,pitch:state.pitch});
     state.radius=state.fitRadius;updateCamera();
     if(state.renderer&&state.environmentMap)$('failureBanner').hidden=true;
@@ -414,7 +426,7 @@ async function loadModel(id){
 }
 async function exportQtRecipe(){
   const output={generator:'ExoSnap consolidated controller lab',date:'2026-11-08',
-    modelId:state.modelId,view:state.view,camera:{fov:state.camera?.fov||35,position:state.camera?.position.toArray()||[0,0,7]},
+    modelId:state.modelId,view:state.view,playerLedPreview:{...state.playerPreview,hardwareWrite:false},camera:{fov:state.camera?.fov||35,position:state.camera?.position.toArray()||[0,0,7]},
     geometryReuse:state.native?.geometryReuse,demo:demo.enabled,markings:state.markings,flatMaterial:resolveFlatMaterial(state.flatTransparency),
     feedback:Object.fromEntries(variants.map(({key})=>{const recipe=recipeFor3D(key);return [key,{recipe,qtQuick3D:qtLabDescriptor(recipe,{activeColor2D:activeColors.color2D})}]}))};
   const blob=new Blob([JSON.stringify(output,null,2)],{type:'application/json'});
@@ -429,6 +441,10 @@ function bindUI(){
   }
   select.value=state.modelId;
   select.addEventListener('change',e=>loadModel(e.target.value));
+  $('playerPreview').addEventListener('change',e=>{
+    state.playerPreviewSelection=e.target.value;
+    scheduleRender();
+  });
   $('view').addEventListener('change',e=>setView(e.target.value));
   $('panelSize').addEventListener('change',e=>{
     state.panelWidth=Number(e.target.value);
@@ -496,6 +512,6 @@ async function main(){
   createRenderer();
   if(state.renderer){try{await loadEnvironmentProbe();}catch(e){setFail(`HDR-Lichtprobe konnte nicht geladen werden: ${e.message}`);}}
   await loadModel(state.modelId);
-  window.__exoPbrLab={get input(){return state.frameInput},get demo(){return demo},get markings(){return state.markings},get flatReferences(){return flatReferences},get status(){return document.body.dataset.renderReady},get model(){return state.native},get variant(){return state.selected},get mix(){return state.mix},get renderer(){return state.renderer},get renderTarget(){return state.renderTarget},get drawStats(){return {...state.drawStats}},get renderMode(){return state.renderMode},get colors(){return {color2D:activeColors.color2D,color3D:activeColors.color3D,sync:activeColors.sync}},get triggerPressure(){return state.triggerPressure}};
+  window.__exoPbrLab={get input(){return state.frameInput},get demo(){return demo},get markings(){return state.markings},get flatReferences(){return flatReferences},get status(){return document.body.dataset.renderReady},get model(){return state.native},get variant(){return state.selected},get mix(){return state.mix},get renderer(){return state.renderer},get renderTarget(){return state.renderTarget},get drawStats(){return {...state.drawStats}},get renderMode(){return state.renderMode},get colors(){return {color2D:activeColors.color2D,color3D:activeColors.color3D,sync:activeColors.sync}},get triggerPressure(){return state.triggerPressure},get playerPreview(){return {...state.playerPreview}}};
 }
 main().catch(error=>{console.error(error);setFail(`Startfehler: ${error.message}`);});
