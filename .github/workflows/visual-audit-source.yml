@@ -18,7 +18,7 @@ jobs:
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Package exact repository and test dependency
         run: |
-          git bundle create "$RUNNER_TEMP/visual-audit.bundle" HEAD main
+          git bundle create "$RUNNER_TEMP/visual-audit.bundle" HEAD
           tar -czf "$RUNNER_TEMP/visual-audit-deps.tar.gz" node_modules
       - uses: actions/upload-artifact@v4
         with:
