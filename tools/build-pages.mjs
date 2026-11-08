@@ -30,7 +30,7 @@ export async function buildPages(source,dest,{captureDir=null,historyFile=null}=
     }
     // Release every genuine 2D review frame at a stable Pages URL.
     for(const name of await readdir(captureDir)){
-      if(/^2d-[a-z0-9-]+\.png$/.test(name))
+      if(/^(?:2d|3d-joycon)-[a-z0-9-]+\.png$/.test(name))
         await copyFile(path.join(captureDir,name),path.join(dest,'screenshots',name));
     }
     await copyFile(path.join(captureDir,'capture-manifest.json'),path.join(dest,'screenshots','latest.json'));

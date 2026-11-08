@@ -167,6 +167,32 @@ try{
     const proof=await shotProof();
     coreSmoke.push({id,threeViewports:proof.sampleCount,svgViewports:proof.flatCount,
       rendered:true,webgl:proof.webglVersion});
+    if(['JoyconGrip','JoyconLeft','JoyconRight'].includes(id)){
+      // A real neutral Chromium/WebGL frame, plus a role/material audit.
+      // The authored source metadata is dark, so idle caps and rear
+      // shoulder inputs must NEVER become pale pressed-state materials.
+      const materials=await page.evaluate(()=>{
+        const rig=window.__exoPbrLab.model;
+        return rig.meshes.filter(m=>
+          /^(?:left|right)_(?:cap|ring|stick|trigger|bumper)[.]obj$/
+            .test(m.userData.sourceFile||'')).map(m=>({
+          file:m.userData.sourceFile,
+          source:m.userData.sourceColor.getHexString(),
+          actual:m.material.color.getHexString(),
+          emissive:m.material.emissiveIntensity
+        }));
+      });
+      if(materials.length<3||materials.some(m=>m.actual!==m.source||m.emissive!==0))
+        throw Error('Joy-Con neutral hardware painted as pressed: '+JSON.stringify({id,materials}));
+      const name='3d-joycon-'+id.slice('Joycon'.length).toLowerCase()+'-neutral.png';
+      const bytes=await page.screenshot({path:path.join(output,name),
+        fullPage:true,animations:'disabled',timeout:60000});
+      if(bytes.length<40000||bytes.subarray(0,8).toString('hex')!=='89504e470d0a1a0a')
+        throw Error('Invalid Joy-Con WebGL screenshot '+name);
+      images.push({file:name,modelId:id,pressed:false,
+        bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),
+        source:'Real WebGL/OBJ neutral material, not native Qt 3D'});
+    }
   }
   // Browser-only visual acceptance matrix: genuine Chromium renderings of
   // the same authored SVGs. Fail the release for missing shapes or bad states.
@@ -803,6 +829,35 @@ try{
       source:'Existing repository SVG; not byte-verified alternate ZIP'});
   };
   await checkSourceReview('dualsense');
+  // Free XY drag must work in all three source/solid/ghost panels.
+  const sourceCap=sourceReviewPage.locator('.stage[data-view="solid"] [id$="-stick-l-cap-top"]');
+  const capRect=await sourceCap.boundingBox();
+  if(!capRect)throw Error('Source review has no pointer-targetable cap');
+  const mx=capRect.x+capRect.width/2,my=capRect.y+capRect.height/2;
+  await sourceReviewPage.mouse.move(mx,my);
+  await sourceReviewPage.mouse.down();
+  await sourceReviewPage.mouse.move(mx+22,my-11,{steps:5});
+  const moving=await sourceReviewPage.evaluate(()=>{
+    const state=window.__exoSourceReview.state();
+    const transform=window.__exoSourceReview.refs.map(x=>
+      x.reference.controls.find(e=>e.stickSide==='left')?.group.getAttribute('transform'));
+    return {left:state.left,right:state.right,click:state.values.get('ls')||0,transform};
+  });
+  if(moving.left.x<.2||moving.left.y>-.1||moving.click||
+    Math.hypot(moving.right.x,moving.right.y)>.0001||
+    new Set(moving.transform).size!==1)
+    throw Error('Source comparison free XY movement is broken: '+JSON.stringify(moving));
+  await sourceReviewPage.mouse.up();
+  const recentered=await sourceReviewPage.evaluate(()=>window.__exoSourceReview.state().left);
+  if(Math.hypot(recentered.x,recentered.y)>.0001)
+    throw Error('Source comparison did not release analog stick');
+  await sourceReviewPage.locator('#clickRight').check();
+  const r3=await sourceReviewPage.evaluate(()=>{
+    const s=window.__exoSourceReview.state();
+    return {ls:s.values.get('ls')||0,rs:s.values.get('rs')||0};
+  });
+  if(r3.ls!==0||r3.rs!==1)throw Error('Source comparison mixes L3/R3: '+JSON.stringify(r3));
+  await sourceReviewPage.locator('#clickRight').uncheck();
   const unstyled=await sourceReviewPage.locator('.stage[data-view="source"]').screenshot();
   const colored=await sourceReviewPage.locator('.stage[data-view="solid"]').screenshot();
   if(createHash('sha256').update(unstyled).digest('hex')===
