@@ -7,7 +7,7 @@ export const PRESS_WHITE='#ffffff';
 export const CONTROL_PALETTE=Object.freeze({
   neutralFill:'#a8b9c7',neutralAlpha:.26,
   activeFill:PRESS_WHITE,activeAlpha:.40,
-  border:'#8198aa',borderAlpha:.87,
+  border:'#667d90',borderAlpha:.94,
   activeBorderAlpha:.9,
   glyph:'#8198a9',glyphAlpha:.9
 });
@@ -321,13 +321,18 @@ function paintStick(reference,entry,colors,values,axes,variant){
   paint(outer,'fill',solid?mixColor(colors.control,PRESS_WHITE,ring):'none');
   paint(outer,'fill-opacity',String(solid?
     colors.controlAlpha+(colors.activeAlpha-colors.controlAlpha)*ring:0));
-  paint(outer,'stroke',mixColor(colors.controlStroke,PRESS_WHITE,ring));
+  // The Solid annulus has one constant dark boundary even when its moving
+  // material turns white. No extra graphic ring is created.
+  paint(outer,'stroke',solid?colors.controlStroke:mixColor(colors.controlStroke,PRESS_WHITE,ring));
   activeEdgeFilter(outer,ring);
   paint(outer,'stroke-opacity',
     String(colors.controlStrokeAlpha+(CONTROL_PALETTE.activeBorderAlpha-colors.controlStrokeAlpha)*ring));
   if(center){
     const level=levels.center;
     paintControl(center,colors,level);
+    // Preserve a dark existing center boundary during white L3/R3.
+    paint(center,'stroke',colors.controlStroke);
+    paint(center,'stroke-opacity','1');
     // Keep the exact source cap boundary visible, including during white L3.
     const attr='data-exo-authored-stroke-width';
     if(!center.hasAttribute(attr)){

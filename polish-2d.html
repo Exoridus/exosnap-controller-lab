@@ -33,7 +33,7 @@ figcaption{font-size:11px;margin-bottom:6px;color:#cbdce9;font-weight:650}
 .stage[data-scene=dark]::before{background-color:#07101c;background-image:linear-gradient(#040914ac,#040914ac),url('./backgrounds/arena.svg')}
 .stage[data-scene=light]::before{background:#f0f2f4}
 .stage[data-scene=mixed]::before{background-image:url('./backgrounds/racing.svg');background-color:#537b91}
-.stage>svg{position:relative;display:block;width:100%;height:100%;overflow:visible;transform:scale(var(--controller-zoom));transform-origin:center;pointer-events:auto}
+.stage>svg{touch-action:none;position:relative;display:block;width:100%;height:100%;overflow:visible;transform:scale(var(--controller-zoom));transform-origin:center;pointer-events:auto}
 .stage:focus-visible{outline:2px solid #d5ebfb;outline-offset:3px}
 .note{color:#9fb4c6;font-size:11px;margin:9px 0 0;max-width:1340px}
 @media(max-height:900px){body{padding-top:8px}.toolbar{padding:7px 10px}.subtitle{margin-bottom:7px}.comparison-grid{row-gap:7px}}
@@ -42,19 +42,21 @@ figcaption{font-size:11px;margin-bottom:6px;color:#cbdce9;font-weight:650}
 <header>
 <div class="kicker">ExoSnap Controller Lab · 2D Visual Review</div>
 <h1>2D Solid / Ghost – direkter 2 × 3 Vergleich</h1>
-<p class="subtitle">Solid und Ghost auf Dunkel / Hell / Gemischt. Kantenlicht und Kantenschatten modellieren nur die Ghost-Silhouette; Ring = Stickbewegung, Mitte = L3/R3.</p>
+<p class="subtitle">Solid und Ghost auf Dunkel / Hell / Gemischt. Kantenlicht und Kantenschatten modellieren nur die Ghost-Silhouette; Ring = Stickbewegung, Mitte = L3/R3. Stick-Kappen mit Maus oder Touch frei in jede Richtung ziehen; beim Loslassen springen sie zurück.</p>
 <div class="toolbar">
 <label>Controller<select id="layout" aria-label="Controller"></select></label>
 <label>Farbvariante<select id="colorway" aria-label="Farbvariante"><option value="auto" selected>Auto</option><option value="light">Hell</option><option value="dark">Dunkel</option></select></label>
 <label>Größe<select id="size" aria-label="Vorschaugröße"><option value="240">240 × 160</option><option value="320">320 × 214</option><option value="480" selected>480 × 320</option></select></label>
 
-<label>Stick-Ausschlag <output id="stickValue">0 %</output><input id="stick" type="range" min="0" max="100" step="1" value="0"></label>
+<label>Demo-Diagonale (beide) <output id="stickValue">0 %</output><input id="stick" type="range" min="0" max="100" step="1" value="0"></label>
 <label>Trigger L2/R2 <output id="triggerValue">0 %</output><input id="trigger" type="range" min="0" max="100" step="1" value="0"></label>
 <label>Kantenlicht <output id="edgeLightValue">38 %</output><input id="edgeLight" type="range" min="0" max="100" step="1" value="38" aria-label="Kantenlicht"></label>
 <label>Kantenschatten <output id="edgeShadowValue">45 %</output><input id="edgeShadow" type="range" min="0" max="100" step="1" value="45" aria-label="Kantenschatten"></label>
 <label class="control-check"><input type="checkbox" id="faceSymbols" checked> Face-Symbole anzeigen</label>
 <label class="control-check"><input type="checkbox" id="faces"> Face/D-Pad drücken</label>
-<label class="control-check"><input type="checkbox" id="clicks"> L3/R3 drücken</label>
+<label class="control-check"><input type="checkbox" id="clickLeft"> L3-Klick</label>
+<label class="control-check"><input type="checkbox" id="clickRight"> R3-Klick</label>
+<label class="control-check"><input type="checkbox" id="clicks"> L3+R3 (beide)</label>
 <label class="control-check"><input type="checkbox" id="live"> Live-Gamepad</label>
 </div>
 <div class="status-row"><p id="status" role="status">Lade SVG-Quellen …</p><div class="links"><a href="./polish-2d-review.html">Transparente A/B/C-Varianten</a> · <a href="./pbr-lab.html">3D-Lab</a> · <a href="./artwork-source-review.html">Quell-SVG vs Solid/Ghost</a> · <a href="./gallery-2d.html">SVG-Diagnose</a> · Mausrad über Vorschau: synchroner Zoom</div></div>

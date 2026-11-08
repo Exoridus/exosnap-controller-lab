@@ -2,6 +2,7 @@ import {LAYOUTS,layoutForId} from './controller-catalog.js';
 import {ControllerReference,isolateReferenceIds} from './controller-reference.js';
 import {readStandardGamepad} from './gamepad-input.js';
 import {paintPolished2D} from './polish-2d-style.js';
+import {attachStickDrag} from './stick-drag.js';
 
 const $=id=>document.getElementById(id);
 const scenes=[['dark','Dunkel'],['light','Hell'],['mixed','Gemischt']];
@@ -10,6 +11,7 @@ const refs=[];
 const sizeHeights={240:160,320:214,480:320};
 const params=new URLSearchParams(location.search);
 let serial=0,selected=null,lastLive='',lastFrame=0,zoom=1;
+const drag={left:null,right:null};let clearDrags=[];
 const clamp=(n)=>Math.max(0,Math.min(1,Number(n)||0));
 function setStatus(message){$('status').textContent=message;}
 
@@ -51,16 +53,24 @@ function inputState(){
   const useLive=$('live').checked;
   const gamepad=useLive?Array.from(navigator.getGamepads?.()||[]).find(p=>p?.connected&&p.mapping==='standard'):null;
   const live=readStandardGamepad(gamepad);
-  if(live)return {values:live.values,left:live.left,right:live.right,source:'Gamepad: '+live.id};
+  if(live){
+    const values=new Map(live.values);
+    if($('clicks').checked||$('clickLeft').checked)values.set('ls',1);
+    if($('clicks').checked||$('clickRight').checked)values.set('rs',1);
+    return {values,left:drag.left||live.left,right:drag.right||live.right,
+      source:drag.left||drag.right?'Stick-Drag':'Gamepad: '+live.id};
+  }
   const magnitude=clamp($('stick').value/100);
   const trigger=clamp($('trigger').value/100);
   const axis=magnitude/Math.SQRT2;
   const values=new Map();
   if($('faces').checked)for(const id of ['b1','b2','b3','b4','up','down','left','right'])values.set(id,1);
-  if($('clicks').checked){values.set('ls',1);values.set('rs',1);}
+  if($('clicks').checked||$('clickLeft').checked)values.set('ls',1);
+  if($('clicks').checked||$('clickRight').checked)values.set('rs',1);
   if(trigger>0){values.set('l2',trigger);values.set('r2',trigger);}
-  return {values,left:{x:axis,y:-axis},right:{x:-axis,y:axis},
-    source:useLive?'Kein Standard-Gamepad verbunden · Demo aktiv':'Manuelle Simulation'};
+  return {values,left:drag.left||{x:axis,y:-axis},right:drag.right||{x:-axis,y:axis},
+    source:drag.left||drag.right?'Stick-Drag':
+      useLive?'Kein Standard-Gamepad verbunden · Demo aktiv':'Manuelle Simulation'};
 }
 function paint(){
   const inputs=inputState();
@@ -82,6 +92,7 @@ async function load(id){
   const layout=layoutForId(id);
   selected=layout?.has2D?layout:LAYOUTS.find(l=>l.id==='dualsense');
   $('layout').value=selected.id;
+  clearDrags.forEach(dispose=>dispose());clearDrags=[];drag.left=null;drag.right=null;
   document.body.dataset.polishReady='loading';
   setStatus('Lade '+selected.name+' …');
   await Promise.all(refs.map((entry,index)=>entry.reference.load(selected).then(()=>{
@@ -89,6 +100,15 @@ async function load(id){
       isolateReferenceIds(entry.reference.svg,'polish-'+token+'-'+index);
   })));
   if(token!==serial)return;
+  for(const item of refs)clearDrags.push(attachStickDrag(item.reference,{
+    start:side=>{
+      $('live').checked=false;
+      $('stick').value='0';$('stickValue').textContent='0 %';
+      drag[side]={x:0,y:0};paint();
+    },
+    move:(side,axes)=>{drag[side]=axes;paint();},
+    end:side=>{drag[side]=null;paint();}
+  }));
   paint();
 }
 function address(){
@@ -101,7 +121,7 @@ $('size').addEventListener('change',()=>{resize();address();paint();});
 for(const id of ['stick','trigger','edgeLight','edgeShadow']){
   $(id).addEventListener('input',()=>{$(id+'Value').textContent=$(id).value+' %';paint();});
 }
-for(const id of ['faces','clicks','live','faceSymbols'])$(id).addEventListener('change',paint);
+for(const id of ['faces','clicks','clickLeft','clickRight','live','faceSymbols'])$(id).addEventListener('change',paint);
 $('colorway').addEventListener('change',()=>{paint();address();});
 function liveTick(now){
   if($('live').checked&&now-lastFrame>=33){
@@ -120,4 +140,4 @@ resize();
 void load(params.get('id')||'dualsense');
 requestAnimationFrame(liveTick);
 window.__exo2DPolish={get refs(){return refs},get state(){return document.body.dataset.polishReady},
-  get zoom(){return zoom},paint,load,inputState};
+  get zoom(){return zoom},paint,load,inputState,get drag(){return {...drag}}};
