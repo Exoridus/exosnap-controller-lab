@@ -149,5 +149,10 @@ export function update3DPlayerLedMask(native,mask){
   if(state.mask===mask)return false;
   for(let i=0;i<state.count;i++)state.uniforms.active.value[i]=bits[i%4]?1:0;
   state.mask=mask;
+  // MeshPhysicalMaterial's onBeforeCompile extras are bound to a compiled
+  // program. A player change is rare; request a fresh program/uniform upload
+  // rather than allowing a cached program to retain the prior LED pattern.
+  // No geometry, extra draw call or per-frame shader compilation is added.
+  state.target.material.needsUpdate=true;
   return true;
 }
