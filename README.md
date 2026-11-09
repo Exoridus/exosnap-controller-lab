@@ -14,7 +14,7 @@ Node.js ≥ 20: `npm ci`, danach `npm start`. Unter Windows kann `start.cmd` ver
 
 - **3D · Weiß:** Eine einzige, quelldatengetreue 3D-Reihe mit weißem Aktivfeedback. Die frühere Blauweiß-Vergleichsreihe wurde entfernt.
 - **Materialmix — nur 3D:** 0 % bewahrt die deckende Darstellung; 100 % reduziert das Gehäuse auf 0,10 und neutrale Eingabeflächen auf 0,25 Alpha. Die 2D-Reihe bleibt unverändert. Neutrale 3D-Tasten behalten am Ghost-Endpunkt 16 % ihrer ursprünglichen RGB-Farbigkeit, ohne Alpha-Änderung.
-- **2D — Transparent:** Original-SVG-Pfade, neutrale Eingabeflächen mit 0,30 Alpha und aktive weiße Flächen mit 0,96. Äußere und innere Gehäusekonturen, Controls und Symbole haben dieselbe Farbregel pro Hintergrund. Auf Hell und Gemischt erscheinen graue statt schwarze Zusatzkonturen. Das SVG enthält seitliche Sicherheitsränder; Verzierungen erhalten kein Eingabefeedback.
+- **2D — Transparent:** Original-SVG-Pfade, neutrale Eingabeflächen mit 0,30 Alpha und aktive weiße Flächen mit 0,96. Äußere und innere Gehäusekonturen, Controls und Symbole haben dieselbe Farbregel pro Hintergrund. Auf Hell und Gemischt erscheinen graue statt schwarze Zusatzkonturen. Alle 2D-Viewer verwenden denselben symmetrischen `viewBox`-Sicherheitsrand und gleich große, erweiterte Stick-Aussparungsmasken; weder äußere Linien noch linke/rechte Konturhälften werden durch den ursprünglichen engen Quellrahmen beschnitten. Verzierungen erhalten kein Eingabefeedback.
 - **Eingaben:** Einzelne Tasten, beide analogen Trigger, Stick-Bewegung, L3/R3, alle Tasten oder ein Standard-Gamepad lassen sich vergleichen. Die 2D-Sticks können direkt gezogen werden; Bewegung und Klick bleiben unabhängig.
 - **Kamera und Größe:** Gemeinsame Kameraposition für 3D; 240, 320 oder 480 Pixel pro Feld. Das Mausrad über 2D/3D zoomt, Shift + Mausrad scrollt horizontal. Das 2D-SVG folgt dem Zoom, bleibt aber frontal.
 - **Aktivfarben & Qt-Parameter:** Eigene Farben für 2D/3D mit optionaler Kopplung; Sync ist standardmäßig aktiv. Der Download enthält die tatsächlich gewählten Parameter und benennt offene native Arbeit. Eine subtile 3D-Außenkontur lässt sich im eingeklappten Darstellungsbereich für A/B-Vergleiche abschalten.
@@ -35,7 +35,7 @@ Die Lab nutzt die vorhandenen Original-SVG-LEDs von Switch Pro und Joy-Con-Grip 
 
 ExoSnap nutzt auf `next` aktuell GameInput v4; die SDL3-Migration läuft separat in [ExoSnap PR #530](https://github.com/Exoridus/exosnap/pull/530). Der Lab-Draft implementiert daher keinen nativen Controller-Provider.
 
-Die äußere 3D-Kante wird nur nach dem fertigen Controller-Render aus dessen Alpha im vorhandenen GPU-Compositor betont. Die einzelnen Meshes bekommen keine neuen Konturen; Innennähte und transparente Überdeckungen bleiben der ursprünglichen Darstellung vorbehalten. Technische Einzelheiten und Qt-Nicht-Parität stehen in [Final 3D Polish](docs/FINAL_3D_POLISH.md).
+Die äußere 3D-Kante wird nur nach dem fertigen Controller-Render aus dessen Alpha im vorhandenen GPU-Compositor sehr dezent betont (etwa eine Bildschirmpixel breite Kante, abgeschwächtes Grau statt hartem Weiß). Die einzelnen Meshes bekommen keine neuen Konturen; Innennähte und transparente Überdeckungen bleiben der ursprünglichen Darstellung vorbehalten. Technische Einzelheiten und Qt-Nicht-Parität stehen in [Final 3D Polish](docs/FINAL_3D_POLISH.md).
 
 ## Prüfung und Veröffentlichung
 
