@@ -11,6 +11,7 @@ import {buildControlBindings} from '../controller-pack-contract.js';
 import {loadNativeRig,disposeNativeRig} from '../pbr-model.js';
 import {prepareGenericCenterControls,controllerPresentationModel} from '../generic-xbox-proxy.js';
 import {encodeControllerGlb} from './controller-glb-export.mjs';
+import {describeRigMotions} from './controller-rig-motion.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
@@ -44,7 +45,7 @@ export function isolateSvgElement(source,mapping,layer){
 }
 function safeOut(destination){
   const out=path.resolve(destination);
-  if(out===root||root.startsWith(out+path.sep)||out.startsWith(path.join(root,'assets')+path.sep)||
+  if(out===path.parse(out).root||out===root||root.startsWith(out+path.sep)||out.startsWith(path.join(root,'assets')+path.sep)||
     out.startsWith(path.join(root,'references')+path.sep))throw Error('Refusing to replace a source directory: '+out);
   return out;
 }
@@ -109,12 +110,14 @@ export async function buildControllerPacks({destination=path.join(root,'.workspa
         prepareGenericCenterControls(rig);
         const output=encodeControllerGlb(rig,layout.id);
         stats=output.stats;
+        const motion=describeRigMotions(rig);
         const parts=rig.parts.map(p=>({
           file:p.file,node:output.partNodes[p.file],
           role:p.holder.userData.role,control:p.holder.userData.control,
           parent:(rig.parts.find(q=>q.holder===p.holder.parent)?.file)||null,
           pivot:p.holder.position.toArray(),rotation:p.holder.quaternion.toArray(),
           sourceIndex:p.holder.userData.sourceIndex,
+          motion:motion.get(p.holder)||null,
           physicalSource:p.holder.userData.reusedPhysicalCapFrom||source3D
         }));
         bindings=buildControlBindings(mapping||{id:layout.id,layers:[]},parts);
@@ -134,7 +137,7 @@ export async function buildControllerPacks({destination=path.join(root,'.workspa
     const manifest={
       schemaVersion:1,id:layout.id,label:layout.name,has2D:!!layout.has2D,
       has3D:!!physical,availability:layout.availability,sourceModelId:source3D,
-      format2D:'source.svg + mapping.json + generated elements + controls.json',
+      format2D:layout.has2D?'source.svg + mapping.json + generated elements + controls.json':null,
       format3D:physical?'glTF 2.0 binary GLB with named nodes + rig.json':null,
       runtime2D:'Qt QPainter/QSvgRenderer prepared atlas, not SVG render on every frame',
       runtime3D:physical?'Balsam Qt Mesh/QML pre-import preferred; Qt 6.12 RuntimeLoader for development':null,
