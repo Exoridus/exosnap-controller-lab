@@ -1,6 +1,6 @@
 {
-  "revision": "535de961f7c522de5db6f10e5936d38d0685d823",
-  "capturedAt": "2026-11-09T04:59:18.015Z",
+  "revision": "e10c85027177cc2f05ff14a1b4547aba45ca42f2",
+  "capturedAt": "2026-11-09T05:37:36.154Z",
   "url": "http://127.0.0.1:8792/pbr-lab.html",
   "content": "Real Three.js/WebGL2 + original controller OBJ + authored SVG",
   "looks": [
@@ -83,8 +83,8 @@
     {
       "file": "3d-final-demo-default.png",
       "scenario": "Automatic demo and collapsed controls at startup",
-      "bytes": 275618,
-      "sha256": "b1739b292d20f1c5abc4d6750b520a98ebe13f103909cc33f7cd5cda054d9ff8"
+      "bytes": 275522,
+      "sha256": "198104e728decf8e822e8821e69698b047c1072a470a6bc63af6d08972b239d7"
     },
     {
       "file": "3d-final-neutral.png",
@@ -125,8 +125,8 @@
     {
       "file": "controller-demo.webm",
       "scenario": "Real-time default controller demo",
-      "bytes": 3841657,
-      "sha256": "d8dc59e3e53fe95e8bf4e56046c4c74d0d7af9c58c8101336e81f2916028509e"
+      "bytes": 4088378,
+      "sha256": "b69c9e667377f0a695fa08dd4125b9b64bdfeb7f2ba75e6573a28e2c64381136"
     },
     {
       "file": "3d-final-socket-front.png",
@@ -665,8 +665,8 @@
     {
       "file": "3d-final-model-ds4compact-markings-off.png",
       "scenario": "DualShock 4 / global markings off",
-      "bytes": 259695,
-      "sha256": "e171a58b20e0e2582ea0c586c15120b8b5e32c2a192e73067e12a18453175ac7"
+      "bytes": 259692,
+      "sha256": "5d5fd1407c4753330adb484c40e230c85958808d0db7262416477bd48e3264a1"
     },
     {
       "file": "3d-final-model-xboxoneclean-0-neutral.png",
@@ -749,8 +749,8 @@
     {
       "file": "3d-final-model-xboxoneclean-70-combined.png",
       "scenario": "Xbox One / combined / transparency 70 / 3 backgrounds / paired production renderers",
-      "bytes": 269104,
-      "sha256": "492084d4a51482ba1907f3c7e0b89187783335c5dd1a0bd337b9b28c52f6fd6e"
+      "bytes": 269109,
+      "sha256": "14630efccd9a09680abc48cceb46582d954a99e60146aff1da834ba781bc4d82"
     },
     {
       "file": "3d-final-model-xboxoneclean-90-neutral.png",
@@ -869,8 +869,8 @@
     {
       "file": "3d-final-model-xboxoneclean-markings-off.png",
       "scenario": "Xbox One / global markings off",
-      "bytes": 265947,
-      "sha256": "8c9f86c32cfab760d769ad31d038cd8ce7d0a3b6dcfab6798308913412267708"
+      "bytes": 265951,
+      "sha256": "5b380abed156825d2a17ba5f525eadcc360b8ce4698c62564a9e0e447c52b438"
     },
     {
       "file": "3d-final-model-xbox360-0-neutral.png",
@@ -899,8 +899,8 @@
     {
       "file": "3d-final-model-xbox360-70-l1.png",
       "scenario": "Xbox 360 / l1 / transparency 70 / 3 backgrounds / paired production renderers",
-      "bytes": 266379,
-      "sha256": "961f10764276e668a7cd443d6ca45441f9465c70c47588689fc40e95aba207d0"
+      "bytes": 266378,
+      "sha256": "b3fab8536fab29fb92c823dfe8edccdd22def4ad24bb1ea7edc4ea2259407dce"
     },
     {
       "file": "3d-final-model-xbox360-70-l2.png",
@@ -918,7 +918,7 @@
       "file": "3d-final-model-xbox360-70-r2.png",
       "scenario": "Xbox 360 / r2 / transparency 70 / 3 backgrounds / paired production renderers",
       "bytes": 267262,
-      "sha256": "291facb5838f2399e44ad0fd08565e773f93cb6fed3ed397490daa3081ca6398"
+      "sha256": "df62429de483c1efbe43c77f01c498eca20b0a1202deb2dc5e84bf6cd80fd38c"
     },
     {
       "file": "3d-final-model-xbox360-70-up.png",
@@ -929,8 +929,8 @@
     {
       "file": "3d-final-model-xbox360-70-right-move.png",
       "scenario": "Xbox 360 / right-move / transparency 70 / 3 backgrounds / paired production renderers",
-      "bytes": 267225,
-      "sha256": "d57ac18eaec3ea1741b3096763d7aade834d7d0b6443c79f7dfea01cc5f0def4"
+      "bytes": 267257,
+      "sha256": "5315fb4e66c3b61e9bfb0d70633808e6f31ac9c1e9ece3bf3a3374f0d3317e60"
     },
     {
       "file": "3d-final-model-xbox360-70-left-move.png",
@@ -1307,14 +1307,14 @@
     {
       "file": "3d-final-model-joycongrip-70-l1.png",
       "scenario": "Joy-Cons · Grip / l1 / transparency 70 / 3 backgrounds / paired production renderers",
-      "bytes": 254062,
-      "sha256": "1d51a59f3c1a313b1041258edf9a94c63d00f00f1526696cfdc1b00c4af9be63"
+      "bytes": 254080,
+      "sha256": "2140abd0081fc8ffed2a054f1a7c3a4c97c0afe943fa87085ae2ff0d2c750c40"
     },
     {
       "file": "3d-final-model-joycongrip-70-l2.png",
       "scenario": "Joy-Cons · Grip / l2 / transparency 70 / 3 backgrounds / paired production renderers",
-      "bytes": 254533,
-      "sha256": "cd6a26dd154f4498cedf47c42d788c66007a93cc84ec322681a3437411df94f3"
+      "bytes": 254542,
+      "sha256": "d3a60f4fb87162889eb6fb7139c710f935efc293c6eeea3bed86648226ed8d16"
     },
     {
       "file": "3d-final-model-joycongrip-70-r1.png",
@@ -1518,13 +1518,13 @@
       "file": "3d-final-model-joyconleft-70-up.png",
       "scenario": "Joy-Con · left / up / transparency 70 / 3 backgrounds / paired production renderers",
       "bytes": 200528,
-      "sha256": "e73e32bba3b52310191ac13b965fdfd9148a02ed1171d4ef1412627fb463e76e"
+      "sha256": "53f83ecdfebaf4dbba8ed7e8ca71035a80f89ffc55183bf955f72d82ca210e9e"
     },
     {
       "file": "3d-final-model-joyconleft-70-left-move.png",
       "scenario": "Joy-Con · left / left-move / transparency 70 / 3 backgrounds / paired production renderers",
-      "bytes": 201631,
-      "sha256": "a81e1cdef92feb38a0b2252c3c01b8b45cacefce06a3de37a6833fe12fe98cc4"
+      "bytes": 201633,
+      "sha256": "ffa5f593d5ffebc8bf2971d31827549a94b9e12e9c3a5e2af34e61bb40e26725"
     },
     {
       "file": "3d-final-model-joyconleft-70-ls-click.png",
@@ -1697,8 +1697,8 @@
     {
       "file": "3d-final-model-joyconright-70-right-move.png",
       "scenario": "Joy-Con · right / right-move / transparency 70 / 3 backgrounds / paired production renderers",
-      "bytes": 203816,
-      "sha256": "32aa310f2ca735fdd2d2067bf13b5da24708bf5be2a5f333eac4e23c5a545eb8"
+      "bytes": 203820,
+      "sha256": "83886db11ec26405703796dce7ee8cd3cbe0016057845f04892d9c75209495fd"
     },
     {
       "file": "3d-final-model-joyconright-70-rs-click.png",
@@ -1835,146 +1835,146 @@
     {
       "file": "3d-final-model-gamecube-0-neutral.png",
       "scenario": "GameCube / neutral / transparency 0 / 3 backgrounds / paired production renderers",
-      "bytes": 276254,
-      "sha256": "99ba3c90e7262cc762aac3d8ab65766bf378d88a0454c91a97e330184b950e43"
+      "bytes": 277761,
+      "sha256": "4d6d1484d97b6eaabce10e3e8d670649b20fdceb3702e0e3e298fcf77a7b45cd"
     },
     {
       "file": "3d-final-model-gamecube-30-neutral.png",
       "scenario": "GameCube / neutral / transparency 30 / 3 backgrounds / paired production renderers",
-      "bytes": 278864,
-      "sha256": "561e5f1a1bcbb2d92f40c6ed4e36e33e2a627bfbdad164610d9ca80e0b934a66"
+      "bytes": 280410,
+      "sha256": "7cc072fb3c101f110948996ea25ee7cca4f15d464f2a7bcc8d63732eb3f0b26f"
     },
     {
       "file": "3d-final-model-gamecube-70-neutral.png",
       "scenario": "GameCube / neutral / transparency 70 / 3 backgrounds / paired production renderers",
-      "bytes": 280115,
-      "sha256": "35d3751abba86b07bb217854806383d4d159aafbbf2ac00cb53507490c06ff95"
+      "bytes": 281619,
+      "sha256": "83f0a741edbaff22e3eec274355c9b1b530d46cf65ac472224a6be561c35e253"
     },
     {
       "file": "3d-final-model-gamecube-70-b1.png",
       "scenario": "GameCube / b1 / transparency 70 / 3 backgrounds / paired production renderers",
-      "bytes": 279663,
-      "sha256": "a8a19226c5d9ae2c5ea364c5016d8fe096d16b9e38c423851f4c76038274f1d6"
+      "bytes": 281168,
+      "sha256": "c144b164a3ba3cb83ec8dc8a076168dd17db5fa9ba6dcf7b4e87c86b28d2d62f"
     },
     {
       "file": "3d-final-model-gamecube-70-l2.png",
       "scenario": "GameCube / l2 / transparency 70 / 3 backgrounds / paired production renderers",
-      "bytes": 280514,
-      "sha256": "ea23cd223034806723d3ee77dcc02547b302d6e3822750efd1d406cfc77d2e63"
+      "bytes": 282013,
+      "sha256": "ba438755524c41fbaeeb39b29b9ffee4bb362d507e5b2a8bac57dc1d828728f7"
     },
     {
       "file": "3d-final-model-gamecube-70-r1.png",
       "scenario": "GameCube / r1 / transparency 70 / 3 backgrounds / paired production renderers",
-      "bytes": 280272,
-      "sha256": "ce2f0db960e1c71ed930abd40a6c2a89d7ddb44b5f8bee4d62984996b712c2b5"
+      "bytes": 281763,
+      "sha256": "6669eed94859f2bf06d17cd62940c53a55e3d9c13d0774a0cfe8097df3f53125"
     },
     {
       "file": "3d-final-model-gamecube-70-r2.png",
       "scenario": "GameCube / r2 / transparency 70 / 3 backgrounds / paired production renderers",
-      "bytes": 281323,
-      "sha256": "5d680defd83e7a16003a86ff948b66341b169cf3c8e9343acff807fbe94ccc74"
+      "bytes": 282841,
+      "sha256": "161102d28fa6e9f46a50b6e0936b95d70bb8836b5da65552eca2a90a7f28a8dc"
     },
     {
       "file": "3d-final-model-gamecube-70-up.png",
       "scenario": "GameCube / up / transparency 70 / 3 backgrounds / paired production renderers",
-      "bytes": 280117,
-      "sha256": "f79c4265eba84852ea0f0fcd3d650bdaf6be61ee78efccaf674359e1ff971004"
+      "bytes": 281623,
+      "sha256": "8631bad846fbf8ac2d7af7e4f40a25adfe81575cf5d0fb21f4205e2595e1ec10"
     },
     {
       "file": "3d-final-model-gamecube-70-right-move.png",
       "scenario": "GameCube / right-move / transparency 70 / 3 backgrounds / paired production renderers",
-      "bytes": 280682,
-      "sha256": "ef504d2e9f1e80ab553852ae793568e0886c47d05b95242eaacd7d3450e7cd96"
+      "bytes": 282190,
+      "sha256": "22043cd6a986172b2414a197e03ada4584a32242d7c558121076e9b9e4a8cf0d"
     },
     {
       "file": "3d-final-model-gamecube-70-left-move.png",
       "scenario": "GameCube / left-move / transparency 70 / 3 backgrounds / paired production renderers",
-      "bytes": 280445,
-      "sha256": "e4368e605dec671cdef6572e6f706781a23d3531eabf35f1bcd03b4b641da67f"
+      "bytes": 281956,
+      "sha256": "dd72798af9038c55454177738c30d61d714585a49dd62cc190d64717ef59b6c5"
     },
     {
       "file": "3d-final-model-gamecube-70-combined.png",
       "scenario": "GameCube / combined / transparency 70 / 3 backgrounds / paired production renderers",
-      "bytes": 281666,
-      "sha256": "d1b82808b3a5d7c7761a54b7417301b129867ef1c54d8a244fe873b6e2390a47"
+      "bytes": 283301,
+      "sha256": "fad1a26137b9c6b04620b98ce85a5e6b89ab6430a53dc4adcd90d7ba8bc8dbac"
     },
     {
       "file": "3d-final-model-gamecube-90-neutral.png",
       "scenario": "GameCube / neutral / transparency 90 / 3 backgrounds / paired production renderers",
-      "bytes": 280361,
-      "sha256": "0b3aeffbb17c48b99bb53dada5f9532e4e387e1784d2c4f930a7e6278b87dc92"
+      "bytes": 281866,
+      "sha256": "3723a50c5b7ec00a36f3faec7086b48c4f682399108d5ab21b98c275fcdb44bb"
     },
     {
       "file": "3d-final-model-gamecube-mix0-front-neutral.png",
       "scenario": "GameCube / mix 0 / front / neutral",
-      "bytes": 248623,
-      "sha256": "59e3a5ddfbe2aa4e4a064328d8c283ce0694d739e9350cf08e3a793fddba8a7b"
+      "bytes": 249097,
+      "sha256": "de93f364fdfec939b4faec665fe4b9eb0344b740f035753a84682d686d22dc6d"
     },
     {
       "file": "3d-final-model-gamecube-mix0-front-combined.png",
       "scenario": "GameCube / mix 0 / front / combined",
-      "bytes": 248815,
-      "sha256": "f981e6f64e0b2cf97e61b935b11237a3f2b698d084ccdf388045149334006edd"
+      "bytes": 249313,
+      "sha256": "ad34f745104b7767949657a980c483f15aae2a1026898c0319c733796b7a9601"
     },
     {
       "file": "3d-final-model-gamecube-mix0-angled-neutral.png",
       "scenario": "GameCube / mix 0 / angled / neutral",
-      "bytes": 246056,
-      "sha256": "a140739653a342f63fe90684b99d941f5dd743b12dbd40d30c6e19e3586c182a"
+      "bytes": 246309,
+      "sha256": "0c2304ab07266ae798c7fbeaea32b6c18b3008a2501fc339e9e83d4e71d0baa7"
     },
     {
       "file": "3d-final-model-gamecube-mix0-angled-combined.png",
       "scenario": "GameCube / mix 0 / angled / combined",
-      "bytes": 245966,
-      "sha256": "73dff5d2d4cfef98e2c18474e6a8bfb733201f02296813174d98410447a60f6c"
+      "bytes": 246227,
+      "sha256": "bc2cb160295dcef40c3362c8a38c456557fbb954dd2957736f61e237c32199b8"
     },
     {
       "file": "3d-final-model-gamecube-mix0-bottom-neutral.png",
       "scenario": "GameCube / mix 0 / bottom / neutral",
-      "bytes": 246583,
-      "sha256": "af7a22aaa134d57227f74af282408bb63a84c5d888d55351442554c0e5162e3a"
+      "bytes": 246820,
+      "sha256": "82f8bf5fa9f0959253d4811f1b00c8c722f5f41c4562a8b0fb55a3a839d727e9"
     },
     {
       "file": "3d-final-model-gamecube-mix0-bottom-combined.png",
       "scenario": "GameCube / mix 0 / bottom / combined",
-      "bytes": 246439,
-      "sha256": "7696a72de27d7f1dd153877f76a2d34c1269a712506c0b86ce75d28515701e11"
+      "bytes": 246691,
+      "sha256": "d0026d3769306489bf0394358a1b4d2f974cc3225fa1d0fee33b77e9def9a41b"
     },
     {
       "file": "3d-final-model-gamecube-mix70-front-neutral.png",
       "scenario": "GameCube / mix 70 / front / neutral",
-      "bytes": 279600,
-      "sha256": "4b182e37d6a69b14c528aeafa72cc8e2bf5d202b19dc1eda37a882c5ad7189c8"
+      "bytes": 281379,
+      "sha256": "1487379cb5da7c108bfcc926792d96c6e7dd6d1a463400336f4eeaf3c303e978"
     },
     {
       "file": "3d-final-model-gamecube-mix70-front-combined.png",
       "scenario": "GameCube / mix 70 / front / combined",
-      "bytes": 281193,
-      "sha256": "8e89e01ddeaa35b47b38a43efd11e2cb84974846f22af56c3d1a413c41db9b62"
+      "bytes": 283006,
+      "sha256": "e0fb1a3b5d44978dbbdd7a69c11811cf1e3e9618da44d859b976a51ba2d83130"
     },
     {
       "file": "3d-final-model-gamecube-mix70-angled-neutral.png",
       "scenario": "GameCube / mix 70 / angled / neutral",
-      "bytes": 263142,
-      "sha256": "1a73f16cd452b7b09cec029b7118100b119289d6a04cfbea33f9e612d4e9244f"
+      "bytes": 264077,
+      "sha256": "bb250f514061f0c571f16cb360a35def21e9dd28548f9501b998443bac16c9b8"
     },
     {
       "file": "3d-final-model-gamecube-mix70-angled-combined.png",
       "scenario": "GameCube / mix 70 / angled / combined",
-      "bytes": 263461,
-      "sha256": "396db2eb694ef339f72ec6e0973bc395cb8c4f28d1532bba2e9f6436646605a2"
+      "bytes": 264365,
+      "sha256": "a4cc21549f2b73c3733a1b82b6c0149fe708f8792c3261f4f392f4c817f3b126"
     },
     {
       "file": "3d-final-model-gamecube-mix70-bottom-neutral.png",
       "scenario": "GameCube / mix 70 / bottom / neutral",
-      "bytes": 267576,
-      "sha256": "a3f52fe6672348ae1d029ca5a51160f5afbf8a3b4d2671197df9645eb8bff285"
+      "bytes": 268446,
+      "sha256": "69cb78d7450ddffe7ef060b01b328aec284270ca8f64b26f54f909b06f6736ee"
     },
     {
       "file": "3d-final-model-gamecube-mix70-bottom-combined.png",
       "scenario": "GameCube / mix 70 / bottom / combined",
-      "bytes": 268568,
-      "sha256": "377e2b70dc9c61f1d5ee9b351c80d0dd6d0852a6adbfcaa9ea5111ca4b4b7ab3"
+      "bytes": 269531,
+      "sha256": "b13a0749f8c8800f3052fbc81ae2bf1622c2d028cccfd4f0f0abde7214c92fee"
     },
     {
       "file": "3d-final-model-gamecube-mix100-front-neutral.png",
@@ -2015,14 +2015,14 @@
     {
       "file": "3d-final-model-gamecube-markings-off.png",
       "scenario": "GameCube / global markings off",
-      "bytes": 271648,
-      "sha256": "782ec8dd7a073ebfaf94d751e141cfbf8fc5f61b49966e946f983fb5f1a4b6c0"
+      "bytes": 273422,
+      "sha256": "ffef757555f7fc24963dc81d2052549861c9db3bac994cc0cb1332ad2e55520b"
     },
     {
       "file": "3d-final-model-genericpro-0-neutral.png",
       "scenario": "Generic Pro / neutral / transparency 0 / 3 backgrounds / paired production renderers",
-      "bytes": 264586,
-      "sha256": "6883f951dbbe944a85a7a63be639016b0ed08c7d913758a61d61191e58301e69"
+      "bytes": 264590,
+      "sha256": "467e7681ba501801ac86a7b9985c3e78a08d597cfa40c48cdea3135be2c4ab55"
     },
     {
       "file": "3d-final-model-genericpro-30-neutral.png",
@@ -2075,8 +2075,8 @@
     {
       "file": "3d-final-model-genericpro-70-right-move.png",
       "scenario": "Generic Pro / right-move / transparency 70 / 3 backgrounds / paired production renderers",
-      "bytes": 269955,
-      "sha256": "2827324289654a8b8798879d384bec88b9c2af0af314f841147f87aa193de665"
+      "bytes": 269910,
+      "sha256": "83fe1fe3f3f87c47917222ae223d20935de035c6efe745cfb04086d150428e56"
     },
     {
       "file": "3d-final-model-genericpro-70-left-move.png",
@@ -2228,7 +2228,7 @@
       "bytes": 296401,
       "sha256": "677f707d5b418d785a1b3d21744fcbc3f0908c3b6dea332bfe4a79c3985dbbec",
       "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
-      "revision": 1617,
+      "revision": 1620,
       "drawStats": {
         "white": {
           "mode": "shared",
@@ -2264,7 +2264,7 @@
       "bytes": 293464,
       "sha256": "633acb8d4f1623021ef29bd35f6582dc90eed3c8e3a500b5be4b10654c21ef81",
       "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
-      "revision": 1618,
+      "revision": 1621,
       "drawStats": {
         "white": {
           "mode": "shared",
@@ -2300,7 +2300,7 @@
       "bytes": 409881,
       "sha256": "a00f1989d669658f1ee7f3ac9fd4029ae7b77d4aba06f6d36575cd316b952d32",
       "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
-      "revision": 1624,
+      "revision": 1627,
       "drawStats": {
         "white": {
           "mode": "shared",
@@ -2336,7 +2336,7 @@
       "bytes": 461880,
       "sha256": "bf0e610f287e06cb4361de21888e089f924a7d619b7d8affcaf921b30ae10486",
       "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
-      "revision": 1626,
+      "revision": 1629,
       "drawStats": {
         "white": {
           "mode": "shared",
@@ -2372,7 +2372,7 @@
       "bytes": 463241,
       "sha256": "3132044234572937c7e07d9726f6b8a6e6bb5ec759f4cbb4e20a420536395b1a",
       "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
-      "revision": 1628,
+      "revision": 1631,
       "drawStats": {
         "white": {
           "mode": "shared",
@@ -2408,7 +2408,7 @@
       "bytes": 464384,
       "sha256": "9f1287431afa04addb0a36c78f8c36da45c1054162bc8de107bda75023f67b39",
       "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
-      "revision": 1629,
+      "revision": 1632,
       "drawStats": {
         "white": {
           "mode": "shared",
@@ -2444,7 +2444,7 @@
       "bytes": 454243,
       "sha256": "c526cbe494377fa366c1c03b9b254300fd53f707979c753a249a5b3762812233",
       "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
-      "revision": 1634,
+      "revision": 1637,
       "drawStats": {
         "white": {
           "mode": "shared",
@@ -2480,7 +2480,7 @@
       "bytes": 410988,
       "sha256": "947b7d385321aa6581a36069f1711aee7131055a697694bff638e50316720413",
       "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
-      "revision": 1639,
+      "revision": 1642,
       "drawStats": {
         "white": {
           "mode": "shared",
@@ -2513,10 +2513,10 @@
     {
       "file": "3d-consolidated-sticks.png",
       "scenario": "Analog motion: ring feedback and complete moving assembly",
-      "bytes": 483968,
-      "sha256": "488b81a69b1b9f51d554b64c79dd40ff57a6e0e035387b1f196c62b3edb67952",
+      "bytes": 484265,
+      "sha256": "0db682057143c6f320e52b5491b728b58228d2bcb9055c9b07993f6d44c4a757",
       "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
-      "revision": 1643,
+      "revision": 1646,
       "drawStats": {
         "white": {
           "mode": "shared",
@@ -2550,10 +2550,10 @@
       "file": "gamecube-neutral.png",
       "modelId": "Gamecube",
       "pressed": false,
-      "bytes": 304810,
-      "sha256": "d7399e86ba04f1e693beb3aa5d1bf1221762d4af487811ee837d688e7cc80dcb",
+      "bytes": 305966,
+      "sha256": "c11603971614cee34e650d2b454cf9a2382e8ac906021a3d600283ab8172aabc",
       "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
-      "revision": 1650,
+      "revision": 1653,
       "drawStats": {
         "white": {
           "mode": "shared",
@@ -2590,7 +2590,7 @@
       "bytes": 294373,
       "sha256": "e86ad842eaf856f4f8cb7c04722b3bb0fcc516cfa091a746108063a85cfa81fa",
       "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
-      "revision": 1652,
+      "revision": 1655,
       "drawStats": {
         "white": {
           "mode": "shared",
@@ -2627,7 +2627,7 @@
       "bytes": 296375,
       "sha256": "6d3b5901d947801c29a1ebeef7c556d9021922e106fc8994257486b7db8ea838",
       "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
-      "revision": 1653,
+      "revision": 1656,
       "drawStats": {
         "white": {
           "mode": "shared",
@@ -2677,8 +2677,8 @@
       "file": "3d-joycon-right-neutral.png",
       "modelId": "JoyconRight",
       "pressed": false,
-      "bytes": 226859,
-      "sha256": "52794b8633bec97397671c45d1f4fcaa3ea0b26d3752d984eac83140b4b8cb9b",
+      "bytes": 226860,
+      "sha256": "06afd33c3c23820ddb9da685464141e9d7f8ac99d0597578527bf43b10bbbc1a",
       "source": "Real WebGL/OBJ neutral material, not native Qt 3D"
     },
     {
@@ -2725,8 +2725,8 @@
       "file": "2d-dualsense-stick-ring.png",
       "modelId": "dualsense",
       "variant": "100% motion + L3/R3",
-      "bytes": 499642,
-      "sha256": "29f7970c752fa5e6aaca77867d135548cf5d80128f97e0fe203878960a7da3e0",
+      "bytes": 499640,
+      "sha256": "01207c562e6f1de042f6279e9cb1f83d8cfeb65fd10e4d250024db0ebbd28681",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
@@ -2734,39 +2734,39 @@
       "modelId": "dualsense",
       "variant": "100% movement without click",
       "bytes": 498471,
-      "sha256": "4065cba20170ad9744ad841f001cb8179fc80b7fb2bc129e3c8abf273e252899",
+      "sha256": "49269a937697b9d577c7fba247946e406c18cd018d366af4394c388b6719227f",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
       "file": "2d-dualsense-stick-click.png",
       "modelId": "dualsense",
       "variant": "L3/R3 click with zero stick movement",
-      "bytes": 501054,
-      "sha256": "77e3019f76d9211666d1cca0ca87598aa456a508164e3e2366ee0beb71baac4c",
+      "bytes": 501042,
+      "sha256": "8da6180a2a38bf5c3fd2660f04f3155cc53536356cdcb34c0f7f64a361300b67",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
       "file": "2d-dualsense-face-symbols-on.png",
       "modelId": "dualsense",
       "variant": "face symbols on; faces pressed",
-      "bytes": 500833,
-      "sha256": "35aab7b873f2e048da1c6aca4e9c762dbd92918e094fb06e05ed79ee2288c71b",
+      "bytes": 500812,
+      "sha256": "fbc2b0678f2c9c1b31f77bc4e39da285c2448d18c5898514bb28778bd7304383",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
       "file": "2d-dualsense-face-symbols-off.png",
       "modelId": "dualsense",
       "variant": "face symbols off; faces pressed",
-      "bytes": 495590,
-      "sha256": "3b81aa78be2a418e327a5bee9ce90eba366ae43b046e29a1cea8878aa27cc102",
+      "bytes": 494894,
+      "sha256": "46ab717486f92196c8e7b4c451011bdecd7052aa86026bce2389ade3be5900fb",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
       "file": "2d-xbox-series-auto.png",
       "modelId": "xbox_series",
       "variant": "Auto dark",
-      "bytes": 433655,
-      "sha256": "f3d36f556831f219636a187ae7eff1517ab7024e223daf504bcedbcf1e454ed5",
+      "bytes": 433661,
+      "sha256": "2bf78b9ab3b358f9daba48e7a206531d4a29a4dd93e5fa98d4db3218c7a7aa44",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
@@ -2781,32 +2781,32 @@
       "file": "2d-xbox-series-solid-pressed.png",
       "modelId": "xbox_series",
       "variant": "White moving annulus + readable labels, bounded shoulder",
-      "bytes": 59113,
-      "sha256": "1f1a889328fe6fd4398038544bd87efe3d465767a5c7520a40ef89c8942359a5",
+      "bytes": 58858,
+      "sha256": "c0851e1fc3132137e8bfcc5e4e6561533bf26077f0f67dafe30c45a7d0d26082",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
       "file": "2d-xbox-series-light.png",
       "modelId": "xbox_series",
       "variant": "Light",
-      "bytes": 440954,
-      "sha256": "15e218ddbcf52c8d201f4650ee072b084b2aae6cb0d42f4820d9e5b7aef7d8af",
+      "bytes": 440977,
+      "sha256": "ea63e0dc54246958cd3abaa6002c5d966e33c8e250596bec948d79aa73001dd7",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
       "file": "2d-dualshock4-auto.png",
       "modelId": "dualshock4",
       "variant": "Auto light",
-      "bytes": 472880,
-      "sha256": "a2201b433ffb7bd7313a924dd4e2a7428591d448e2b2ec0cd9d49a9e5e3857b2",
+      "bytes": 472871,
+      "sha256": "a3c3ac82a99392c3cf4528a99262c01f7507641166f1f66126f445425b3b83a2",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
       "file": "2d-dualshock4-dark.png",
       "modelId": "dualshock4",
       "variant": "Dark",
-      "bytes": 466228,
-      "sha256": "0e5030234849ba671d8d4cb7c636919d91f6a44ebe0bee7c2c976ffd40e05fbe",
+      "bytes": 466237,
+      "sha256": "a922e9b27df1e1ce21c35fb3225fdd4b4a3322badf66cdaad8530ee7cae1ca2a",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
@@ -2829,8 +2829,8 @@
       "file": "2d-generic-solid-fixed.png",
       "modelId": "generic",
       "variant": "Solid original contours and material-filled moving sticks",
-      "bytes": 62633,
-      "sha256": "46c64adacae42c7b78bda65b50a56cf7a3804aca2283bf7f335b9cbf373a0a76",
+      "bytes": 62636,
+      "sha256": "193d2d21fcf937f4414e54da83bace20533ce3f8795a2b52f56289ad988b09e3",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
@@ -2845,24 +2845,24 @@
       "file": "2d-edge-dark-light.png",
       "modelId": "dualsense",
       "variant": "dark Ghost edge light 100% / shadow 0%",
-      "bytes": 106699,
-      "sha256": "55a71a625a28e32a6af80d9514c915bb12fd25078d118805c9b4850717a4c6b0",
+      "bytes": 106700,
+      "sha256": "cd407e6d7e4b29e0b0d51efb2949629ed750d7c92b41b8740e47b3ce92e3a95f",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
       "file": "2d-edge-dark-shadow.png",
       "modelId": "dualsense",
       "variant": "dark Ghost edge light 0% / shadow 100%",
-      "bytes": 103074,
-      "sha256": "5f46df54d30406257ef95e94b0d3bfc12f56e04edd41b03c26b5eda17069ca98",
+      "bytes": 103488,
+      "sha256": "e86aeb7d5622457e395a354e7b3cc0cbb9ce904928e7d7d64f910b9117e7f75b",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
       "file": "2d-edge-dark-combined.png",
       "modelId": "dualsense",
       "variant": "dark Ghost edge light 65% / shadow 65%",
-      "bytes": 104559,
-      "sha256": "83ac4f792b4c06d2b2e3b008f9178ad197691c730b818078f21dcaaa51c2ad44",
+      "bytes": 104561,
+      "sha256": "e318a1960391b89c23aaad34d5492f8335bc739933304150282560d6eaebe4e1",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
@@ -2870,23 +2870,23 @@
       "modelId": "dualsense",
       "variant": "light Ghost edge light 0% / shadow 0%",
       "bytes": 39542,
-      "sha256": "af4062e2aadbc8e96469b2199e910cc367949bfc4936a4985fe10a9988484d0a",
+      "sha256": "c987bab9e7ead83e9780cda7137b6d1affd968d58e69808cc964438bb3f2ff86",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
       "file": "2d-edge-light-light.png",
       "modelId": "dualsense",
       "variant": "light Ghost edge light 100% / shadow 0%",
-      "bytes": 45678,
-      "sha256": "8defdfa3acf47e3252a0f6c542f02ea5a8792618ceff3fdf5ba3ee3ec2d3bbde",
+      "bytes": 45682,
+      "sha256": "2e3fb6eb9184b602cd9794183b54bdc72d85b81032beefb60bd664870bb5d81d",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
       "file": "2d-edge-light-shadow.png",
       "modelId": "dualsense",
       "variant": "light Ghost edge light 0% / shadow 100%",
-      "bytes": 45675,
-      "sha256": "f71d69c9dfc4748c1fd925c00119446435b262bd88c53b017415a6d7fc1e74ee",
+      "bytes": 45648,
+      "sha256": "97c1709e6f410d52eed88f9be28d88a4694a34dfb26b6f556cfdc78de395b687",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
@@ -2917,16 +2917,16 @@
       "file": "2d-edge-mixed-shadow.png",
       "modelId": "dualsense",
       "variant": "mixed Ghost edge light 0% / shadow 100%",
-      "bytes": 93269,
-      "sha256": "117685a73d7dcb5173c8b989aef67651f82068f0990ef833e0083f39d23ad81b",
+      "bytes": 93632,
+      "sha256": "9da7f7cc1ae3ab0582a63e4f401835ddcd2ab3a835b0a48f1575c005c3aabd20",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
       "file": "2d-edge-mixed-combined.png",
       "modelId": "dualsense",
       "variant": "mixed Ghost edge light 65% / shadow 65%",
-      "bytes": 92568,
-      "sha256": "3d9ef823c12bbfd1fc8173e2002f6b7ab4ae83bc21026f7dd411d7d3283040dc",
+      "bytes": 92549,
+      "sha256": "ab612b8c9c5c0a8e83626b6bbf242c00ed493da8802a380d5d4feb79cd0cf22a",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
@@ -2968,8 +2968,8 @@
     {
       "file": "2d-source-solid-ghost-dualsense.png",
       "modelId": "2DSourceReview",
-      "bytes": 303781,
-      "sha256": "3a8aaac2a9ed6d28b59050b03bc10a8c4854340373486b8a879fbe9e71009f7c",
+      "bytes": 303737,
+      "sha256": "f2f13336c66f527c02f19d81f7df7a7cd6cfba3c2a25f0ac5eb4b7deb3762d87",
       "source": "Existing repository SVG; not byte-verified alternate ZIP"
     },
     {

@@ -28,8 +28,11 @@ export function extractInteriorHousingEdges(meshes,root,{minimumAngleDegrees=INT
     .map(m=>{
       const b=new THREE.Box3().setFromObject(m),c=b.getCenter(new THREE.Vector3()).applyMatrix4(inv);
       const size=b.getSize(new THREE.Vector3());
-      return {center:c,radius:Math.max(.26,Math.max(size.x,size.y)*1.25)};
+      return {file:m.userData.sourceFile,center:c,radius:Math.max(.26,Math.max(size.x,size.y)*1.25)};
     }):[];
+  const padParts=insets.filter(({file})=>/^dpad_(?:up|down|left|right)[.]obj$/i.test(file));
+  const leftGameCubeInset=padParts.length===4?
+    padParts.reduce((center,{center:part})=>center.add(part),new THREE.Vector3()).multiplyScalar(.25):null;
   const edges=[];
   const minAngle=Math.max(5,Math.min(89,Number(minimumAngleDegrees)||37))*Math.PI/180;
   for(const mesh of meshes||[]){
@@ -75,7 +78,17 @@ export function extractInteriorHousingEdges(meshes,root,{minimumAngleDegrees=INT
       if(edge.faces.length!==2)continue;
       const [n1,n2]=edge.faces;
       const angle=Math.acos(clamp(n1.dot(n2)));
-      if(angle<minAngle||angle>2.36)continue;
+      // GameCube's lower-left D-pad recess is a genuine, GENTLER curve than
+      // the right C-stick recess (~25-33° versus ~42-54°). The universal 37°
+      // threshold silently erased its outline while keeping the right one.
+      // Lower the threshold ONLY on the source-authored, front-facing left
+      // recess, not for its overall shell, the outer silhouette, or other rigs.
+      const mid=edge.u.clone().add(edge.v).multiplyScalar(.5);
+      const leftPadRecess=leftGameCubeInset&&mesh.userData.sourceFile==='top_shell.obj'&&
+        Math.hypot(mid.x-leftGameCubeInset.x,mid.y-leftGameCubeInset.y)<.58&&
+        Math.max(n1.z,n2.z)>.96&&Math.min(n1.z,n2.z)>.78;
+      const localMinimum=leftPadRecess?Math.min(minAngle,22*Math.PI/180):minAngle;
+      if(angle<localMinimum||angle>2.36)continue;
       // The co/Exo source front (+Y) is +Z after native rig normalization.
       // Exclude hidden rear geometry and exterior silhouette front/back folds.
       if(Math.max(n1.z,n2.z)<.20||Math.min(n1.z,n2.z)<-.14)continue;
