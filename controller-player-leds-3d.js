@@ -36,18 +36,25 @@ function shaderSource(){
     vec4 rect=playerLedRects[led];
     vec2 d=abs(vPlayerLedNativePos.xz-rect.xy);
     float outside=step(d.x,rect.z)*step(d.y,rect.w);
-    vec2 insideExt=max(rect.zw-vec2(0.004),vec2(0.001));
+    // LED height can be only ~1 pixel at the 320px comparison size.
+    // A fixed 0.004 source-unit inset consumed the entire visible interior.
+    // Keep a thin proportional edge and let the whole status rectangle react
+    // to the active bit, so antialiasing cannot suppress its on/off signal.
+    vec2 inset=min(rect.zw*0.14,vec2(0.001));
+    vec2 insideExt=max(rect.zw-inset,vec2(0.001));
     float inside=step(d.x,insideExt.x)*step(d.y,insideExt.y);
+    float ledArea=outside*playerLedFacing;
     float rim=(outside-inside)*playerLedFacing;
-    float face=inside*playerLedFacing;
     float ledOn=playerLedActive[led];
-    diffuseColor.rgb=mix(diffuseColor.rgb,vec3(0.34,0.39,0.44),rim*0.92);
+    diffuseColor.rgb=mix(diffuseColor.rgb,vec3(0.34,0.39,0.44),
+      rim*(0.92-ledOn*0.50));
     diffuseColor.rgb=mix(diffuseColor.rgb,
       mix(vec3(0.19,0.24,0.28),vec3(0.95,0.97,1.0),ledOn),
-      face*(0.30+ledOn*0.70));
+      ledArea*(0.30+ledOn*0.70));
     // Only tiny indicators receive local coverage; shell/control alpha stays
     // untouched. Off outlines remain visible in transparent Ghost on white.
-    diffuseColor.a=max(diffuseColor.a,rim*0.75+face*(0.36+ledOn*0.60));
+    diffuseColor.a=max(diffuseColor.a,
+      rim*0.75+ledArea*(0.36+ledOn*0.60));
   }`;
 }
 export function prepare3DPlayerLedSurface(native){
@@ -149,10 +156,5 @@ export function update3DPlayerLedMask(native,mask){
   if(state.mask===mask)return false;
   for(let i=0;i<state.count;i++)state.uniforms.active.value[i]=bits[i%4]?1:0;
   state.mask=mask;
-  // MeshPhysicalMaterial's onBeforeCompile extras are bound to a compiled
-  // program. A player change is rare; request a fresh program/uniform upload
-  // rather than allowing a cached program to retain the prior LED pattern.
-  // No geometry, extra draw call or per-frame shader compilation is added.
-  state.target.material.needsUpdate=true;
   return true;
 }
