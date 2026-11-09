@@ -190,12 +190,16 @@ try{
   // establish optical visibility at the actual 320px overlay scale.
   await page.locator('#demoToggle').uncheck();
   await page.locator('#pressAll').uncheck();
+  const previousInkRevision=Number(await page.evaluate(()=>document.body.dataset.renderRevision||0));
   await page.locator('#view').selectOption('front');
   await page.locator('#materialMix').evaluate(el=>{
     el.value='70';el.dispatchEvent(new Event('input',{bubbles:true}));
   });
-  await page.waitForFunction(()=>window.__exoPbrLab?.model?.model?.id==='Gamecube'&&
-    document.body.dataset.renderReady==='three-rendered');
+  await page.waitForFunction(previous=>
+    window.__exoPbrLab?.model?.model?.id==='Gamecube'&&
+    document.body.dataset.renderReady==='three-rendered'&&
+    Number(document.body.dataset.renderRevision||0)>previous,
+    previousInkRevision,{timeout:30000});
   const proofState=await page.evaluate(()=>{
     const s=window.__exoPbrLab?.model?.interiorHousingContours;
     return {segments:s?.segments,recessSegments:s?.recessSegments,
