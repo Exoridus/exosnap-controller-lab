@@ -15,21 +15,10 @@ export const INTERIOR_CONTOUR_POLICY=Object.freeze({
   tone:'#59697b',solidOpacity:.26,ghostOpacity:0,
 });
 
-export function extractInteriorHousingEdges(meshes,root,{minimumAngleDegrees=INTERIOR_CONTOUR_POLICY.minimumAngleDegrees,maxSegments=MAX_SEGMENTS,includeGameCubeInsets=false}={}){
+export function extractInteriorHousingEdges(meshes,root,{minimumAngleDegrees=INTERIOR_CONTOUR_POLICY.minimumAngleDegrees,maxSegments=MAX_SEGMENTS}={}){
   if(!root?.isObject3D)throw new TypeError('Expected original rig root');
   root.updateMatrixWorld(true);
   const inv=new THREE.Matrix4().copy(root.matrixWorld).invert();
-  // The GameCube top shell has actual open inset lips around its controls.
-  // These are source topology, not artificial silhouettes or triangulation.
-  // Restrict them to the original button neighborhoods so outer mesh boundaries
-  // and open backside edges cannot masquerade as decorative interior seams.
-  const insets=includeGameCubeInsets?[...(meshes||[])].filter(m=>
-    /^(?:dpad_(?:up|down|left|right)|[abxy]_button)[.]obj$/i.test(m?.userData?.sourceFile||''))
-    .map(m=>{
-      const b=new THREE.Box3().setFromObject(m),c=b.getCenter(new THREE.Vector3()).applyMatrix4(inv);
-      const size=b.getSize(new THREE.Vector3());
-      return {center:c,radius:Math.max(.26,Math.max(size.x,size.y)*1.25)};
-    }):[];
   const edges=[];
   const minAngle=Math.max(5,Math.min(89,Number(minimumAngleDegrees)||37))*Math.PI/180;
   for(const mesh of meshes||[]){
@@ -58,20 +47,8 @@ export function extractInteriorHousingEdges(meshes,root,{minimumAngleDegrees=INT
       }
     }
     for(const edge of incident.values()){
-      if(edge.faces.length===1&&insets.length){
-        const face=edge.faces[0],mid=edge.u.clone().add(edge.v).multiplyScalar(.5);
-        const len=edge.u.distanceTo(edge.v);
-        const nearInset=insets.some(inset=>
-          Math.hypot(mid.x-inset.center.x,mid.y-inset.center.y)<inset.radius&&
-          Math.abs(mid.z-inset.center.z)<.25);
-        if(!nearInset||face.z<.27||
-            len<INTERIOR_CONTOUR_POLICY.minimumWorldLength||len>.40)continue;
-        const bias=face.clone().multiplyScalar(.004);
-        edges.push({a:edge.u.clone().add(bias),b:edge.v.clone().add(bias),
-          score:.55+Math.min(len,.2),len});
-        continue;
-      }
-      // Two-face creases only; one-face boundaries on other models are NOT seams.
+      // A physical seam between adjoining front facets has exactly two faces.
+      // A one-face edge is a mesh boundary, not an interior contour.
       if(edge.faces.length!==2)continue;
       const [n1,n2]=edge.faces;
       const angle=Math.acos(clamp(n1.dot(n2)));
@@ -98,8 +75,7 @@ export function interiorContourOpacity(mix){
 export function prepareInteriorHousingContours(native){
   if(!native?.meshes||!native.group)throw new TypeError('Expected original rig');
   if(native.interiorHousingContours)return native.interiorHousingContours;
-  const gameCube=native.model?.id==='Gamecube';
-  const edges=extractInteriorHousingEdges(native.meshes,native.group,{includeGameCubeInsets:gameCube});
+  const edges=extractInteriorHousingEdges(native.meshes,native.group);
   const vertices=new Float32Array(edges.length*6);
   edges.forEach(({a,b},i)=>{vertices.set(a.toArray(),6*i);vertices.set(b.toArray(),6*i+3);});
   const geometry=new THREE.BufferGeometry();
@@ -114,15 +90,13 @@ export function prepareInteriorHousingContours(native){
   lines.renderOrder=-34;lines.frustumCulled=false;lines.visible=false;
   lines.userData.interiorHousingContour=true;
   native.group.add(lines);
-  native.interiorHousingContours={lines,geometry,material,segments:edges.length,gameCube};
+  native.interiorHousingContours={lines,geometry,material,segments:edges.length};
   return native.interiorHousingContours;
 }
 export function updateInteriorHousingContours(native,recipe){
   const state=native?.interiorHousingContours;if(!state)return;
   const opacity=interiorContourOpacity(recipe?.mix);
-  // The recessed GameCube seams need a little more contrast at intermediate
-  // transparency; full Ghost still fades to zero and other rigs are unchanged.
-  state.material.opacity=state.gameCube?Math.min(.39,opacity*1.35):opacity;
+  state.material.opacity=opacity;
   state.lines.visible=state.segments>0&&opacity>.004;
 }
 export function disposeInteriorHousingContours(native){

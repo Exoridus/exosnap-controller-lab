@@ -310,18 +310,7 @@ function paintControlGroup(entry,colors,level){
     if(surface){
       paintControl(node,colors,level,{fill:node===surface,
         stroke:shapes.length===1||visibleStroke(node)});
-      if(node===pressure){
-        const clip=getOrCreateXboxBumperClip(entry,node);if(clip)paint(node,'clip-path',clip);
-        if(colors.coherentContours&&entry.layoutId==='xbox_one'&&
-            ['btn-l1','btn-r1'].includes(layer.id)&&level<.02){
-          // Neutral front shoulder lobe must remain separated from the rear
-          // trigger, even when the native source pressure path has no stroke.
-          // The existing physical-lobe clip prevents outlining its long rail.
-          paint(node,'stroke',colors.line);
-          paint(node,'stroke-opacity',String(Math.min(.64,colors.lineAlpha*.74)));
-          paint(node,'stroke-width','4.2');
-        }
-      }
+      if(node===pressure){const clip=getOrCreateXboxBumperClip(entry,node);if(clip)paint(node,'clip-path',clip);}
     }else paintControl(node,colors,level,{fill:authoredFill(node)});
   }
 }
