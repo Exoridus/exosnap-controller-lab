@@ -21,6 +21,7 @@ import {paintPolished2D} from './polish-2d-style.js';
 import {attachStickDrag} from './stick-drag.js';
 import {readStandardGamepad} from './gamepad-input.js';
 import {previewPlayerIndex,previewLabel} from './controller-player-leds.js';
+import {prepare3DPlayerLedSurface,apply3DPlayerLedLayout,update3DPlayerLedMask} from './controller-player-leds-3d.js';
 import {ControllerDemo,createControllerState,stickClickCapabilities,applyStickClickCapabilities} from './controller-demo.js';
 
 const $=id=>document.getElementById(id);
@@ -38,7 +39,7 @@ const state={mix:.70,modelId:'DualSenseCompact',selected:'white',view:'front',pa
   environmentMap:null};
 const demo=new ControllerDemo();
 const manualInput=createControllerState();
-state.frameInput=createControllerState();state.markings=true;state.flatTransparency=.70;
+state.frameInput=createControllerState();state.markings=true;state.flatTransparency=.70;state.outerContour=true;
 state.playerPreviewSelection='demo';state.playerPreview=previewPlayerIndex('demo');
 state.manualButtons=new Map();state.manualHeld=new Set();
 const demoPresets={neutral:poseForStickDemo('neutral'),move:poseForStickDemo('move'),click:poseForStickDemo('click')};
@@ -168,8 +169,10 @@ async function loadFlatReferences(model){
     const reference=[...flatReferences.values()][0];
     state.stickClicks=stickClickCapabilities(reference?.mapping);
     updateFlatReferences();
-    if(state.native?.model?.id===model.id&&reference?.svg)
+    if(state.native?.model?.id===model.id&&reference?.svg){
       applyControllerArtwork(state.native,reference.svg);
+      apply3DPlayerLedLayout(state.native,reference);
+    }
     setControllerMarkings(state.native,state.markings);
     for(const ref of flatReferences.values())clearStickDrags.push(attachStickDrag(ref,{
       start:side=>{state.stickPose='neutral';$('stickPose').value='neutral';state.manualSticks[side]={x:0,y:0};scheduleRender();},
@@ -267,6 +270,7 @@ function render(now=performance.now()){
   const pose=visualInput(now);state.frameInput=pose;
   const pad=firstStandardGamepad();
   state.playerPreview=previewPlayerIndex(state.playerPreviewSelection,pad?.index??null);
+  update3DPlayerLedMask(state.native,state.playerPreview.mask);
   const info=previewLabel(state.playerPreview);
   if($('playerIndexStatus').textContent!==info)$('playerIndexStatus').textContent=info;
   const animate=()=>{if(demo.enabled||state.manualButtons.size||state.frameInput.source==='live'||state.stickPose==='live'||Array.from(navigator.getGamepads?.()||[]).some(p=>p?.connected))scheduleRender(false);};
@@ -329,7 +333,7 @@ function render(now=performance.now()){
         renderer.setViewport(r.left,r.bottom,r.width,r.height);
         renderer.setScissor(r.left,r.bottom,r.width,r.height);
         renderer.clear(true,true,true);
-        updateContrastComposite(state.compositeMaterial,scenes[i],target,true);
+        updateContrastComposite(state.compositeMaterial,scenes[i],target,true,state.outerContour?.42:0);
         renderer.info.reset();
         renderer.render(state.blitScene,state.blitCamera);
         blits.push(drawMetrics(renderer));rendered++;
@@ -396,6 +400,7 @@ async function loadModel(id){
     const next=await loadNativeRig(model);
     if(serial!==modelLoadSerial){disposeNativeRig(next);return;}
     next.geometryReuse=shareEquivalentControlGeometry(next);
+    prepare3DPlayerLedSurface(next);
     next.optimization=optimizeStaticHousing(next);
     next.instanceOptimization=instantiateStickPairs(next);
     prepareGhostOcclusion(next);
@@ -427,7 +432,11 @@ async function loadModel(id){
 async function exportQtRecipe(){
   const output={generator:'ExoSnap consolidated controller lab',date:'2026-11-08',
     modelId:state.modelId,view:state.view,playerLedPreview:{...state.playerPreview,hardwareWrite:false},camera:{fov:state.camera?.fov||35,position:state.camera?.position.toArray()||[0,0,7]},
-    geometryReuse:state.native?.geometryReuse,demo:demo.enabled,markings:state.markings,flatMaterial:resolveFlatMaterial(state.flatTransparency),
+    geometryReuse:state.native?.geometryReuse,demo:demo.enabled,markings:state.markings,
+    outerSilhouette3D:state.outerContour,playerLedSurface3D:state.native?.playerLedSurface?
+      {layout:state.native.playerLedSurface.config.layout,count:state.native.playerLedSurface.count,
+       surfacePart:state.native.playerLedSurface.config.sourcePart,extraDrawCalls:0,hardwareWrite:false}:null,
+    flatMaterial:resolveFlatMaterial(state.flatTransparency),
     feedback:Object.fromEntries(variants.map(({key})=>{const recipe=recipeFor3D(key);return [key,{recipe,qtQuick3D:qtLabDescriptor(recipe,{activeColor2D:activeColors.color2D})}]}))};
   const blob=new Blob([JSON.stringify(output,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob),a=document.createElement('a');
@@ -455,6 +464,7 @@ function bindUI(){
   });
   $('demoToggle').addEventListener('change',e=>{demo.setEnabled(e.target.checked);scheduleRender();});
   $('markingsToggle').addEventListener('change',e=>{state.markings=e.target.checked;scheduleRender();});
+  $('outerContour').addEventListener('change',e=>{state.outerContour=e.target.checked;scheduleRender();});
   $('flatTransparency').addEventListener('input',e=>{state.flatTransparency=Number(e.target.value)/100;$('flatValue').textContent=e.target.value+' %';scheduleRender();});
   $('materialMix').addEventListener('input',e=>{state.mix=Number(e.target.value)/100;$('mixValue').textContent=`${e.target.value} %`;scheduleRender();});
   for(const toggle of document.querySelectorAll('[data-look]'))toggle.addEventListener('change',setVisibleLooks);
@@ -512,6 +522,6 @@ async function main(){
   createRenderer();
   if(state.renderer){try{await loadEnvironmentProbe();}catch(e){setFail(`HDR-Lichtprobe konnte nicht geladen werden: ${e.message}`);}}
   await loadModel(state.modelId);
-  window.__exoPbrLab={get input(){return state.frameInput},get demo(){return demo},get markings(){return state.markings},get flatReferences(){return flatReferences},get status(){return document.body.dataset.renderReady},get model(){return state.native},get variant(){return state.selected},get mix(){return state.mix},get renderer(){return state.renderer},get renderTarget(){return state.renderTarget},get drawStats(){return {...state.drawStats}},get renderMode(){return state.renderMode},get colors(){return {color2D:activeColors.color2D,color3D:activeColors.color3D,sync:activeColors.sync}},get triggerPressure(){return state.triggerPressure},get playerPreview(){return {...state.playerPreview}}};
+  window.__exoPbrLab={get input(){return state.frameInput},get demo(){return demo},get markings(){return state.markings},get flatReferences(){return flatReferences},get status(){return document.body.dataset.renderReady},get model(){return state.native},get variant(){return state.selected},get mix(){return state.mix},get renderer(){return state.renderer},get renderTarget(){return state.renderTarget},get drawStats(){return {...state.drawStats}},get renderMode(){return state.renderMode},get colors(){return {color2D:activeColors.color2D,color3D:activeColors.color3D,sync:activeColors.sync}},get triggerPressure(){return state.triggerPressure},get playerPreview(){return {...state.playerPreview}},get playerLedSurface3D(){return state.native?.playerLedSurface||null},get outerContour(){return state.outerContour}};
 }
 main().catch(error=>{console.error(error);setFail(`Startfehler: ${error.message}`);});

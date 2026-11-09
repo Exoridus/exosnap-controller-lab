@@ -112,7 +112,9 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
       const support=isStructuralRole(role);
       const t=clamp01(recipe.mix),blend=t*t*(3-2*t);
       m.color.copy(mesh.userData.sourceColor);
-      if(isInteractiveRole(role))m.color.lerp(neutralControl,blend);
+      // Leave neutral controls slightly closer to their original controller color.
+      // This changes RGB only; the existing Ghost alpha path is untouched.
+      if(isInteractiveRole(role))m.color.lerp(neutralControl,blend*(1-clamp01(recipe.material.ghostSourceRetention??0)));
       m.opacity=support?(integrateSupports?supportOpacityFor(recipe.material,cached.supportCoverage):recipe.material.shell.opacity):spec.opacity;
       if(support&&integrateSupports&&native.supportShellColor){
         m.color.lerp(cached.supportShellColor||native.supportShellColor,blend);

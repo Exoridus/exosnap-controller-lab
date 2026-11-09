@@ -74,6 +74,67 @@ try{
   };
   await mkdir(output,{recursive:true});
   const images=[];
+  // Focused 3D final-polish evidence. Screenshot ONLY the 3D panel, not the
+  // 2D LEDs or status text, so a P1/P4 change must affect real PBR pixels.
+  await page.locator('#demoToggle').uncheck();
+  await page.locator('#pressAll').uncheck();
+  await page.locator('#view').selectOption('front');
+  await page.locator('#materialMix').evaluate(el=>{el.value='70';el.dispatchEvent(new Event('input',{bubbles:true}));});
+  await page.locator('#outerContour').check();
+  for(const [model,expectedCount] of [['SwitchPro',4],['JoyconGrip',8]]){
+    await page.locator('#controller').selectOption(model);
+    await page.waitForFunction(id=>document.body.dataset.renderReady==='three-rendered'&&
+      window.__exoPbrLab?.model?.model?.id===id&&
+      window.__exoPbrLab?.playerLedSurface3D?.count===(id==='SwitchPro'?4:8),
+      model,{timeout:60000});
+    let prior=null;
+    for(const [playerIndex,mask] of [['0',1],['3',15]]){
+      const previousRevision=await page.evaluate(()=>Number(document.body.dataset.renderRevision||0));
+      await page.locator('#playerPreview').selectOption(playerIndex);
+      await page.waitForFunction(({mask,previousRevision})=>window.__exoPbrLab?.playerLedSurface3D?.mask===mask&&
+        Number(document.body.dataset.renderRevision||0)>previousRevision,
+        {mask,previousRevision},{timeout:60000});
+      await shotProof();
+      const rect=await page.locator('.variant[data-variant="white"] .sample[data-scene="light"]')
+        .boundingBox();
+      if(!rect)throw Error('Missing visible 3D light panel for '+model);
+      const name='final-3d-player-led-'+model.toLowerCase()+'-p'+(Number(playerIndex)+1)+'.png';
+      const bytes=await page.screenshot({path:path.join(output,name),
+        clip:{x:Math.max(0,rect.x),y:Math.max(0,rect.y),width:rect.width,height:rect.height},
+        animations:'disabled',timeout:60000});
+      const sha256=createHash('sha256').update(bytes).digest('hex');
+      const ledDebug=await page.evaluate(()=>{
+        const lab=window.__exoPbrLab,led=lab.playerLedSurface3D;
+        const gl=lab.renderer.getContext();
+        const programs=[];
+        for(const p of lab.renderer.info.programs||[]){
+          const program=p.program,loc=program&&gl.getUniformLocation(program,'playerLedActive[0]');
+          if(!loc)continue;
+          const activeValues=Array.from({length:8},(_,i)=>{
+            const at=gl.getUniformLocation(program,'playerLedActive['+i+']');
+            return at?gl.getUniform(program,at):null;
+          });
+          const countLoc=gl.getUniformLocation(program,'playerLedCount');
+          const minLoc=gl.getUniformLocation(program,'playerLedFrontMinY');
+          programs.push({key:String(p.cacheKey).slice(-100),values:activeValues,
+            count:countLoc?gl.getUniform(program,countLoc):null,
+            frontMinY:minLoc?gl.getUniform(program,minLoc):null});
+        }
+        return {mask:led?.mask,cpuValues:Array.from(led?.uniforms?.active?.value||[]),
+          cpuCount:led?.uniforms?.count?.value,uniformPrograms:programs,
+          meshVisible:led?.target?.visible,materialVersion:led?.target?.material?.version,
+          model:lab.model.model.id};
+      });
+      console.log('3D_LED_UNIFORM_DIAGNOSTIC '+JSON.stringify(ledDebug));
+      if(bytes.length<4000||sha256===prior)throw Error('3D player LEDs must actually change WebGL pixels: '+model+' '+name+' '+JSON.stringify(ledDebug));
+      prior=sha256;
+      images.push({file:name,modelId:model,playerMask:mask,bytes:bytes.length,sha256,
+        source:'Actual WebGL2 source OBJ material LEDs; no physical LED readback'});
+    }
+  }
+  await page.locator('#controller').selectOption('DualSenseCompact');
+  await shotProof();
+  await page.locator('#demoToggle').check();
   const finalPolish=await captureFinalPolish(page,{output,images,base});
   await captureVisualFinish(page,{output,images});
   await captureModelConsistency(page,{output,images,shotProof});
@@ -182,12 +243,15 @@ try{
       // Neutral now follows the shared semantic contract, not fixed black
       // source materials. Assert exact expected color and zero input emission.
       const materials=await page.evaluate(async()=>{
-        const [{Color},{CONTROL_NEUTRAL,isStructuralRole}]=await Promise.all([
+        const [{Color},{CONTROL_NEUTRAL,isStructuralRole,isInteractiveRole}]=await Promise.all([
           import('three'),import('./controller-visual-policy.js')]);
         const lab=window.__exoPbrLab,rig=lab.model,t=lab.mix,blend=t*t*(3-2*t);
+        const retained=lab.model?.model?0.16:0;
         return rig.meshes.filter(m=>/^(?:left|right)_(?:cap|ring|stick|trigger|bumper)[.]obj$/.test(m.userData.sourceFile||'')).map(m=>{
-          const expected=m.userData.sourceColor.clone().lerp(isStructuralRole(m.userData.role)
-            ?m.userData.supportShellColor||rig.supportShellColor:new Color(CONTROL_NEUTRAL),blend);
+          const structural=isStructuralRole(m.userData.role);
+          const originalWeight=structural?blend:isInteractiveRole(m.userData.role)?blend*(1-retained):0;
+          const expected=m.userData.sourceColor.clone().lerp(structural
+            ?m.userData.supportShellColor||rig.supportShellColor:new Color(CONTROL_NEUTRAL),originalWeight);
           return {file:m.userData.sourceFile,expected:expected.getHexString(),actual:m.material.color.getHexString(),
             emissive:m.material.emissiveIntensity};
         });

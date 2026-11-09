@@ -122,6 +122,9 @@ export function optimizeStaticHousing(native){
   const groups=new Map();
   for(const m of native.meshes){
     if(!m.visible||!isHousingRole(m.userData.role)||!m.geometry?.attributes.position)continue;
+    // Nintendo status LEDs are rasterized directly in original source-space
+    // coordinates by the shell material. Never bake that mesh into a batch.
+    if(m.userData.playerLedNativeSurface)continue;
     // Preserve the one-pass structural-region material instead of dropping its attribute.
     if(m.material.userData.rimSurface)continue;
     // Keep original source color and semantic role; no dynamic or stick part is batched.

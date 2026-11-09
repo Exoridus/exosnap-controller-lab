@@ -10,11 +10,18 @@ import {surfaceGlyphColor} from '../polish-2d-style.js';
 const read=p=>fs.readFile(new URL('../'+p.replace(/^\.\//,''),import.meta.url),'utf8');
 const models=CONTROLLERS.filter(isLicensedModel);
 test('one consolidated neutral control material and non-emitting shell-linked supports across licensed models',async()=>{
- const neutralColors=new Set();
+ const subtleGhostColors=new Set();
  for(const model of models){const r=await loadNativeRig(model,read);try{
   const recipe=resolveLabRecipe('white',1);applyPbrRecipeToRig(r,recipe,{});
   for(const mesh of r.meshes){const d=mesh.userData;
-   if(['button','trigger','touch-surface','stick-cap','stick-pivot'].includes(d.role))neutralColors.add(mesh.material.color.getHexString());
+   if(['button','trigger','touch-surface','stick-cap','stick-pivot'].includes(d.role)){
+    const expected=d.sourceColor.clone().lerp(new (await import('three')).Color('#9ca3aa'),1-recipe.material.ghostSourceRetention);
+    assert.ok(Math.abs(mesh.material.color.r-expected.r)<1e-6&&
+      Math.abs(mesh.material.color.g-expected.g)<1e-6&&
+      Math.abs(mesh.material.color.b-expected.b)<1e-6,
+      model.id+' has the same bounded source-RGB share in its neutral Ghost controls');
+    subtleGhostColors.add(mesh.material.color.getHexString());
+   }
    if(['stick-stem','stick-base','stick-well'].includes(d.role)){
     assert.equal(mesh.material.opacity,supportOpacityFor(recipe.material,d.supportCoverage),model.id+' support '+d.sourceFile);
     const color=mesh.material.color.clone();
@@ -24,7 +31,7 @@ test('one consolidated neutral control material and non-emitting shell-linked su
    }
   }
  }finally{disposeNativeRig(r);}}
- assert.equal(neutralColors.size,1,'Ghost controls must not retain incompatible per-source neutral palettes: '+[...neutralColors]);
+ assert.ok(subtleGhostColors.size>1,'Ghost controls should retain a restrained fraction of their original RGB');
 });
 test('moving ring rim is separately weighted from lower structural sidewall without extra meshes',async()=>{
  for(const model of models.filter(m=>m.source==='co')){

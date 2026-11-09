@@ -29,7 +29,8 @@ test('both original DualSense support domes blend toward shell material without 
     assert.equal(m.material.depthTest,true);assert.equal(m.material.depthWrite,true);
    }
    for(const m of rig.meshes.filter(m=>['stick-pivot','stick-cap'].includes(m.userData.role)))
-    assert.ok(m.material.color.equals(m.userData.sourceColor.clone().lerp(new THREE.Color(CONTROL_NEUTRAL),amount)),'source identity blends to the shared neutral control material');
+    assert.ok(m.material.color.equals(m.userData.sourceColor.clone().lerp(new THREE.Color(CONTROL_NEUTRAL),amount*(1-recipe.material.ghostSourceRetention))),
+      'source identity gradually retains a small RGB share of its original material');
   }
   const recipe=resolveLabRecipe('white',.7);applyPbrRecipeToRig(rig,recipe,{left:{x:.7,y:.3,click:true},right:{x:-.7,y:.3,click:true}});
   for(const m of supports){assert.equal(m.material.emissiveIntensity,0);assert.equal(m.material.opacity,recipe.material.supportOpacity);}

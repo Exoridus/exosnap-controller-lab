@@ -29,7 +29,10 @@ export function resolveLabRecipe(feedback='white',mix=1){
     hiddenIndicators:{enabled:true,idleOpacity:.28,activeOpacity:.90,activeFillOpacity:.12},
     material:{...base.material,shell,controls,supportOpacity:shell.opacity*(1-.72*t*t*(3-2*t)),supportShellBlend:true,
       pressBlue:'#ffffff',defaultPressBlue:'#ffffff',pressEmissive:'#ffffff',
-      pressOpacity:1,pressEmissiveIntensity:.16}
+      pressOpacity:1,pressEmissiveIntensity:.16,
+      // Keep a restrained share of actual controller RGB at full Ghost.
+      // Alpha and neutral/pressed control semantics remain unchanged.
+      ghostSourceRetention:.16}
   };
 }
 
@@ -48,6 +51,9 @@ export function qtLabDescriptor(recipe,{activeColor2D='#ffffff'}={}){
     activeContrast:recipe.activeContrast,
     nativeValidated:false,demoDefault:true,markingsDefault:true,
     surfaceRegions:{technique:'source vertex weights in existing material',extraDrawCalls:0,qtNativeValidated:false},
+    ghostColor:{retainedSourceRGB:recipe.material.ghostSourceRetention,alphaUnchanged:true,scope:'3D interactive controls only'},
+    playerLED3D:{technique:'source-SVG rectangles projected into original shell PBR material',extraDrawCalls:0,hardwareWrite:false,qtNativeValidated:false},
+    silhouette3D:{technique:'optional small strength adjustment in existing final-alpha GPU compositor',externalOnly:true,noMeshOutlines:true,qtNativeValidated:false},
     transparency:{target:'nearest physical surface, premultiplied RGBA',qtPort:'explicit source One / destination Zero and depth write; native validation pending'},
     markings:{technique:'alpha mask in existing button material',extraDrawCalls:0,floatingMenuLabels:false},
     stickPolicy:{supportModel:'all source families',ring:'analog magnitude',cap:'L3/R3 click only',support:'source-to-shell material blend; shell-linked, reduced Ghost opacity',
@@ -62,6 +68,7 @@ export function qtLabDescriptor(recipe,{activeColor2D='#ffffff'}={}){
     geometryReuse:'share proven equivalent buffers; instance only equal final material states',
     calibrationNotes:[...base.calibrationNotes,
       'A single PBR recipe plus source-region and ink material stages serves white feedback; no Fresnel patch.',
+      '3D Ghost retains 16% source RGB in neutral controls with unchanged alpha; this has not been calibrated in native Qt.',
       'Hidden-line depth comparison and the shared alpha-edge compositor need explicit Qt implementations and native visual validation.']
   };
 }

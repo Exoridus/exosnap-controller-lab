@@ -23,6 +23,7 @@ uniform int mode;
 uniform float darkStrength;
 uniform float lightStrength;
 uniform float inkGain;
+uniform float silhouetteEmphasis;
 varying vec2 vUv;
 float coverage(float a){return smoothstep(0.003,0.017,a);}
 float ring(float radius){
@@ -58,8 +59,12 @@ void main(){
   float alpha=clamp(src.a*(1.+.58*inkGain*fade),0.,1.);
   vec3 darkInk=vec3(.08);
   vec3 lightInk=vec3(.94);
-  float darkA=darkStrength*wide;
-  float lightA=lightStrength*(mode==2?narrow:wide);
+  // Extend ONLY the outer edge of the already composed controller image.
+  // No source-part, hidden-part or overlapping per-mesh contours are drawn.
+  float extra=clamp(silhouetteEmphasis,0.,1.)*narrow;
+  float darkA=clamp(darkStrength*wide+extra*(mode==1?.16:mode==2?.105:.015),0.,.96);
+  float lightA=clamp(lightStrength*(mode==2?narrow:wide)
+    +extra*(mode==0?.14:mode==2?.038:.012),0.,.96);
   float combined=1.-(1.-darkA)*(1.-lightA);
   vec3 outline=darkInk*darkA+lightInk*lightA*(1.-darkA);
   // RGB is premultiplied; the fixed-function blending is ONE / ONE_MINUS_SRC_ALPHA.
@@ -75,7 +80,7 @@ export function createContrastCompositeMaterial(texture){
   const material=new THREE.ShaderMaterial({
     uniforms:{
       colorTexture:{value:texture},pixelSize:{value:new THREE.Vector2(1,1)},
-      mode:{value:0},darkStrength:{value:0},lightStrength:{value:0},inkGain:{value:0},
+      mode:{value:0},darkStrength:{value:0},lightStrength:{value:0},inkGain:{value:0},silhouetteEmphasis:{value:0},
     },
     vertexShader,fragmentShader,
     transparent:true,depthWrite:false,depthTest:false,toneMapped:false,
@@ -85,7 +90,7 @@ export function createContrastCompositeMaterial(texture){
   material.name='ExoSnap background-contrast composition';
   return material;
 }
-export function updateContrastComposite(material,scene,size,legacyOutline=true){
+export function updateContrastComposite(material,scene,size,legacyOutline=true,silhouetteEmphasis=0){
   const p=sceneContrastProfile(scene);
   const width=Math.max(1,Number(size.width)||1);
   const height=Math.max(1,Number(size.height)||1);
@@ -94,4 +99,5 @@ export function updateContrastComposite(material,scene,size,legacyOutline=true){
   material.uniforms.darkStrength.value=p.darkStrength;
   material.uniforms.lightStrength.value=p.lightStrength;
   material.uniforms.inkGain.value=p.inkGain;
+  material.uniforms.silhouetteEmphasis.value=legacyOutline?Math.min(1,Math.max(0,Number(silhouetteEmphasis)||0)):0;
 }
