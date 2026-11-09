@@ -198,11 +198,25 @@ try{
     const rig=window.__exoPbrLab?.model;
     const legends=[];
     rig?.group?.traverse(x=>{if(['A','B','X','Y'].includes(x.userData?.buttonGlyph))legends.push(x.userData.buttonGlyph);});
-    return {parts:rig?.partCount,triangles:rig?.triangles,legends};
+    const centers=rig?.meshes?.filter(m=>m.userData.genericCenterControl)
+      .map(m=>({file:m.userData.sourceFile,key:m.userData.control,artwork:m.userData.artworkKey,
+        source:m.userData.artworkSource,markings:!!m.material.userData.surfaceMarking}));
+    return {parts:rig?.partCount,originalParts:rig?.originalPartCount,
+      modelSource:rig?.model?.assetId,physicalSource:rig?.physicalRigSource,
+      originalSource:rig?.model?.source,triangles:rig?.triangles,legends,centers,
+      genericLayout:[...window.__exoPbrLab.flatReferences.values()].every(ref=>ref.layout.id==='generic'),
+      interiorSegments:rig?.interiorHousingContours?.segments,
+      interiorOpacity:rig?.interiorHousingContours?.material?.opacity};
   });
-  if(genericPartState.parts!==23||genericPartState.triangles<500||
-      genericPartState.legends.sort().join(',')!=='A,B,X,Y')
-    throw Error('Generic Pro is incomplete or has wrong button faces: '+JSON.stringify(genericPartState));
+  if(genericPartState.parts!==25||genericPartState.originalParts!==24||
+      genericPartState.modelSource!=='XboxOneClean'||genericPartState.physicalSource!=='XboxOneClean'||
+      genericPartState.originalSource!=='co'||!genericPartState.genericLayout||
+      genericPartState.triangles<500||genericPartState.legends.sort().join(',')!=='A,B,X,Y'||
+      genericPartState.centers?.length!==4||genericPartState.centers.some(m=>!m.markings||m.source!=='2d-svg')||
+      genericPartState.centers.map(m=>m.artwork).sort().join(',')!=='home,menu,share,view'||
+      !Number.isFinite(genericPartState.interiorOpacity))
+    throw Error('Generic 3D Xbox One proxy / 2D generic symbols or source seams incomplete: '+JSON.stringify(genericPartState));
+  console.log('GENERIC_XBOX_PROXY_PASS '+JSON.stringify(genericPartState));
   for(const [file,pressed] of [['generic-neutral.png',false],['generic-pressed.png',true]]){
     if(pressed){
       await page.locator('#pressAll').check();
