@@ -16,7 +16,8 @@ export function encodeControllerGlb(native,layoutId){
     buffers:[{byteLength:0}],bufferViews:[],accessors:[]};
   const binary=[],meshCache=new Map(),materialCache=new Map();
   const holderNames=new Map(native.parts.map(p=>[p.holder,'part__'+clean(p.file.replace(/\.obj$/i,''))]));
-  const nodeNames=new Map(),partNodes={},sourceTriangles=native.triangles;
+  const nodeNames=new Map(),partNodes={},sourceTriangles=native.meshes.filter(m=>m.visible)
+    .reduce((n,m)=>n+(m.geometry.index?.count||m.geometry.getAttribute('position').count)/3,0);
   let rawVertices=0,uniqueVertices=0,triangleCount=0,meshNodes=0,drawGeometryBytes=0;
   const append=(bytes,target)=>{
     const offset=binary.reduce((sum,item)=>sum+item.length,0);
@@ -30,8 +31,10 @@ export function encodeControllerGlb(native,layoutId){
     const view=append(Buffer.from(values.buffer,values.byteOffset,values.byteLength),target);
     const a={bufferView:view,componentType,count:values.length/components,type};
     if(bounds){
-      a.min=Array.from({length:components},(_,k)=>Math.min(...Array.from(values).filter((_,i)=>i%components===k)));
-      a.max=Array.from({length:components},(_,k)=>Math.max(...Array.from(values).filter((_,i)=>i%components===k)));
+      a.min=Array(components).fill(Infinity);a.max=Array(components).fill(-Infinity);
+      for(let i=0;i<values.length;i++){
+        const k=i%components;a.min[k]=Math.min(a.min[k],values[i]);a.max[k]=Math.max(a.max[k],values[i]);
+      }
     }
     const index=gltf.accessors.length;gltf.accessors.push(a);return index;
   }
