@@ -30,3 +30,24 @@ test('global material markings toggle changes uniforms, not geometry or shader i
  assert.equal(mesh.geometry,geometry);assert.equal(mesh.material,material);assert.equal(material.customProgramCacheKey(),program);
  assert.ok(material.userData.surfaceMarking.ink.value.r<.1,'D-pad ink is dark at rest');
 });
+
+test('DualShock 4 arrows are reserved for the fixed housing, never the four moving D-pad surfaces',async()=>{
+  const rig=await loadNativeRig(CONTROLLERS.find(x=>x.id==='DS4Compact'),read);
+  try{
+    const arrows=['up','down','left','right'];
+    for(const dir of arrows){
+      const part=rig.meshes.find(m=>m.userData.sourceFile==='dpad_'+dir+'.obj');
+      assert.ok(part,'source-authored directional button '+dir);
+      assert.equal(part.userData.artworkKey,undefined,'no moving-button ink for '+dir);
+      assert.equal(part.geometry.getAttribute('controllerMarkUv'),undefined);
+    }
+    assert.equal(rig.meshes.filter(m=>m.userData.artworkKey).length,4,
+      'four face buttons; the four arrows are mapped to the case by the SVG loader');
+    const shell=rig.meshes.find(m=>m.userData.sourceFile==='top_shell.obj');
+    assert.ok(shell?.visible);
+    assert.equal(typeof artwork.applyDualShockHousingArrows,'function');
+    const svg=await fs.readFile(new URL('../references/controllers/dualshock4/source.svg',import.meta.url),'utf8');
+    for(const dir of arrows)assert.match(svg,new RegExp('<g id="btn-'+dir+'">[\\s\\S]*?class="glyph"'),
+      'original SVG '+dir+' arrow must be available for source-projected housing ink');
+  }finally{disposeNativeRig(rig);}
+});

@@ -122,6 +122,9 @@ export function optimizeStaticHousing(native){
   const groups=new Map();
   for(const m of native.meshes){
     if(!m.visible||!isHousingRole(m.userData.role)||!m.geometry?.attributes.position)continue;
+    // DualShock's four off-button arrows are rasterized into the original
+    // top shell after the 2D SVG loads. Never hide that source under a batch.
+    if(native.model?.id==='DS4Compact'&&m.userData.sourceFile==='top_shell.obj')continue;
     // Nintendo status LEDs are rasterized directly in original source-space
     // coordinates by the shell material. Never bake that mesh into a batch.
     if(m.userData.playerLedNativeSurface)continue;
