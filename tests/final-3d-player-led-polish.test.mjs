@@ -98,7 +98,7 @@ test('subtle 3D silhouette boost changes only the existing compositing shader, n
  updateContrastComposite(m,'light',{width:320,height:214},true,.42);
  assert.equal(m.uniforms.silhouetteEmphasis.value,.42);
  assert.equal(m.uniforms.mode.value,1);
- assert.match(m.fragmentShader,/ring\(\.72\)-coverageHere/);
+ assert.match(m.fragmentShader,/ring\(\.66\)-coverageHere/);
  assert.match(m.fragmentShader,/Only faint transparent surfaces/);
  assert.match(m.fragmentShader,/No source-part, hidden-part or overlapping per-mesh contours/);
  updateContrastComposite(m,'dark',{width:320,height:214},true,0);
