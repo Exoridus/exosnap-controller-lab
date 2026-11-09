@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import {loadStudioEnvironment} from './hdr-probe.js';
 import {CONTROLLERS,CONTROL_IDS,isLicensedModel} from './models.js';
 import {controllerPresentationModel,prepareGenericCenterControls} from './generic-xbox-proxy.js';
+import {prepareInteriorHousingContours} from './interior-housing-contours.js';
 import {layoutForModel} from './controller-catalog.js';
 import {ControllerReference,isolateReferenceIds} from './controller-reference.js';
 import {prepareGhostOcclusion,setRearHintViewport,hideOccludedRearControls} from './ghost-depth-policy.js';
@@ -399,6 +400,9 @@ async function loadModel(id){
     const next=await loadNativeRig(controllerPresentationModel(model));
     if(serial!==modelLoadSerial){disposeNativeRig(next);return;}
     prepareGenericCenterControls(next);
+    // Source topology, once per model. Do not derive contours from a post-batch
+    // mesh or the three per-background images.
+    prepareInteriorHousingContours(next);
     next.geometryReuse=shareEquivalentControlGeometry(next);
     prepare3DPlayerLedSurface(next);
     next.optimization=optimizeStaticHousing(next);
