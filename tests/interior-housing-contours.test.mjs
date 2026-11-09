@@ -95,3 +95,33 @@ test('GameCube uses only genuine front inset opening edges in addition to struct
     assert.equal(native.material.opacity,0,'fully transparent Ghost still hides internal seams');
   }finally{disposeNativeRig(rig);}
 });
+
+test('GameCube lower-left D-pad recess receives a complete subtle contour beside the C-stick recess',async()=>{
+  const rig=await loadNativeRig(CONTROLLERS.find(m=>m.id==='Gamecube'),read);
+  try{
+    rig.group.updateMatrixWorld(true);
+    const inverse=new THREE.Matrix4().copy(rig.group.matrixWorld).invert();
+    const center=file=>new THREE.Box3().setFromObject(
+      rig.meshes.find(m=>m.userData.sourceFile===file)).getCenter(new THREE.Vector3()).applyMatrix4(inverse);
+    const dpad=['up','down','left','right'].map(dir=>center('dpad_'+dir+'.obj'));
+    const left=dpad.reduce((c,p)=>c.add(p),new THREE.Vector3()).multiplyScalar(.25);
+    const right=center('right_ring.obj');
+    const count=(edges,c)=>edges.filter(e=>{
+      const mid=e.a.clone().add(e.b).multiplyScalar(.5);
+      return Math.hypot(mid.x-c.x,mid.y-c.y)<.58;
+    }).length;
+    const before=extractInteriorHousingEdges(rig.meshes,rig.group);
+    const after=extractInteriorHousingEdges(rig.meshes,rig.group,{includeGameCubeInsets:true});
+    const leftBefore=count(before,left),leftAfter=count(after,left),rightAfter=count(after,right);
+    assert.ok(leftAfter>=leftBefore+20,
+      'Missing source-authored shallow left rim: '+JSON.stringify({leftBefore,leftAfter,rightAfter}));
+    assert.ok(rightAfter>=12,'Right inset must still retain its original contour');
+    assert.ok(leftAfter>=rightAfter*.45&&leftAfter<=rightAfter*2.25,
+      'Both lower lobes need comparable inner contour density, not a one-sided rim: '+
+        JSON.stringify({leftAfter,rightAfter}));
+    const originalTriangles=rig.triangles,originalMeshes=rig.meshes.length;
+    prepareInteriorHousingContours(rig);
+    assert.equal(rig.triangles,originalTriangles,'source surface geometry unchanged');
+    assert.equal(rig.meshes.length,originalMeshes,'no new controller mesh or per-button draw');
+  }finally{disposeNativeRig(rig);}
+});
