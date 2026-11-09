@@ -44,7 +44,7 @@ test('Generic Pro uses the same licensed Xbox One original OBJ rig but retains i
   assert.deepEqual(keys,['select','home','start','share']);
   const cap=rig.meshes.find(m=>m.userData.sourceFile==='generic_share_button.obj');
   assert.ok(cap,'share is a reused source cap, not a floating glyph');
-  assert.equal(cap.parent.parent.parent,rig.group.children[0],'share physically attached to the native Xbox shell root');
+  assert.equal(cap.parent.parent,rig.group.children[0],'share physically attached to the native Xbox shell root');
   assert.ok(cap.geometry.boundingBox||cap.geometry.attributes.position.count);
   assert.equal(rig.meshes.filter(m=>m.userData.genericCenterControl).length,4);
   assert.equal(rig.meshes.filter(m=>m.userData.role==='button'&&/^[abxy]_button[.]obj$/.test(m.userData.sourceFile)).length,4);
