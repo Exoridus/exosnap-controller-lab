@@ -23,6 +23,16 @@ jobs:
         run: |
           node download-assets.mjs
           node tools/verify-licensed-assets.mjs
+      - name: Build deterministic native controller interchange packs
+        run: npm run build:controller-packs -- --out .workspace/controller-packs
+      - name: Attach Qt 2D/GLB controller packs
+        uses: actions/upload-artifact@v4
+        with:
+          name: controller-packs-pr
+          path: .workspace/controller-packs/
+          retention-days: 30
+          if-no-files-found: error
+          include-hidden-files: true
       - name: Prepare real Chrome browser for PR screenshots
         run: |
           npm install --no-save --package-lock=false --ignore-scripts playwright@1.64.1
