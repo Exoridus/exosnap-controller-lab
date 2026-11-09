@@ -1,0 +1,17 @@
+{
+  "models": [
+    "DS4Compact",
+    "DualSenseCompact",
+    "Gamecube",
+    "JoyconGrip",
+    "JoyconLeft",
+    "JoyconRight",
+    "SwitchPro",
+    "Wavebird",
+    "Xbox360",
+    "XboxOneClean"
+  ],
+  "source": "https://raw.githubusercontent.com/Khyretos/3dco-plus/73b3a602a0b2afeb2fc7a2e9db940f9d2004ef9c/assets/models",
+  "license": "MIT (original Larf models)",
+  "sourceRef": "73b3a602a0b2afeb2fc7a2e9db940f9d2004ef9c"
+}

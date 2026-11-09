@@ -1,0 +1,377 @@
+{
+  "source": "ExoSnap segmented Generic Pro; profile from approved native SVG",
+  "license": "MIT AND CC0-1.0",
+  "profileSource": "references/controllers/generic/source.svg",
+  "profileSha256": "4a192594e161098c1c344f39dfb9ac4635f589edefe0033fe8e1255fa4b97ccc",
+  "description": "Approved source contours, real bevel/depth surfaces, corrected button/stick locations, same 23-part mechanical rig",
+  "parts": [
+    {
+      "filename": "top_shell.obj",
+      "name": "top shell",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.83,
+        0.84,
+        0.86
+      ]
+    },
+    {
+      "filename": "bottom_shell.obj",
+      "name": "bottom shell",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.24,
+        0.29,
+        0.35
+      ]
+    },
+    {
+      "filename": "left_stick.obj",
+      "name": "left stick",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        -0.8810884999999999,
+        0.225,
+        -0.3023435
+      ],
+      "color": [
+        0.19,
+        0.24,
+        0.3
+      ]
+    },
+    {
+      "filename": "left_ring.obj",
+      "name": "left ring",
+      "visible": true,
+      "parent": 2,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.19,
+        0.24,
+        0.3
+      ]
+    },
+    {
+      "filename": "left_cap.obj",
+      "name": "left cap",
+      "visible": true,
+      "parent": 2,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.19,
+        0.24,
+        0.3
+      ]
+    },
+    {
+      "filename": "right_stick.obj",
+      "name": "right stick",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0.44614049999999994,
+        0.225,
+        0.24504299999999998
+      ],
+      "color": [
+        0.19,
+        0.24,
+        0.3
+      ]
+    },
+    {
+      "filename": "right_ring.obj",
+      "name": "right ring",
+      "visible": true,
+      "parent": 5,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.19,
+        0.24,
+        0.3
+      ]
+    },
+    {
+      "filename": "right_cap.obj",
+      "name": "right cap",
+      "visible": true,
+      "parent": 5,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.19,
+        0.24,
+        0.3
+      ]
+    },
+    {
+      "filename": "a_button.obj",
+      "name": "a button",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.26,
+        0.32,
+        0.39
+      ]
+    },
+    {
+      "filename": "b_button.obj",
+      "name": "b button",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.26,
+        0.32,
+        0.39
+      ]
+    },
+    {
+      "filename": "x_button.obj",
+      "name": "x button",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.26,
+        0.32,
+        0.39
+      ]
+    },
+    {
+      "filename": "y_button.obj",
+      "name": "y button",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.26,
+        0.32,
+        0.39
+      ]
+    },
+    {
+      "filename": "dpad_up.obj",
+      "name": "dpad up",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.26,
+        0.32,
+        0.39
+      ]
+    },
+    {
+      "filename": "dpad_down.obj",
+      "name": "dpad down",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.26,
+        0.32,
+        0.39
+      ]
+    },
+    {
+      "filename": "dpad_left.obj",
+      "name": "dpad left",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.26,
+        0.32,
+        0.39
+      ]
+    },
+    {
+      "filename": "dpad_right.obj",
+      "name": "dpad right",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.26,
+        0.32,
+        0.39
+      ]
+    },
+    {
+      "filename": "back_button.obj",
+      "name": "back button",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.34,
+        0.41,
+        0.48
+      ]
+    },
+    {
+      "filename": "start_button.obj",
+      "name": "start button",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.34,
+        0.41,
+        0.48
+      ]
+    },
+    {
+      "filename": "guide_button.obj",
+      "name": "guide button",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.34,
+        0.41,
+        0.48
+      ]
+    },
+    {
+      "filename": "left_bumper.obj",
+      "name": "left bumper",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.44,
+        0.49,
+        0.56
+      ]
+    },
+    {
+      "filename": "left_trigger.obj",
+      "name": "left trigger",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.19,
+        0.24,
+        0.3
+      ]
+    },
+    {
+      "filename": "right_bumper.obj",
+      "name": "right bumper",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.44,
+        0.49,
+        0.56
+      ]
+    },
+    {
+      "filename": "right_trigger.obj",
+      "name": "right trigger",
+      "visible": true,
+      "parent": -1,
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "color": [
+        0.19,
+        0.24,
+        0.3
+      ]
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ExoSnap · Transparente 2D-Looks A/B/C</title>
+<style>
+:root{color-scheme:dark;font:13px/1.35 system-ui,Segoe UI,sans-serif;background:#0a121c;color:#e8f2f9;--panel-width:320px;--panel-height:214px}
+*{box-sizing:border-box}body{margin:0;padding:14px clamp(12px,2vw,28px) 25px}header,main{max-width:1520px;margin-inline:auto}
+a{color:#a8d9fa}h1{font-size:22px;margin:0 0 5px}.hint{color:#a9c1d0;font-size:12px;margin:0 0 12px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px 13px;padding:11px 12px;border:1px solid #375067;background:#172536;border-radius:10px}
+label{display:flex;flex-direction:column;gap:4px;color:#cbdde8;font-size:11px}
+label.check{flex-direction:row;align-items:center;gap:6px;padding-top:15px;white-space:nowrap}
+label input[type=range]{width:125px;accent-color:#edf7ff}
+select{color:#eef7ff;background:#24394b;border:1px solid #5c768a;padding:6px 8px;border-radius:6px;min-width:120px}
+output{color:white;font-variant-numeric:tabular-nums}
+#status{font-size:12px;color:#b1dced;margin:10px 0;min-height:17px}
+.scroll{overflow-x:auto;overscroll-behavior-inline:contain;padding:5px 5px 15px}
+.heads,.samples{display:grid;grid-template-columns:repeat(3,var(--panel-width));gap:12px;width:max-content}
+.heads{padding-bottom:7px;color:#c2d8e8;font-size:12px;text-transform:uppercase;letter-spacing:.04em;font-weight:650}
+.review-row{margin:0 0 12px}
+.row-label{display:flex;gap:15px;align-items:baseline;margin:7px 0 8px;font-weight:750;font-size:13px}
+.row-label span{font-size:12px;font-weight:400;color:#9fb7c8}
+.stage{position:relative;isolation:isolate;width:var(--panel-width);height:var(--panel-height);outline:1px solid #476174;border-radius:7px;overflow:visible}
+.stage::before{content:"";position:absolute;inset:0;z-index:0;border-radius:inherit;background-position:center;background-size:cover;pointer-events:none}
+.stage[data-scene=dark]::before{background-color:#07101c;background-image:linear-gradient(#040914ac,#040914ac),url('./backgrounds/arena.svg')}
+.stage[data-scene=light]::before{background:#f0f2f4}
+.stage[data-scene=mixed]::before{background-image:url('./backgrounds/racing.svg');background-color:#537b91}
+.stage>svg{position:relative;display:block;width:100%;height:100%;overflow:visible}
+.footer{font-size:11px;color:#a6bed0;max-width:1300px}
+@media(max-height:900px){.toolbar{padding:6px 10px}.review-row{margin-bottom:7px}.row-label{margin:3px 0 6px}}
+</style></head>
+<body>
+<header>
+<h1>2D · Drei transparente Ghost-Looks</h1>
+<p class="hint"><strong>Nur die Außenkante unterscheidet sich.</strong> Keine Gehäusefüllung, keine Fototexturen und gleiche neutrale Controls in allen Varianten. Das ist ein Browser-Review, keine native ExoSnap-Preview.</p>
+<div class="toolbar">
+<label>Controller<select id="layout" aria-label="Controller"></select></label>
+<label>Größe<select id="size" aria-label="Größe"><option value="240">240 × 160</option><option value="320" selected>320 × 214</option><option value="480">480 × 320</option></select></label>
+<label>Stick-Bewegung <output id="stickValue">0 %</output><input id="stick" type="range" min="0" max="100" step="1" value="0"></label>
+<label>L2/R2 <output id="triggerValue">0 %</output><input id="trigger" type="range" min="0" max="100" step="1" value="0"></label>
+<label class="check"><input type="checkbox" id="clicks"> L3/R3-Klick</label>
+<label class="check"><input type="checkbox" id="faces"> Face-/D-Pad drücken</label>
+<label class="check"><input type="checkbox" id="allControls"> Alle Tasten (inkl. L1/R1, PS, Share/Options, Touchpad)</label>
+<label class="check"><input type="checkbox" id="faceSymbols" checked> Face-Symbole</label>
+<label class="check"><input type="checkbox" id="live"> Live-Gamepad</label>
+</div>
+<div id="status" role="status">SVG-Quellen werden geladen …</div>
+<div class="hint"><a href="./polish-2d.html">Bisherige Solid/Ghost-Seite</a> · <a href="./pbr-lab.html">3D-Lab</a></div>
+</header>
+<main class="scroll"><div class="heads"><span>Dunkel</span><span>Hell</span><span>Gemischt / Gameplay</span></div><div id="comparison"></div></main>
+<p class="footer">A = reine Kontur · B = sanftes Kantenlicht · C = zurückhaltender Kantenschatten. Bei allen drei Looks: Ring weiß bei Bewegung, Mitte weiß bei L3/R3, neutraler Sockel. Die Außenkontur stammt aus den originalen SVG-Dateien; für echte Produktabnahme ist der native Renderer gesondert zu prüfen.</p>
+<script type="module" src="./polish-2d-review.js"></script>
+</body>
+</html>

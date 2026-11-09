@@ -1,0 +1,13 @@
+<!doctype html><meta charset="utf-8"><title>ExoSnap WebGL capability check</title>
+<style>body{background:#111c28;color:#e8eef3;font:16px monospace;padding:28px;white-space:pre-wrap}canvas{border:1px solid #849bab;margin:8px;width:120px;height:80px}</style>
+<h1>Actual browser WebGL capability</h1><p id="result">Checking…</p>
+<script>
+const results=[];
+for(const type of ['webgl2','webgl'])for(const options of [{},{alpha:true,antialias:true},{powerPreference:'low-power',failIfMajorPerformanceCaveat:false}]){
+ const canvas=document.createElement('canvas');document.body.append(canvas);
+ const record={type,options};canvas.addEventListener('webglcontextcreationerror',e=>{record.error=e.statusMessage});
+ try{const gl=canvas.getContext(type,options);record.context=Boolean(gl);if(gl){record.version=gl.getParameter(gl.VERSION);record.renderer=gl.getParameter(gl.RENDERER);gl.clearColor(.2,.6,.9,1);gl.clear(gl.COLOR_BUFFER_BIT);}}catch(error){record.exception=error.message;}
+ results.push(record);
+}
+document.getElementById('result').textContent=JSON.stringify(results,null,2);document.body.dataset.complete='true';
+</script>

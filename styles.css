@@ -1,0 +1,104 @@
+:root{color-scheme:dark;--bg:#10141b;--panel:#1a222d;--line:#344453;--text:#e5edf6;--muted:#93a3b4;--accent:#b6d4e9;font:12px/1.35 Inter,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0b0e13;color:var(--text)}
+*{box-sizing:border-box} html,body{margin:0;min-width:320px}button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.42;cursor:default}button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid #b0d1e7;outline-offset:2px}
+.app-shell{width:min(1320px,calc(100vw - 28px));margin:12px auto;background:var(--bg);border:1px solid #2a3440;border-radius:12px;overflow:hidden;box-shadow:0 14px 36px #0005}
+.app-header{height:46px;padding:0 18px;background:#151a22;border-bottom:1px solid #313d49;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;white-space:nowrap}.brand strong{font-size:13px}.brand>span{color:var(--muted)}.brand-symbol{font-size:23px;line-height:1;color:#afccdf!important}.header-split{display:block;width:1px;height:15px;background:#506172}.version-label{font-size:10px;color:#74889a!important;letter-spacing:.8px}.app-status{display:flex;align-items:center;gap:8px;color:#9eabba;font-size:10px}.footer-dot{width:7px;height:7px;border-radius:50%;background:#8397a9;display:block}.footer-dot.ready{background:#77c8a9}
+.workspace{min-width:0}.stage{position:relative;isolation:isolate;height:min(63vh,660px);min-height:360px;background:#172430;overflow:hidden}.game-backdrop,.game-backdrop-dim{position:absolute;inset:0;pointer-events:none}.game-backdrop{z-index:0;background-size:cover;background-position:center;background-repeat:no-repeat}.game-backdrop-dim{z-index:1;background:#08121a;opacity:.16}#scene{position:absolute;inset:0;width:100%;height:100%;z-index:2;display:block;outline:0;touch-action:none;cursor:grab}#scene:active{cursor:grabbing}
+.stage-head{position:absolute;z-index:3;top:19px;left:22px;pointer-events:none;text-shadow:0 1px 8px #0008}.stage-title{font-weight:660;font-size:21px;letter-spacing:-.45px}.stage-sub{color:#a8b9c7;font-size:11px;margin-top:2px}.stage-indicator{position:absolute;right:18px;top:20px;z-index:3;display:flex;gap:7px;align-items:center;font-size:10px;color:#b8c9d8}.stage-led{height:6px;width:6px;border-radius:50%;background:#90c4ac}
+.stage-center-message{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:5;display:flex;flex-direction:column;align-items:center;gap:9px;width:min(320px,calc(100% - 32px));padding:18px;background:#101a26df;border:1px solid #4c6174;border-radius:9px;color:#cbd9e8;text-align:center;box-shadow:0 12px 32px #0005}.stage-center-message.hidden{opacity:0;pointer-events:none}.stage-center-message strong{font-weight:600}.stage-center-message span{color:#a1b3c1}.spinner{width:18px;height:18px;border-radius:100%;border:2px solid #4c6882;border-top-color:#c4dff1;animation:spin .9s linear infinite}.progress-track{height:3px;background:#394b5c;width:100%;overflow:hidden;border-radius:2px}.progress-track span{display:block;height:100%;width:0;background:#b8d9ec}#retryLoad{border:1px solid #6988a0;border-radius:6px;background:#263749;color:white;padding:6px 10px}@keyframes spin{to{transform:rotate(360deg)}}
+.scene-toolbar{position:absolute;bottom:17px;left:50%;transform:translateX(-50%);z-index:4;display:flex;align-items:center;gap:4px;padding:5px 6px;border:1px solid #b1c4d532;border-radius:10px;background:#0e1824e8;backdrop-filter:blur(14px);box-shadow:0 9px 22px #0007}.scene-toolbar button{border:0;border-radius:6px;color:#b4c7d8;background:transparent;height:29px;min-width:37px;padding:0 9px}.scene-toolbar button:hover{background:#708aa42b;color:#fff}.scene-toolbar .selected,.scene-toolbar .on{background:#b3d1e32a;color:#fff}.toolbar-divider{height:18px;width:1px;margin:0 2px;background:#627990}.stage-hint{position:absolute;left:18px;bottom:20px;z-index:3;font-size:10px;color:#c4d7e7a9;pointer-events:none}.stage-hint span{margin:0 5px;color:#91aabf}.action-toast{position:absolute;left:50%;bottom:57px;z-index:5;transform:translateX(-50%);border-radius:6px;padding:7px 12px;background:#d8ecfa;color:#203444;opacity:0;pointer-events:none;transition:opacity .2s}.action-toast.active{opacity:1}
+.quick-controls{padding:11px 13px 10px;background:#1a222c;display:flex;flex-direction:column;gap:8px;border-top:1px solid #324251}.control-row{display:flex;align-items:end;gap:9px;min-width:0}.control-field{display:flex;min-width:0;flex-direction:column;gap:4px;color:#becbd8}.control-field>span{display:flex;justify-content:space-between;align-items:center;gap:4px;white-space:nowrap;font-size:10px;font-weight:600}.control-field output{font-variant-numeric:tabular-nums;color:#8fb8d3;font-size:10px}.control-field select{width:100%;height:29px;min-width:0;border:1px solid #465a6e;border-radius:6px;padding:0 8px;background:#273441;color:#f0f6fc;outline:0;white-space:nowrap;text-overflow:ellipsis}.control-field select:hover{border-color:#7892a6}.control-field input[type=range]{margin:5px 0 3px;width:100%;min-width:0;accent-color:#a7cbdf;cursor:pointer}.model-field{width:200px;flex:1.1}.appearance-field{width:112px;flex:.65}.range-field{width:112px;flex:.7}.scene-field{width:110px;flex:.65}.dim-field{width:88px;flex:.5}.icon-file-label{height:30px;width:31px;min-width:31px;display:grid;place-items:center;align-self:end;border:1px solid #46596d;border-radius:6px;background:#273441;color:#bdd7e6;cursor:pointer;font-size:18px}.icon-file-label input{position:absolute;width:1px;height:1px;opacity:0;clip-path:inset(50%)}
+.input-row{align-items:end}.input-field{width:115px;flex:0 0 115px}.device-field{width:192px;flex:1 1 192px;max-width:230px}.sensor-strip{display:flex;gap:6px;align-items:end;flex:1;min-width:0;flex-wrap:nowrap}.strip-label{font-size:10px;font-weight:650;color:#bcd0dd;white-space:nowrap;align-self:center;margin-bottom:7px}.sensor-strip button,.subtle-button,.mini-button{height:29px;border:1px solid #465e72;border-radius:6px;padding:0 10px;background:#2a3a49;color:#d7e6f2;white-space:nowrap}.sensor-strip button:hover:not(:disabled),.subtle-button:hover,.mini-button:hover{background:#385065}.pose-field{width:120px}.mini-switch{height:29px;display:flex;align-items:center;gap:5px;border:1px solid #475b6d;padding:0 9px;border-radius:6px;white-space:nowrap;cursor:pointer;font-size:11px}.mini-switch input{accent-color:#a4c8db;margin:0}.status-row{display:flex;align-items:center;gap:9px;min-height:24px;font-size:10px;color:#9fb3c6}.status-row .stretch{flex:1}.sensor-status{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:42%}.status-divider{height:11px;width:1px;background:#556474}.status-detail{font-size:10px;color:#8398ab;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:19%}.subtle-button{height:23px;background:transparent;padding:0 8px;font-size:10px;color:#a9bed0}
+.advanced-panel{border-top:1px solid #3b4b5a;padding-top:9px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}.advanced-panel[hidden]{display:none}.controls-grid{display:flex;flex-wrap:wrap;gap:4px}.control-key{min-width:31px;height:28px;padding:0 7px;border:1px solid #465c6e;border-radius:5px;background:#283644;color:#bdd0e0}.control-key.pressed{background:#b8d7eb;color:#14202b;border-color:#d1eafa}.telemetry-panel{gap:15px;color:#a9bbca;font:10px ui-monospace,Consolas,monospace}.telemetry-panel output{color:#e1eef9}
+#ghostContoursSetting:not(.active){opacity:.42}#ghostContoursSetting:not(.active) input{pointer-events:none}[hidden]{display:none!important}
+@media(max-width:1020px){.stage-hint{display:none}.primary-row{flex-wrap:wrap}.model-field{flex:1 1 190px}.appearance-field{flex:0 0 110px}.range-field{flex:1 1 115px}.scene-field{flex:0 1 122px}.input-row{flex-wrap:wrap}.sensor-strip{flex:1 1 100%;flex-wrap:wrap}.sensor-status{max-width:50%}}
+@media(max-width:700px){.app-shell{width:100%;margin:0;border-radius:0;border:0}.stage{height:48vh;min-height:310px}.stage-title{font-size:17px}.app-status{display:none}.stage-head{top:13px;left:14px}.scene-toolbar{bottom:12px}.scene-toolbar button{min-width:31px;padding:0 5px}.quick-controls{padding:11px 10px}.control-row{gap:8px}.model-field{flex:1 1 48%}.appearance-field{flex:1 1 32%}.range-field{flex:1 1 26%}.scene-field,.dim-field{flex:1 1 29%}.device-field{flex:1 1 48%;max-width:none}.strip-label{width:100%;margin-top:2px}.status-detail{display:none}}
+@media(prefers-reduced-motion:reduce){.spinner{animation:none}*,*::before,*::after{transition-duration:0s!important}}
+/* Sensor buttons must not collapse when the compact bar gets crowded. */
+.sensor-strip button{flex:0 0 auto}
+.pose-field{flex:0 0 120px}
+#motionCalibrate{min-width:83px;background:#3d576b;border-color:#7b9cb4;color:#f1f8fc}
+#motionRecenter{min-width:66px}
+
+.status-row #motionDisconnect{height:23px;border:1px solid #576f85;border-radius:6px;padding:0 8px;background:#2a3c4b;color:#b9cad7;font-size:10px}
+.status-row #motionDisconnect:disabled{display:none}
+/* Compact but never hide sensor actions at narrower desktop widths. */
+@media(max-width:1240px){
+ .primary-row,.input-row{flex-wrap:wrap}
+ .sensor-strip{flex:1 1 640px;flex-wrap:wrap}
+ .strip-label{margin-right:6px}
+ .range-field{min-width:100px}
+}
+@media(max-width:700px){
+ .sensor-strip{flex:1 1 100%;flex-wrap:wrap}
+ .pose-field{flex:0 0 120px}
+ .input-field,.device-field{flex:1 1 40%}
+ .status-row{flex-wrap:wrap}
+ .sensor-status{max-width:100%}
+}
+/* Safe fallback even when viewport media queries are unavailable. */
+.primary-row,.input-row,.sensor-strip{flex-wrap:wrap}
+
+#motionAxisLearn {min-width:94px;background:#27445e;border-color:#4c83ad;color:#dceffd;}
+#motionAxisLearn:disabled {opacity:.50;cursor:not-allowed;}
+.control-key.pressed{background:#2388e9;color:#eefaff;border-color:#77caff;box-shadow:0 0 11px #278fff82;}
+
+.axis-guide{position:absolute;z-index:7;top:82px;left:50%;transform:translateX(-50%);max-width:calc(100% - 28px);padding:10px 14px;background:#09263ae8;border:1px solid #6ca7cfaa;color:#e2f5ff;border-radius:8px;font-size:12px;font-weight:600;box-shadow:0 10px 32px #0006;pointer-events:none;text-align:center;line-height:1.45;backdrop-filter:blur(12px);}
+.axis-guide[hidden]{display:none}
+@media(max-width:650px){.axis-guide{top:72px;font-size:11px;padding:8px 10px}}
+
+/* v12 · overlay-friendly display mode in the compact sensor strip */
+.sensor-strip .pose-field select#motionDisplayMode{min-width:104px;}
+.sensor-strip button[hidden]{display:none!important;}
+
+/* v14: keep the compact controls visible on smaller viewports without
+   extending the page below the browser's visible area unnecessarily. */
+@media(min-width:701px) and (max-width:1020px){.stage{height:min(56vh,560px);min-height:320px}}
+@media(max-width:700px){.stage{height:43vh;min-height:310px}}
+
+/* v15 · collapsed ergonomic motion tuning. The main preview remains compact. */
+.motion-tuning-panel{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px 16px;padding:12px 4px 3px;align-items:end}
+.motion-tuning-panel[hidden]{display:none}
+.motion-tuning-panel .tuning-field{width:auto;min-width:0}
+.motion-tuning-panel .tuning-field input[type=range]{width:100%;margin:6px 0 4px;accent-color:#65b9f5;cursor:pointer}
+.motion-tuning-panel .tuning-field output{color:#b9e5ff}
+.motion-tuning-panel .tuning-checkbox{height:29px;justify-content:center;align-self:end;white-space:nowrap}
+.motion-tuning-panel #motionTuningReset{align-self:end;height:29px}
+#motionTuningToggle[aria-expanded="true"]{background:#2f5268;color:#e3f5ff;border-color:#5795c1}
+@media(max-width:700px){.motion-tuning-panel{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
+
+.motion-tuning-panel .tuning-preset-field{min-width:120px;align-self:end}
+.motion-tuning-panel .tuning-preset-field select{height:29px}
+.motion-tuning-panel .tuning-checkbox input:disabled{opacity:.45}
+
+/* While tuning is expanded, reserve enough room to keep the sliders onscreen
+   on desktop. The compact/default layout is unchanged. */
+@media(min-width:1021px){
+  .app-shell:has(#motionTuningPanel:not([hidden])) .stage{height:min(60vh,620px)}
+}
+@media(min-width:701px) and (max-width:1020px){
+  .app-shell:has(#motionTuningPanel:not([hidden])) .stage{height:min(42vh,450px);min-height:310px}
+}
+
+/* v21: shared 2D/3D comparison, with an honest 2D-only fallback. */
+.reference-frame{position:absolute;inset:0;z-index:3;display:grid;place-items:center;pointer-events:none;overflow:hidden}
+.reference-frame[hidden]{display:none}
+.reference-graphic{display:grid;place-items:center;width:100%;height:100%;overflow:hidden}
+.reference-graphic>svg{display:block;width:100%;height:100%;overflow:visible}
+.reference-tag{position:absolute;top:57px;right:18px;padding:4px 8px;border:1px solid #8dadc260;border-radius:6px;background:#101b29d9;color:#e1eaf2;font-size:10px;font-weight:650;letter-spacing:.02em}
+.stage[data-reference-mode="overlay"] .reference-frame{pointer-events:none}
+.stage[data-reference-mode="2d"] .reference-frame{pointer-events:auto}
+.stage[data-reference-mode="2d"] .reference-graphic{cursor:crosshair}
+.stage[data-reference-mode="2d"] .reference-graphic>svg{max-width:76%;max-height:76%;width:76%;height:76%;overflow:visible;filter:drop-shadow(0 10px 16px #0005)}
+.stage[data-reference-mode="2d"] #scene{visibility:hidden}
+.parity-notice{z-index:4;position:absolute;left:18px;top:59px;max-width:min(72%,580px);border-radius:6px;background:#162636d9;color:#c8e0ee;padding:6px 10px;font-size:10px;border:1px solid #65849f77;pointer-events:none}
+.reference-mode-field{width:118px;flex:0 1 120px}.reference-alpha-field{width:118px;flex:0 1 120px}
+#referenceOpacitySetting{opacity:.95}
+@media(max-width:700px){.reference-mode-field{flex:1 1 29%}.reference-alpha-field{flex:1 1 28%}.parity-notice{font-size:9px;top:48px}.reference-tag{top:48px;right:12px}}
+/* v24 - compact technical controls; no extra scrolling panel. */
+.v24-row{padding:5px 2px 3px;align-items:center;flex-wrap:wrap!important;gap:7px 9px;border-top:1px solid #394856;}
+.v24-outline-field{min-width:138px;width:138px;flex:0 0 138px;}
+.v24-stats{margin-left:auto;color:#91b3cb;font:10px ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums;}
+.v24-gallery-link{font-size:11px;color:#add7ff;text-decoration:underline;text-underline-offset:3px;}
+.v24-row .mini-switch{height:29px}
+@media(max-width:700px){.v24-stats{width:100%;order:3;margin-left:0}}

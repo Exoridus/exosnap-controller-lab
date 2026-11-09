@@ -1,0 +1,26 @@
+
+:root{color-scheme:dark;--muted:#91aabd;--blue:#8bcff5;color:#edf6ff;background:#081019;font:13px/1.42 system-ui,"Segoe UI",sans-serif}
+*{box-sizing:border-box}html{min-width:320px}body{margin:0;background:#08111a}
+.site-head{background:#0e1b28;border-bottom:1px solid #2e4557;padding:10px 12px 8px}
+.toolbar{display:flex;align-items:end;gap:10px;flex-wrap:wrap}.field{display:flex;flex-direction:column;gap:4px;color:#a4bed0;font-size:11px;font-weight:650}
+.input-toolbar{margin-top:9px}.trigger-field{width:170px}.settings{margin-top:8px;color:#a4bed0;font-size:11px}.settings summary{cursor:pointer;width:max-content}.settings .toolbar{margin-top:8px}.settings button{border:1px solid #496077;border-radius:5px;background:#17293a;color:#e9f3fc;padding:8px 12px;cursor:pointer}
+.field select,.field input[type=color]{min-width:92px;background:#17293a;border:1px solid #365369;color:#e9f3fc;border-radius:6px;padding:6px 8px;font:inherit;font-size:12px;height:36px}.model-field select{min-width:176px}
+.mix-field{flex:1 1 220px;max-width:420px}.mix-title{display:flex;justify-content:space-between;color:#eaf3fd}.mix-title output{color:#a8d9fa;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:#77c2ee;cursor:pointer;margin:4px 0 0}.range-labels{display:flex;justify-content:space-between;font-size:10px;color:#7396ae}.range-labels i{font-style:normal}
+.press-field{display:flex;align-items:center;gap:6px;font-size:12px;padding-bottom:7px;white-space:nowrap;color:#d7eaf6}.press-field input{accent-color:#80c8f3}
+.color-field input[type=color]{padding:2px;width:54px;min-width:54px}
+.status-row{display:flex;gap:16px;justify-content:space-between;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px solid #243747;color:#94b0c3;font-size:11px}.status-row a{color:#c6d2dc;text-underline-offset:3px}
+main{padding:10px 12px 16px;overflow-x:auto;overflow-y:visible;overscroll-behavior-x:contain}
+#failureBanner{background:#30282e;border:1px solid #9d655b;color:#ffe0d4;border-radius:8px;padding:10px 14px;margin-bottom:10px}#failureBanner[hidden]{display:none}
+#gallery{position:relative;width:max-content;min-width:100%;display:grid;grid-template-columns:1fr;gap:10px;--panel-width:320px;--panel-height:214px}
+.variant{position:relative;background:transparent;border:0;border-radius:0;padding:0;margin:0}
+.player-index-field[hidden]{display:none}.player-index-field select{min-width:148px}
+.variant[hidden]{display:none}.variant-top,.sample-title,.corner-note,.sample-stats{display:none !important}
+.look-label{font-size:11px;font-weight:650;line-height:1.4;margin:0 0 5px;color:#b7c5d0;letter-spacing:.015em}.look-views{display:grid;grid-template-columns:repeat(3,var(--panel-width));gap:8px;position:relative}
+.sample-wrap{display:block;min-width:0}.sample{position:relative;overflow:hidden;width:var(--panel-width);aspect-ratio:320/214;height:auto;min-height:0;border:1px solid #46657e6e;border-radius:6px;background-size:cover;background-position:center;cursor:grab;touch-action:none}
+.sample:active{cursor:grabbing}.sample--flat{cursor:default;touch-action:auto}.sample[data-scene=dark]{background-color:#050914;background-image:linear-gradient(#02091080,#02091080),url('./backgrounds/arena.svg')}.sample[data-scene=light]{background:#f4f7fa}.sample[data-scene=mixed]{background-color:#608da7;background-image:url('./backgrounds/racing.svg')}
+.flat-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}.flat-stage svg{width:92%;height:88%;display:block;overflow:visible}.flat-stage [data-exo-stick-drag]{cursor:grab}.flat-stage p{font-size:10px;padding:9px;color:#e3f4ff}
+#threeCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;background:transparent}
+#gallery.gpu-unavailable .sample:not(.sample--flat):after{content:'WebGL nicht verfügbar';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#7799b0;background:#0d1b2b73;font-size:11px;z-index:3}
+#gallery.gpu-unavailable .sample[data-scene=light]:after{background:#f4f7fac4;color:#627b8c}
+@media(max-width:1330px){.site-head{padding:10px}.look-views{gap:6px}}

@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>ExoSnap V29 RC · Kontrastvergleich · ungeprüfte Kandidaten</title>
+<style>
+  :root{color-scheme:dark;--ground:#101820;--surface:#192734;--ink:#e3edf6;--muted:#b7cadb;--line:#53697a;--accent:#92d0f1;--warning:#ffd99d;--warning-ground:#30271b;--preview-width:320px;--preview-height:214px;font:14px/1.5 system-ui,"Segoe UI",sans-serif;background:var(--ground);color:var(--ink)}
+  *{box-sizing:border-box}
+  body{margin:0;padding:24px}
+  header,main,footer{max-width:1500px;margin-inline:auto}
+  h1{font-size:23px;line-height:1.3;margin:0 0 10px}
+  h2{font-size:17px;line-height:1.35;margin:0 0 12px}
+  p{margin:8px 0;color:var(--muted)}
+  a{color:var(--accent);text-underline-offset:3px}
+  a:focus-visible,select:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+  .acceptance{background:var(--warning-ground);border-left:4px solid var(--warning);padding:16px 20px;margin-bottom:20px}
+  .acceptance h1,.acceptance strong{color:var(--warning)}
+  .acceptance p{color:var(--ink);max-width:100ch}
+  .page-intro{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
+  .page-intro p{margin:0;max-width:90ch}
+  nav{display:flex;gap:20px;flex-wrap:wrap;font-size:13px}
+  form{display:flex;align-items:end;flex-wrap:wrap;gap:14px 20px;padding:20px 0 16px;margin:0}
+  label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--ink)}
+  select,button{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:3px;min-height:38px;padding:7px 10px}
+  select{min-width:145px;max-width:100%}
+  #comparisonCandidate{min-width:240px}
+  button{cursor:pointer}
+  button:hover{border-color:var(--accent)}
+  .check{flex-direction:row;align-items:center;min-height:38px;gap:9px}
+  .check input{accent-color:var(--accent);width:17px;height:17px;margin:0}
+  .selection-note{margin:0 0 6px;max-width:110ch;color:var(--ink)}
+  .runtime-summary{font-size:12px;font-variant-numeric:tabular-nums;min-height:18px}
+  .preview-scroll{overflow-x:auto;max-width:100%;padding:4px 1px 14px;margin-top:18px;scrollbar-gutter:stable}
+  .preview-grid{display:grid;grid-template-columns:repeat(3,var(--preview-width));gap:20px;width:max-content;align-items:start}
+  figure{width:var(--preview-width);margin:0;min-width:0}
+  figcaption{display:flex;justify-content:space-between;gap:12px;margin-bottom:8px;font-size:13px}
+  figcaption strong{font-size:14px;font-weight:650}
+  .frame-shell{width:var(--preview-width);height:var(--preview-height);outline:1px solid var(--line);background:#06090e}
+  iframe{display:block;box-sizing:content-box;width:var(--preview-width);height:var(--preview-height);border:0;margin:0;padding:0;pointer-events:none}
+  .frame-status{font-size:12px;min-height:36px;margin:10px 0 4px;color:var(--muted)}
+  figure[data-frame-state="unavailable"] .frame-status,figure[data-frame-state="error"] .frame-status{color:var(--warning)}
+  .open-frame{font-size:12px}
+  .size-note{font-size:12px;margin:0 0 22px}
+  .techniques{margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
+  .table-scroll{overflow-x:auto}
+  table{border-collapse:collapse;text-align:left;width:100%;min-width:700px;font-size:13px}
+  th,td{padding:11px 12px 11px 0;vertical-align:top;border-bottom:1px solid #314353}
+  th{color:var(--muted);font-weight:600}
+  td:first-child{width:180px;font-weight:650;color:var(--ink)}
+  td:nth-child(2){width:38%}
+  tr[aria-current="true"] td:first-child{color:var(--accent)}
+  .method-note{font-size:12px;max-width:110ch;margin:14px 0 0}
+  footer{padding-top:24px;font-size:12px;color:var(--muted)}
+  code{font:12px ui-monospace,SFMono-Regular,Consolas,monospace}
+  noscript p{padding:16px;border:1px solid var(--warning);color:var(--warning)}
+  @media(max-width:700px){body{padding:16px}.acceptance{padding:14px 16px}h1{font-size:20px}.page-intro{gap:10px}form{gap:12px}form>label:not(.check){flex:1 1 180px}select,#comparisonCandidate{min-width:0;width:100%}.check{flex-basis:100%}.preview-grid{gap:16px}}
+</style>
+</head>
+<body><a href="./labs.html" style="display:inline-flex;align-items:center;border:1px solid #4d7a99;background:#142b3b;color:#b4e0f8;padding:6px 10px;border-radius:7px;text-decoration:none;font:700 12px system-ui,sans-serif;margin:4px 8px 4px 0">Alle Labs</a>
+<header>
+  <section class="acceptance" aria-labelledby="acceptanceTitle">
+    <h1 id="acceptanceTitle">VISUELLE 3D-ABNAHME BLOCKIERT; Kandidaten, keine getestete Auswahl</h1>
+    <p>Der Prüf-Browser dieser Lieferung konnte weder WebGL 1 noch WebGL 2 initialisieren. Shaderausgabe, Kontrast und Stickgeometrie sind deshalb visuell noch nicht abgenommen. <strong>D ist nur der vorläufige Startwert, keine akzeptierte Variante.</strong></p>
+  </section>
+  <div class="page-intro">
+    <p>DualSense · dieselbe Diagnoseansicht auf drei Hintergründen. Jede Auswahl lädt den tatsächlichen Renderer mit identischem Material, Kamerawinkel und Eingabezustand.</p>
+    <nav aria-label="Diagnoseseiten"><a href="./index.html?layout=dualsense">Hauptvorschau</a><a href="./gallery-2d.html">2D-SVG-Prüfung</a></nav>
+  </div>
+  <form id="comparisonControls" aria-label="Gemeinsame Vergleichseinstellungen">
+    <label for="comparisonCandidate">Kontrastkandidat
+      <select id="comparisonCandidate" name="contrast">
+        <option value="A">A · dunkle + helle Kante</option>
+        <option value="B">B · kleiner versetzter Schatten</option>
+        <option value="C">C · weiche lokale Trennung</option>
+        <option value="D" selected>D · Kante + Fresnel (vorläufig)</option>
+        <option value="E">E · Hintergrundluminanz</option>
+        <option value="off">off · ohne Kontrastpass</option>
+      </select>
+    </label>
+    <label for="comparisonSize">Vorschaufenster
+      <select id="comparisonSize" name="size"><option value="240x160">240 × 160 CSS px</option><option value="320x214" selected>320 × 214 CSS px</option><option value="480x320">480 × 320 CSS px</option></select>
+    </label>
+    <label for="comparisonMix">Material
+      <select id="comparisonMix" name="mix"><option value="1" selected>Ghost</option><option value="0.5">Glass</option><option value="0">Normal</option></select>
+    </label>
+    <label for="comparisonView">Kamera
+      <select id="comparisonView" name="view"><option value="front">Front</option><option value="angled">3/4</option><option value="side">Seite</option></select>
+    </label>
+    <label for="comparisonPose">Beide Sticks
+      <select id="comparisonPose" name="pose"><option value="neutral">Neutral</option><option value="right">Rechts · Maximum</option><option value="down">Unten · Maximum</option><option value="up-right">Oben rechts · Maximum</option></select>
+    </label>
+    <label class="check" for="comparisonPressed"><input id="comparisonPressed" name="pressed" type="checkbox"> Alle Tasten + L3/R3 gedrückt</label>
+    <button id="comparisonReload" type="button">Ansichten neu laden</button>
+  </form>
+  <p id="techniqueSummary" class="selection-note">D · Dunkle Silhouette mit materialbasiertem Fresnel-Rand. Vorläufiger Startwert; visuell ungeprüft.</p>
+  <p id="comparisonRuntime" class="runtime-summary" role="status">Drei Diagnoseansichten werden vorbereitet.</p>
+</header>
+<main>
+  <section class="preview-scroll" aria-label="Drei echte 3D-Diagnoseansichten" tabindex="0">
+    <div id="comparisonPanels" class="preview-grid">
+      <figure id="comparison-dark" data-background="dark" data-frame-state="waiting"><figcaption><strong>Dark</strong><span class="frame-size">320 × 214</span></figcaption><div class="frame-shell"><iframe id="comparison-frame-dark" title="Dark · echte 3D-Diagnose" width="320" height="214" tabindex="-1" loading="eager"></iframe></div><p class="frame-status">Warte auf Diagnoseansicht.</p><a class="open-frame" target="_blank" rel="noopener" href="./index.html?diagnostic=1&amp;layout=dualsense&amp;contrast=D&amp;mix=1&amp;view=front&amp;background=dark&amp;stick=0%2C0&amp;buttons=0&amp;click=0&amp;label=0">Ansicht einzeln öffnen</a></figure>
+      <figure id="comparison-light" data-background="light" data-frame-state="waiting"><figcaption><strong>Light</strong><span class="frame-size">320 × 214</span></figcaption><div class="frame-shell"><iframe id="comparison-frame-light" title="Light · echte 3D-Diagnose" width="320" height="214" tabindex="-1" loading="eager"></iframe></div><p class="frame-status">Warte auf Diagnoseansicht.</p><a class="open-frame" target="_blank" rel="noopener" href="./index.html?diagnostic=1&amp;layout=dualsense&amp;contrast=D&amp;mix=1&amp;view=front&amp;background=light&amp;stick=0%2C0&amp;buttons=0&amp;click=0&amp;label=0">Ansicht einzeln öffnen</a></figure>
+      <figure id="comparison-mixed" data-background="racing" data-frame-state="waiting"><figcaption><strong>Mixed</strong><span class="frame-size">320 × 214</span></figcaption><div class="frame-shell"><iframe id="comparison-frame-mixed" title="Mixed · echte 3D-Diagnose" width="320" height="214" tabindex="-1" loading="eager"></iframe></div><p class="frame-status">Warte auf Diagnoseansicht.</p><a class="open-frame" target="_blank" rel="noopener" href="./index.html?diagnostic=1&amp;layout=dualsense&amp;contrast=D&amp;mix=1&amp;view=front&amp;background=racing&amp;stick=0%2C0&amp;buttons=0&amp;click=0&amp;label=0">Ansicht einzeln öffnen</a></figure>
+    </div>
+  </section>
+  <p class="size-note">Die Fenster bleiben exakt so groß wie gewählt; bei Bedarf horizontal scrollen. Die Kamera wird gemeinsam über die Auswahl gesetzt. Stickauslenkung und Tastendruck sind unabhängig.</p>
+  <section class="techniques" aria-labelledby="techniquesTitle">
+    <h2 id="techniquesTitle">Ansätze und offene Prüfpunkte</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th scope="col">Variante</th><th scope="col">Implementierter Ansatz</th><th scope="col">Beabsichtigte Wirkung und offene Risiken</th></tr></thead>
+        <tbody>
+          <tr data-technique="A"><td>A · zwei Kanten</td><td>Schmale dunkle Außenkante, helle Innenkante und Grenzen der physischen Controls.</td><td>Soll die Form auf beiden Helligkeitsniveaus trennen. Bei 240 px prüfen, ob eine sichtbare Doppelkante entsteht oder aktive blaue Controls zu stark eingefasst werden.</td></tr>
+          <tr data-technique="B"><td>B · versetzter Schatten</td><td>Kleiner versetzter Schatten aus der tatsächlichen Modellmaske; schwächere Kontrollgrenzen.</td><td>Soll eine zurückhaltende Trennung erzeugen. Versatz und Seitenansicht auf scheinbare Geometrieverbreiterung prüfen; Wirkung auf Dark bleibt offen.</td></tr>
+          <tr data-technique="C"><td>C · weiche Trennung</td><td>Weiche lokale Außenmaske und dunkle Kontrollgrenzen.</td><td>Soll harte Doppelkonturen vermeiden. Bei kleinen Fenstern auf diffuse oder zu dichte Säume und erhaltene Zwischenräume prüfen.</td></tr>
+          <tr data-technique="D" aria-current="true"><td>D · Kante + Fresnel<br><small>Vorläufig, nicht akzeptiert</small></td><td>Schmale dunkle Silhouette und Kontrollgrenzen; heller Fresnel-Rand im tatsächlichen Control-Material.</td><td>Soll Außenkontur und Oberflächenkante zusammenführen. Transparente Sticks, Seitenansicht und die Helligkeit des Randes bleiben visuell zu prüfen.</td></tr>
+          <tr data-technique="E"><td>E · Luminanzwahl</td><td>Helle oder dunkle Kontur abhängig von der Luminanz des verwendeten Hintergrunds.</td><td>Soll lokal auf Hell und Dunkel reagieren. Wechselnde Konturfarben sowie Deckung der Racing-Textur mit dem sichtbaren Hintergrund prüfen.</td></tr>
+          <tr data-technique="off"><td>off · Referenz</td><td>Zusätzlicher Kontrastpass ausgeschaltet; Materialdarstellung als Vergleichsbasis.</td><td>Zeigt den Bezugspunkt für A–E. Auch diese Referenz hat in dieser Lieferung keine visuelle 3D-Abnahme.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="method-note">Die drei Frames laden <code>index.html?diagnostic=1</code> mit den Original-Assets und dem aktuellen Produktionsrenderer. Ein gemeldeter Initialisierungsstatus bestätigt keine Shaderqualität oder visuelle Abnahme. Für reproduzierbare Einzelaufnahmen liegt die Erfassungsliste in <a href="./evidence/capture-cases.json">capture-cases.json</a>.</p>
+  </section>
+  <noscript><p>JavaScript ist für den gemeinsamen Vergleich erforderlich. Die drei Links „Ansicht einzeln öffnen“ laden die echte Diagnoseansicht mit dem vorläufigen Kandidaten D.</p></noscript>
+</main>
+<footer>ExoSnap V29 RC · Technischer Prüfkandidat. Die Hauptvorschau bleibt eine gemeinsame 3D-Szene; diese separate Diagnoseseite lädt drei unabhängige Dokumente.</footer>
+<script type="module" src="./comparison.js"></script>
+</body>
+</html>

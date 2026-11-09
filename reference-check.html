@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ExoSnap · 2D/3D Reference Check v21</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,"Segoe UI",sans-serif}*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#101820;color:#e3edf6}header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 23px;background:#182431;border-bottom:1px solid #344859}header strong{font-size:17px}a{color:#92d0f1;text-decoration:none}a:hover{text-decoration:underline}
+main{max-width:1250px;margin:20px auto;padding:0 18px;display:grid;grid-template-columns:270px minmax(0,1fr);gap:18px}
+aside,section{background:#1d2c3a;border:1px solid #405468;border-radius:12px;padding:16px}aside{display:flex;flex-direction:column;gap:15px}
+label{font-size:13px;display:flex;flex-direction:column;gap:7px;color:#b7cadb}select,input{background:#26394b;border:1px solid #506a80;color:#f4f9ff;border-radius:6px;padding:8px;width:100%}input[type=range]{padding:0;accent-color:#87cafe}
+fieldset{border:1px solid #455a6e;border-radius:7px;display:flex;flex-wrap:wrap;gap:6px}legend{font-size:12px;color:#b7cadb}fieldset button{color:#eaf3fa;background:#304759;border:1px solid #61778a;padding:8px 11px;border-radius:5px;cursor:pointer}button.selected{background:#267ec0;border-color:#a9e1ff}
+#artwork{position:relative;min-height:420px;display:grid;place-items:center;background:#16232e;border:1px dashed #476175;border-radius:12px;padding:14px;overflow:hidden}
+#artwork svg{max-width:100%;max-height:420px;width:100%;height:100%;filter:drop-shadow(0 8px 18px #0007)}#artwork p{color:#fbad99}
+#status{font-size:12px;color:#a6cadc;padding-top:10px}.sub{font-size:12px;line-height:1.45;color:#a7bdcf}.small{font-size:11px;color:#a7bdcf}
+@media(max-width:800px){main{grid-template-columns:1fr;margin:12px auto}#artwork{min-height:260px}header{flex-wrap:wrap}}
+</style>
+</head>
+<body><a href="./labs.html" style="display:inline-flex;align-items:center;border:1px solid #4d7a99;background:#142b3b;color:#b4e0f8;padding:6px 10px;border-radius:7px;text-decoration:none;font:700 12px system-ui,sans-serif;margin:4px 8px 4px 0">Alle Labs</a>
+<header><strong>ExoSnap · 2D-Referenzprüfung v21</strong><a href="./index.html?layout=dualsense">Zum 3D Lab</a></header>
+<main>
+<aside>
+<label>Controller <select id="layout" aria-label="2D-Controller wählen"></select></label>
+<div class="sub" id="parity">Die 2D-Vorlagen stammen aus dem bereitgestellten Overlay-Paket. Verfügbarkeit und Modellparität werden angezeigt.</div>
+<label>Stick X <input type="range" id="axisX" min="-100" max="100" value="0" step="1"></label>
+<label>Stick Y <input type="range" id="axisY" min="-100" max="100" value="0" step="1"></label>
+<fieldset><legend>Stick-Auswahl</legend><button type="button" class="selected" data-side="left">Links</button><button type="button" data-side="right">Rechts</button><button type="button" id="reset">Zentrieren</button></fieldset>
+<fieldset><legend>Inputs (gedrückt halten)</legend><button type="button" data-key="b1">A / ✕</button><button type="button" data-key="b2">B / ○</button><button type="button" data-key="b3">X / □</button><button type="button" data-key="b4">Y / △</button><button type="button" data-key="l1">L1</button><button type="button" data-key="r1">R1</button><button type="button" data-key="l2">L2</button><button type="button" data-key="r2">R2</button><button type="button" data-key="ls">L3</button><button type="button" data-key="rs">R3</button></fieldset>
+<div class="small">Die Vorschau dient der Sichtkontrolle; sie ersetzt keine native Gamepad-Sprites-Validierung.</div>
+</aside>
+<section><div id="artwork" role="img" aria-label="Interaktive Controller-Zeichnung"></div><div id="status" role="status">Lade 2D-Referenz…</div></section>
+</main>
+<script type="module" src="./reference-check.js"></script>
+</body>
+</html>

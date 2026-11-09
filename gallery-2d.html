@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ExoSnap · 2D SVG source-stage inspection</title>
+<style>
+  :root{color-scheme:dark;font:14px/1.45 system-ui,"Segoe UI",sans-serif;background:#101820;color:#e3edf6}
+  *{box-sizing:border-box}
+  body{margin:0;padding:20px 24px 32px}
+  header,main{max-width:1104px;margin:0 auto}
+  h1{font-size:19px;line-height:1.4;margin:0 0 10px;color:#ffd99d}
+  h2{font-size:15px;margin:24px 0 10px}
+  p{margin:8px 0;color:#b7cadb}
+  a{color:#92d0f1}
+  .controls{display:flex;align-items:end;flex-wrap:wrap;gap:18px;margin:18px 0 12px}
+  label{display:flex;flex-direction:column;gap:5px;font-size:13px}
+  select{font:inherit;min-width:190px;padding:6px 8px;color:#eef7ff;background:#203242;border:1px solid #61778a;border-radius:3px}
+  .check{flex-direction:row;align-items:center;padding:7px 0}
+  input{accent-color:#83cbf5}
+  #status{font-size:12px;font-variant-numeric:tabular-nums;min-height:18px}
+  .panel-row{display:grid;grid-template-columns:240px 320px 480px;gap:16px;align-items:start;width:max-content}
+  figure{margin:0}
+  figcaption{font-size:12px;margin-bottom:7px;color:#c4d6e5}
+  .inspection-stage{box-sizing:content-box;position:relative;isolation:isolate;overflow:hidden;padding:0;border:0;outline:1px solid #61778a;background-position:center;background-repeat:no-repeat;background-size:cover}
+  .inspection-stage::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(115deg,#0000 35%,#0001)}
+  .inspection-stage[data-background="dark"]{background-color:#06090e;background-image:linear-gradient(#03060de6,#03060de6),url('./backgrounds/arena.svg')}
+  .inspection-stage[data-background="light"]{background-color:#f7f8fa}
+  .inspection-stage[data-background="mixed"]{background-color:#587c8c;background-image:url('./backgrounds/racing.svg')}
+  .inspection-stage>svg{position:relative;z-index:1;display:block;width:100%;height:100%}
+  .overflow-note{font-size:12px}
+  #sourceStage{display:none}
+  @media(min-width:1152px){.overflow-note{display:none}}
+</style>
+</head>
+<body><a href="./labs.html" style="display:inline-flex;align-items:center;border:1px solid #4d7a99;background:#142b3b;color:#b4e0f8;padding:6px 10px;border-radius:7px;text-decoration:none;font:700 12px system-ui,sans-serif;margin:4px 8px 4px 0">Alle Labs</a>
+<header>
+  <h1>2D SVG source-stage inspection; WebGL raster/composite not verified</h1>
+  <p>The panels use the same <code>ControllerReference</code> SVG and moving knockout masks as the lab, with authored stroke widths and aspect ratio. Each viewport has the exact CSS dimensions shown; the SVG is fitted inside it.</p>
+  <p>Light panels remap neutral visible SVG paints using the lab’s colour rule, before rasterization. This checks the vector source and masks. It does not verify the canvas pixel threshold at overlapping colours, texture sampling, camera framing, or WebGL compositing.</p>
+  <div class="controls">
+    <label>Controller <select id="galleryLayout" aria-label="Controller"></select></label>
+    <label>Both sticks <select id="galleryPose" aria-label="Stick pose"><option value="neutral">Neutral</option></select></label>
+    <label class="check"><input id="galleryPressed" type="checkbox"> All standard controls pressed</label>
+    <a href="./reference-check.html">Single reference check</a>
+    <a href="./index.html?layout=dualsense">3D lab</a>
+  </div>
+  <p id="status" role="status">Loading SVG source…</p>
+  <p class="overflow-note">Scroll horizontally to inspect the larger panels. Their dimensions stay fixed.</p>
+</header>
+<main id="galleryPanels" aria-label="Exact-size 2D SVG inspection panels"></main>
+<div id="sourceStage" aria-hidden="true"></div>
+<script type="module" src="./gallery-2d.js"></script>
+</body>
+</html>

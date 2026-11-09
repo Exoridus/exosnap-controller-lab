@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+<defs>
+ <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#10162d"/><stop offset=".6" stop-color="#233450"/><stop offset="1" stop-color="#13242b"/></linearGradient>
+ <linearGradient id="floor" x2="0" y2="1"><stop stop-color="#193440"/><stop offset="1" stop-color="#080f1c"/></linearGradient>
+ <linearGradient id="wall"><stop stop-color="#172936"/><stop offset=".5" stop-color="#3c5664"/><stop offset="1" stop-color="#0d1927"/></linearGradient>
+ <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="12"/></filter>
+ <pattern id="grid" width="84" height="84" patternUnits="userSpaceOnUse"><path d="M84 0H0V84" fill="none" stroke="#b5e1ed" stroke-opacity=".07" stroke-width="2"/></pattern>
+</defs>
+<rect width="1920" height="1080" fill="url(#sky)"/>
+<path d="M0 485 450 325 730 428 960 414 1240 325 1510 394 1920 300V650H0Z" fill="#0a1520"/>
+<path d="M0 260 388 305 610 493V742L0 815Z" fill="url(#wall)"/><path d="M1920 202 1580 315 1350 560V750L1920 844Z" fill="url(#wall)"/>
+<path d="M550 477H1435L1920 1080H0Z" fill="url(#floor)"/>
+<path d="M550 477H1435L1920 1080H0Z" fill="url(#grid)"/>
+<path d="M0 320 365 350 592 515M1920 263 1585 353 1380 540" fill="none" stroke="#59d2e6" stroke-width="15" stroke-opacity=".55"/>
+<path d="M80 381 359 404 479 515M1840 345 1618 410 1483 535" fill="none" stroke="#50d7e8" stroke-width="31" stroke-opacity=".15" filter="url(#glow)"/>
+<path d="M730 423H1190L1255 528H663Z" fill="#263a50" stroke="#3c8ea8" stroke-width="9"/><path d="M786 451h351l31 46H757Z" fill="#0e1a29"/>
+<path d="M0 912 630 555M1920 912 1320 555M107 1080 730 554M1817 1080 1190 554" fill="none" stroke="#80aec9" stroke-opacity=".24" stroke-width="8"/>
+<path d="M100 705 630 588M1893 719 1300 600" stroke="#f070b3" stroke-width="8" opacity=".8"/>
+<path d="M104 706 630 589M1894 720 1300 600" stroke="#f06bac" stroke-width="21" opacity=".28" filter="url(#glow)"/>
+<g opacity=".82"><path d="m1570 765 180-66 170 65v132l-185 77-165-86z" fill="#253f50" stroke="#5ca5b1" stroke-width="8"/><path d="m1570 765 180 67 170-68M1750 832v138" fill="none" stroke="#7bafc8" stroke-width="7" opacity=".6"/></g>
+<g opacity=".88"><path d="m110 760 120-41 151 71v100l-142 52-129-80z" fill="#28404c" stroke="#6e8aa2" stroke-width="7"/><path d="m110 760 130 74 141-44M240 834v105" stroke="#82abc5" stroke-width="6" fill="none"/></g>
+<g transform="translate(960 535)" stroke="#e0f5fa" stroke-width="3" opacity=".75"><path d="M-20 0h12M8 0h12M0-20v12M0 8v12"/><circle r="4" fill="none"/></g>
+<g transform="translate(1265 843)"><path d="m-110 225-60-95 75-93 64-15 60-75 104-6 125 76 60 90v118Z" fill="#0c1522" stroke="#1e3f4b" stroke-width="10"/><path d="m35-28 110-24 44 86-77 47-129-46z" fill="#274254"/><path d="m140-47 64 56-34 64-42-5z" fill="#5fa9b8"/><path d="m10 45 143-21 26 32-136 41z" fill="#091823" stroke="#2b6f85" stroke-width="6"/></g>
+<g font-family="Arial,sans-serif" font-weight="bold" fill="#cfeaf0"><rect x="70" y="60" width="235" height="70" fill="#0f2034" opacity=".65" rx="8"/><text x="94" y="105" font-size="29">ARENA • 04</text><text x="87" y="1015" font-size="52">100</text><rect x="178" y="977" width="263" height="35" rx="4" fill="#142835" stroke="#6cacc1" stroke-width="4"/><rect x="186" y="985" width="216" height="19" rx="3" fill="#56d8df"/><text x="1681" y="1019" font-size="44">024 / 144</text></g>
+<rect x="1626" y="56" width="215" height="206" rx="9" fill="#081821" opacity=".68" stroke="#7a9dad" stroke-width="4"/><circle cx="1733" cy="158" r="79" stroke="#80a5b2" stroke-width="3" fill="none"/><path d="M1733 80v156M1655 158h156" stroke="#9cbfcb" stroke-opacity=".35" stroke-width="3"/><circle cx="1772" cy="127" r="8" fill="#ec81b2"/><circle cx="1691" cy="177" r="8" fill="#70dee9"/>
+</svg>
