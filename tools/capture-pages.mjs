@@ -103,7 +103,26 @@ try{
         clip:{x:Math.max(0,rect.x),y:Math.max(0,rect.y),width:rect.width,height:rect.height},
         animations:'disabled',timeout:60000});
       const sha256=createHash('sha256').update(bytes).digest('hex');
-      if(bytes.length<4000||sha256===prior)throw Error('3D player LEDs must actually change WebGL pixels: '+model+' '+name);
+      const ledDebug=await page.evaluate(()=>{
+        const lab=window.__exoPbrLab,led=lab.playerLedSurface3D;
+        const gl=lab.renderer.getContext();
+        const programs=[];
+        for(const p of lab.renderer.info.programs||[]){
+          const program=p.program,loc=program&&gl.getUniformLocation(program,'playerLedActive[0]');
+          if(!loc)continue;
+          const countLoc=gl.getUniformLocation(program,'playerLedCount');
+          const minLoc=gl.getUniformLocation(program,'playerLedFrontMinY');
+          programs.push({key:String(p.cacheKey).slice(-100),values:Array.from(gl.getUniform(program,loc)||[]),
+            count:countLoc?gl.getUniform(program,countLoc):null,
+            frontMinY:minLoc?gl.getUniform(program,minLoc):null});
+        }
+        return {mask:led?.mask,cpuValues:Array.from(led?.uniforms?.active?.value||[]),
+          cpuCount:led?.uniforms?.count?.value,uniformPrograms:programs,
+          meshVisible:led?.target?.visible,materialVersion:led?.target?.material?.version,
+          model:lab.model.model.id};
+      });
+      console.log('3D_LED_UNIFORM_DIAGNOSTIC '+JSON.stringify(ledDebug));
+      if(bytes.length<4000||sha256===prior)throw Error('3D player LEDs must actually change WebGL pixels: '+model+' '+name+' '+JSON.stringify(ledDebug));
       prior=sha256;
       images.push({file:name,modelId:model,playerMask:mask,bytes:bytes.length,sha256,
         source:'Actual WebGL2 source OBJ material LEDs; no physical LED readback'});
