@@ -54,6 +54,9 @@ function record(table,id,dimension,value){
 export function buildControlBindings(mapping,parts=[]){
   if(!mapping?.id||!Array.isArray(mapping.layers))throw Error('Invalid original controller mapping');
   const result={};
+  const clickAllowed=new Set(mapping.layers.filter(layer=>layer.role==='stick'&&
+    (layer.binding?.clickMask||layer.clickControl)).map(layer=>
+      semanticControlFrom2DLayer(layer)==='ls'?'left':'right'));
   for(const layer of mapping.layers){
     const svg={id:layer.id,file:layer.file,role:layer.role,sourceControl:layer.control??null,
       sourceClickControl:layer.clickControl??null};
@@ -80,7 +83,7 @@ export function buildControlBindings(mapping,parts=[]){
       const side=legacy==='ls'?'left':legacy==='rs'?'right':null;
       if(side){
         record(result,side+'_stick','nodes',entry);
-        if(role==='stick-cap')record(result,side+'_stick_click','nodes',entry);
+        if(role==='stick-cap'&&clickAllowed.has(side))record(result,side+'_stick_click','nodes',entry);
       }
     }else record(result,canonicalControlId(legacy),'nodes',entry);
   }
