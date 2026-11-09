@@ -154,10 +154,8 @@ async function loadFlatReferences(model){
     if(serial!==flatLoadSerial)return;
     if(!ref.svg){stage.textContent=`2D-Vorlage für ${layout.name} nicht ladbar`;return;}
     isolateReferenceIds(ref.svg,`pbr-${serial}-${index}`);
-    // Ensure a real margin around the authored full-width shell and triggers.
-    const vb=ref.svg.viewBox.baseVal;
-    const mx=vb.width*.055,my=vb.height*.035;
-    ref.svg.setAttribute('viewBox',[vb.x-mx,vb.y-my,vb.width+2*mx,vb.height+2*my].join(' '));
+    // ControllerReference.load already applies the identical shared SVG safe
+    // area to all 2D viewers and their knockout masks. Never pad twice here.
     stage.replaceChildren(ref.svg);ref.container=stage;
     ref.svg.addEventListener('dblclick',event=>{
       const entry=ref.controls.find(c=>c.stickSide&&c.group.contains(event.target));
