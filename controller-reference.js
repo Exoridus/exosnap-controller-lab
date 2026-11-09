@@ -1,7 +1,7 @@
 // Interactive 2D reference from the supplied Gamepad-Overlay artwork package.
 // This is a lab renderer, not a replacement for native GamepadSprites.
 import { semanticControlFrom2DLayer } from './controller-catalog.js';
-import {ensureSvgSafeArea} from './svg-safe-viewbox.js';
+import {ensureSvgSafeArea,paddedSvgViewBox} from './svg-safe-viewbox.js';
 import {EXO_PALETTE,stickSurfaceColor,triggerSurfaceColor} from './palette.js';
 import {appearanceCacheKey,resolve2DPaint} from './material-paint.js';
 const SVG_NS='http://www.w3.org/2000/svg';
@@ -164,7 +164,11 @@ export class ControllerReference{
     if(!sticks.length||!body)return;
     // The knockout mask must cover the padded SVG viewport too. The old
     // mapping-sized mask silently sheared half of edge strokes at x=0/right.
-    const viewBox=(svg.getAttribute('viewBox')||'').trim().split(/[\s,]+/).map(Number);
+    const attr=svg.getAttribute('viewBox');
+    // Direct unit/fixture callers may invoke installKnockouts without load().
+    // In that case use the same padded source mapping, never tight bounds.
+    const viewBox=attr?attr.trim().split(/[\s,]+/).map(Number):
+      paddedSvgViewBox(mapping.viewBox||[0,0,480,320]);
     if(viewBox.length!==4||viewBox.some(v=>!Number.isFinite(v))||viewBox[2]<=0||viewBox[3]<=0)
       throw new RangeError('Invalid safe SVG knockout bounds');
     const maskId=`ref-knockout-${mapping.id}`;
