@@ -1,6 +1,6 @@
 {
-  "revision": "edf46c18fd451519436f62d218928daa1814bbf1",
-  "capturedAt": "2026-11-09T07:42:15.477Z",
+  "revision": "2be493658395301ebf0c2f06d0177c96b9c28f9e",
+  "capturedAt": "2026-11-09T08:40:48.016Z",
   "url": "http://127.0.0.1:8792/pbr-lab.html",
   "content": "Real Three.js/WebGL2 + original controller OBJ + authored SVG",
   "looks": [
@@ -83,8 +83,8 @@
     {
       "file": "3d-final-demo-default.png",
       "scenario": "Automatic demo and collapsed controls at startup",
-      "bytes": 275685,
-      "sha256": "78718dff7da206e5a6d32be8ce767336ea9da2104aec033c318eb87672213435"
+      "bytes": 275849,
+      "sha256": "27e8ad494fe7d50c328bb1672fafaae5733d2d07f184837b8576acb000307e3a"
     },
     {
       "file": "3d-final-neutral.png",
@@ -125,8 +125,8 @@
     {
       "file": "controller-demo.webm",
       "scenario": "Real-time default controller demo",
-      "bytes": 3822102,
-      "sha256": "bd0a347d5b2c3929eaebd26db7367a6c8093fdc103bb104bb83235c85d909b0c"
+      "bytes": 3732476,
+      "sha256": "47bafe398abf1467a7427b1e2372bd56fa482bdf484f70bfc63eeb6eedc476a3"
     },
     {
       "file": "3d-final-socket-front.png",
@@ -875,8 +875,8 @@
     {
       "file": "3d-final-model-xbox360-0-neutral.png",
       "scenario": "Xbox 360 / neutral / transparency 0 / 3 backgrounds / paired production renderers",
-      "bytes": 259634,
-      "sha256": "479a39a806a8c51b2c464b1e81ec48f208622964cc76e63abad7ba5ad5c230c9"
+      "bytes": 259603,
+      "sha256": "fee7a3e0eb29be6209c3a53f234d3b220668c4ab1423ce85ab9abd7b6cd6bd2b"
     },
     {
       "file": "3d-final-model-xbox360-30-neutral.png",
@@ -1523,8 +1523,8 @@
     {
       "file": "3d-final-model-joyconleft-70-left-move.png",
       "scenario": "Joy-Con · left / left-move / transparency 70 / 3 backgrounds / paired production renderers",
-      "bytes": 201631,
-      "sha256": "a81e1cdef92feb38a0b2252c3c01b8b45cacefce06a3de37a6833fe12fe98cc4"
+      "bytes": 201589,
+      "sha256": "ee7dfb659da248e08809b58a1508f290cc3a5f62d66bf99ad1c7f0a256dd7e3f"
     },
     {
       "file": "3d-final-model-joyconleft-70-ls-click.png",
@@ -2677,16 +2677,16 @@
       "file": "3d-joycon-right-neutral.png",
       "modelId": "JoyconRight",
       "pressed": false,
-      "bytes": 226859,
-      "sha256": "52794b8633bec97397671c45d1f4fcaa3ea0b26d3752d984eac83140b4b8cb9b",
+      "bytes": 226860,
+      "sha256": "06afd33c3c23820ddb9da685464141e9d7f8ac99d0597578527bf43b10bbbc1a",
       "source": "Real WebGL/OBJ neutral material, not native Qt 3D"
     },
     {
       "file": "2d-dualsense-neutral-480.png",
       "modelId": "dualsense",
       "variant": "solid+ghost neutral",
-      "bytes": 494674,
-      "sha256": "691db6f074089611fd2e3c8935658168d9105eb27146b45b78ca76fe12ee798a",
+      "bytes": 494694,
+      "sha256": "4645192a94817b57bd1cb6bbda244375f25d197f9d3fb91f5082a758e28b9537",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
@@ -2702,7 +2702,7 @@
       "modelId": "dualsense",
       "variant": "Only L3 center pressed; neutral stick travel",
       "bytes": 69073,
-      "sha256": "bf59f4edc5571a21f00b65b711482bf20aa38c0e5819cfe7b49edd2597d94363",
+      "sha256": "af85587e5782b329c6e5b6c7d5cac99e51ec1af6abee9aa86bf85107e2d8e30c",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
@@ -2717,16 +2717,16 @@
       "file": "2d-dualsense-trigger-100.png",
       "modelId": "dualsense",
       "variant": "L2/R2 100%, rendered surface",
-      "bytes": 71360,
-      "sha256": "9353627dd925eb97cf0c9fbcd59e82f7ad121a85d8373c69f273268a0b1af84c",
+      "bytes": 71359,
+      "sha256": "5d7d069339668ed6784a0f66967c53b9cea7c40b92458f024c5dd187388ab4e3",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
       "file": "2d-dualsense-stick-ring.png",
       "modelId": "dualsense",
       "variant": "100% motion + L3/R3",
-      "bytes": 499640,
-      "sha256": "01207c562e6f1de042f6279e9cb1f83d8cfeb65fd10e4d250024db0ebbd28681",
+      "bytes": 499642,
+      "sha256": "29f7970c752fa5e6aaca77867d135548cf5d80128f97e0fe203878960a7da3e0",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
@@ -2741,24 +2741,24 @@
       "file": "2d-dualsense-stick-click.png",
       "modelId": "dualsense",
       "variant": "L3/R3 click with zero stick movement",
-      "bytes": 501010,
-      "sha256": "0cd36fe4215e7542eb36eaa3d23a0b8c7ba8485ed29e37ef85d72f71c6aa7a47",
+      "bytes": 501054,
+      "sha256": "77e3019f76d9211666d1cca0ca87598aa456a508164e3e2366ee0beb71baac4c",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
       "file": "2d-dualsense-face-symbols-on.png",
       "modelId": "dualsense",
       "variant": "face symbols on; faces pressed",
-      "bytes": 500756,
-      "sha256": "8db53a214ecdf63025253950fdb8ea74ec4623a01209b56234493d82cf836737",
+      "bytes": 500833,
+      "sha256": "35aab7b873f2e048da1c6aca4e9c762dbd92918e094fb06e05ed79ee2288c71b",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
       "file": "2d-dualsense-face-symbols-off.png",
       "modelId": "dualsense",
       "variant": "face symbols off; faces pressed",
-      "bytes": 495581,
-      "sha256": "7d25308edf834e57a20d605141afc4722654c34519a5601170ab0eba851e80ba",
+      "bytes": 495590,
+      "sha256": "3b81aa78be2a418e327a5bee9ce90eba366ae43b046e29a1cea8878aa27cc102",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
@@ -2781,32 +2781,32 @@
       "file": "2d-xbox-series-solid-pressed.png",
       "modelId": "xbox_series",
       "variant": "White moving annulus + readable labels, bounded shoulder",
-      "bytes": 58874,
-      "sha256": "84f7a53a38d060307b2f9e7d8acd5edf00d2c6dc55034610fc2e05345b43d17a",
+      "bytes": 59114,
+      "sha256": "647b5bb4ed0f46092079d399c3823031c1c1598d11d910dedf3542c8c34ad505",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
       "file": "2d-xbox-series-light.png",
       "modelId": "xbox_series",
       "variant": "Light",
-      "bytes": 440998,
-      "sha256": "2d246a91aa1eff93b3793794a17cd4f1852a330ec89ac1012a13ae73e8de9b18",
+      "bytes": 440952,
+      "sha256": "161e1f4d6f9533ba868af91e89aa8ddfb1153f7662d506a6fcff20e251bc2a84",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
       "file": "2d-dualshock4-auto.png",
       "modelId": "dualshock4",
       "variant": "Auto light",
-      "bytes": 472880,
-      "sha256": "10c2997141ddab20ba56ee42b2a39dc4d74c3aab0e35d517c1a3cfd9fd6f57f3",
+      "bytes": 472884,
+      "sha256": "67d464f3395e7a68db8e46d4066569d4c1a5c833d6dfcf04831b5bf7334f33b7",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
       "file": "2d-dualshock4-dark.png",
       "modelId": "dualshock4",
       "variant": "Dark",
-      "bytes": 466141,
-      "sha256": "ae47eabbb0c0f3e2e99822adca72755993bcad90a8d344f4a5e833bd4e66b45f",
+      "bytes": 466236,
+      "sha256": "31c1ac4944f4a158c11e530fba2212f815e620284afdc5b3b89b8ea48387e086",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
@@ -2837,8 +2837,8 @@
       "file": "2d-edge-dark-off.png",
       "modelId": "dualsense",
       "variant": "dark Ghost edge light 0% / shadow 0%",
-      "bytes": 99007,
-      "sha256": "9a2de5d4fa1450d4486db7b0b3f353debdc4ab850f456dd08386e29307e75ea3",
+      "bytes": 98970,
+      "sha256": "c24e2dfc6d166a8beaab74807e5ec185b56af78ad18560a169d026f4df7b6414",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
@@ -2870,7 +2870,7 @@
       "modelId": "dualsense",
       "variant": "light Ghost edge light 0% / shadow 0%",
       "bytes": 39542,
-      "sha256": "c987bab9e7ead83e9780cda7137b6d1affd968d58e69808cc964438bb3f2ff86",
+      "sha256": "5cbc352e0b0ef5f029077560619c6383ca513999973fc0c52306df60a10cc76e",
       "source": "Chromium authored SVG; not native Qt/D3D11"
     },
     {
