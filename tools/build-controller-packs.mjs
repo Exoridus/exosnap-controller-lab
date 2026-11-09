@@ -170,6 +170,6 @@ if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.ur
   const models=readOpt('--models')?.split(',').map(s=>s.trim()).filter(Boolean)||null;
   const {directory,catalog}=await buildControllerPacks({
     destination:readOpt('--out')||undefined,modelIds:models});
-  console.log('Controller packs: '+catalog.packs.length+' generated at '+directory);
-  console.table(catalog.packs.map(({id,has2D,has3D,controls,svgLicense})=>({id,has2D,has3D,controls,svgLicense})));
+  console.log('Controller packs: '+catalog.length+' generated at '+directory);
+  console.table(catalog.map(({id,has2D,has3D,controls,svgLicense})=>({id,has2D,has3D,controls,svgLicense})));
 }
