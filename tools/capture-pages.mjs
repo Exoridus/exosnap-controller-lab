@@ -368,6 +368,48 @@ try{
   }
   await capturePolish('2d-dualsense-neutral-480.png','dualsense','solid+ghost neutral');
 
+  // A real Chromium geometry+stroke safety gate, not just unchanged SVG markup.
+  // Source viewBoxes touch some housing outlines on x=0/right; the SAME inset
+  // and knockout mask must preserve both complete sides at all 3 panel sizes.
+  const edgeLayouts=['dualsense','dualshock4','xbox_one','xbox_360','generic',
+    'switch_pro','joycon_grip','joycon_left','joycon_right','gamecube'];
+  for(const layout of edgeLayouts){
+    await select2D('layout',layout);
+    for(const [width] of sizes){
+      await select2D('size',String(width));
+      const measurements=await polish.evaluate(()=>{
+        return window.__exo2DPolish.refs.map(({reference,stage,mode,scene})=>{
+          const svg=reference.svg;
+          const outline=svg.querySelector('[id$="-outline-strong"]');
+          if(!outline)return {mode,scene,error:'Missing source outer silhouette'};
+          const box=outline.getBoundingClientRect(),frame=stage.getBoundingClientRect();
+          const vb=svg.viewBox.baseVal;
+          const maskAttr=reference.bodyShape?.getAttribute('mask')||'';
+          const maskId=maskAttr.match(/^url\(#([^)]*)\)$/)?.[1]||null;
+          const mask=maskId?svg.querySelector('#'+CSS.escape(maskId)):null;
+          const m=mask?['x','y','width','height'].map(name=>Number(mask.getAttribute(name))):null;
+          const maskValid=maskId?Boolean(m&&[vb.x,vb.y,vb.width,vb.height]
+            .every((value,index)=>Math.abs(value-m[index])<1e-6)):true;
+          return {mode,scene,stroke:parseFloat(getComputedStyle(outline).strokeWidth)||0,
+            padLeft:box.left-frame.left,padRight:frame.right-box.right,
+            padTop:box.top-frame.top,padBottom:frame.bottom-box.bottom,
+            maskValid,masked:Boolean(maskId),safe:svg.getAttribute('data-exo-padded-viewbox')==='1'};
+        });
+      });
+      const bad=measurements.filter(m=>m.error||!m.safe||!m.maskValid||
+        [m.padLeft,m.padRight,m.padTop,m.padBottom].some(value=>!Number.isFinite(value)||value<2.0));
+      if(bad.length)throw Error('Clipped authored SVG silhouette at '+layout+' '+width+
+        'px: '+JSON.stringify(bad));
+      if(width===320&&['dualsense','switch_pro','generic','gamecube'].includes(layout))
+        await capturePolish('2d-safe-outline-'+layout+'-320.png',layout,
+          'real SVG front outline with symmetrical margins, no cropped left/right stroke',
+          '.stage[data-look="ghost"][data-scene="light"]');
+    }
+  }
+  await select2D('layout','dualsense');
+  await select2D('size','480');
+  await ready2D('dualsense');
+
   // Direct free-XY pointer movement must shift the SAME SVG stick layer in
   // all six panels, without implicitly pressing L3/R3.
   const dragTarget=polish.locator('.stage[data-look="solid"][data-scene="dark"] [id$="-stick-l-cap-top"]');
