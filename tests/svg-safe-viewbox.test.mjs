@@ -32,14 +32,14 @@ test('safe-area is idempotent even across multiple viewer integrations',()=>{
   assert.deepEqual(ensureSvgSafeArea(mock),first,'viewBox cannot be padded a second time');
   assert.equal(values.get('data-exo-padded-viewbox'),'1');
   assert.equal(first[2],250*(1+2*.055));
-  assert.equal(first[3],160*(1+2*.035));
+  assert.ok(Math.abs(first[3]-160*(1+2*.035))<1e-9);
 });
 
 test('every 2D entry point shares the same source SVG padding and matching knockout mask',async()=>{
   const controller=await source('controller-reference.js');
   const pbr=await source('pbr-lab.js');
   assert.match(controller,/ensureSvgSafeArea\(adopted\)/);
-  assert.match(controller,/const viewBox=\(svg\.getAttribute\('viewBox'\)/);
+  assert.match(controller,/const viewBox=attr\?attr\.trim\(\)/);
   assert.match(controller,/maskUnits:'userSpaceOnUse'/);
   assert.match(controller,/x:viewBox\[0\],y:viewBox\[1\],width:viewBox\[2\],height:viewBox\[3\]/);
   assert.doesNotMatch(pbr,/ref\.svg\.setAttribute\('viewBox'/,'3D Lab must not apply a second per-view SVG pad');
