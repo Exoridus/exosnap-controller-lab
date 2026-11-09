@@ -29,7 +29,11 @@ export async function verifySvgSafeEdges(browser,{base,output,images}){
             const svg=reference.svg;
             // Joy-Con Right has a body outline group rather than an
             // outline-strong ID. No synthetic geometry may be substituted.
-            const outline=svg.querySelector('[id$="-outline-strong"]')||reference.bodyShape;
+            // The Generic SVG also has a <clipPath id="seam-outline-strong">
+            // inside <defs>. A global suffix selector accidentally finds
+            // that invisible definition before the real housing outline.
+            const outline=reference.bodyShape?.querySelector('path[id$="-outline-strong"]')||
+              reference.bodyShape;
             if(!outline)return {mode,scene,error:'Missing authored outside contour'};
             const box=outline.getBoundingClientRect(),frame=stage.getBoundingClientRect();
             // Compare authored attribute values, not the float32 SVGRect DOM API.
