@@ -1,48 +1,99 @@
-# ExoSnap Controller Lab — Abschlussvergleich
+# ExoSnap Controller Lab
 
-[Lab öffnen](https://exoridus.github.io/exosnap-controller-lab/pbr-lab.html) · [Bildnachweise und Verlauf](https://exoridus.github.io/exosnap-controller-lab/screenshots.html) · [Qt-Handoff und genaue Parameter](docs/CONTROLLER_CONSOLIDATION.md)
+[Controller-Lab öffnen](https://exoridus.github.io/exosnap-controller-lab/pbr-lab.html) · [Screenshots](https://exoridus.github.io/exosnap-controller-lab/screenshots.html) · [Qt-Handoff](docs/CONTROLLER_CONSOLIDATION.md)
 
-Das Lab zeigt eine Original-3D-Darstellung mit weißem Aktivfeedback und eine unabhängige transparente 2D-Ansicht. Jede Reihe hat drei Hintergründe: dunkel, hell und gemischt.
+**Ziel:** Ein gemeinsamer Input-Vertrag für 2D und 3D, aber zwei jeweils passende Qt-Renderpfade. Freigegebene visuelle Basis: **PR #14**; die GameCube-Experimente #15/#16 sind nicht enthalten.
 
-## Finaler Stand
+## 2D, 3D und Qt Quick
 
-**Demo ON · Markings ON.** Die Lab startet mit synchronisierten 2D-/3D-Eingaben und mechanischen Buttons/Triggern. Material- und Debug-Regler sind eingeklappt. Der 2D-Ring ist eine Aktivfläche; der Mittelteil zeigt unabhängig L3/R3. [Umsetzung, Artefaktquellen und Abnahme](docs/FINAL_POLISH.md).
+| | 2D | 3D |
+|---|---|---|
+| Bearbeitbare Quelle | Ein vollständiges `source.svg` | Original-OBJ-Meshes und `info.json` |
+| Bedienelemente | Benannte SVG-Gruppen; daraus generierte `elements/*.svg` | Separat benannte Meshes und Nodes mit eigenen Pivots |
+| Austauschpaket | SVG + `mapping.json` + `controls.json` | **Eine `model.glb` pro Grundmodell** + `rig.json` |
+| Qt-Laufzeit | Ein vorberechneter Sprite-Atlas + Elementdaten | Balsam-importierte Qt-Meshes + erhaltene Rig-Hierarchie |
+| Eingang | **Kanonischer GamepadState** | **Derselbe GamepadState** |
+| Pro Frame | Atlas-Elemente einfärben und verschieben | Pivots/Materialparameter aktualisieren; keine Vertex-Neuberechnung |
 
-## Start und Bedienung
+Ein GLB ist **nicht** ein einziges starres Mesh. Es kann viele unabhängig bewegbare Nodes enthalten, z. B. beide Sticks, vier Face-Tasten, D-Pad, Trigger, Menü, Housing und Touchpad.
 
-Node.js ≥ 20: `npm ci`, danach `npm start`. Unter Windows kann `start.cmd` verwendet werden. `http://127.0.0.1:8792/` öffnet `pbr-lab.html`; die freigegebenen Modelle und die HDR-Lichtprobe liegen im Repository.
+## Controller-Pakete erzeugen
 
-- **3D · Weiß:** Eine einzige, quelldatengetreue 3D-Reihe mit weißem Aktivfeedback. Die frühere Blauweiß-Vergleichsreihe wurde entfernt.
-- **Materialmix — nur 3D:** 0 % bewahrt die deckende Darstellung; 100 % reduziert das Gehäuse auf 0,10 und neutrale Eingabeflächen auf 0,25 Alpha. Die 2D-Reihe bleibt unverändert. Neutrale 3D-Tasten behalten am Ghost-Endpunkt 16 % ihrer ursprünglichen RGB-Farbigkeit, ohne Alpha-Änderung.
-- **2D — Transparent:** Original-SVG-Pfade, neutrale Eingabeflächen mit 0,30 Alpha und aktive weiße Flächen mit 0,96. Äußere und innere Gehäusekonturen, Controls und Symbole haben dieselbe Farbregel pro Hintergrund. Auf Hell und Gemischt erscheinen graue statt schwarze Zusatzkonturen. Alle 2D-Viewer verwenden denselben symmetrischen `viewBox`-Sicherheitsrand und gleich große, erweiterte Stick-Aussparungsmasken; weder äußere Linien noch linke/rechte Konturhälften werden durch den ursprünglichen engen Quellrahmen beschnitten. Verzierungen erhalten kein Eingabefeedback.
-- **Eingaben:** Einzelne Tasten, beide analogen Trigger, Stick-Bewegung, L3/R3, alle Tasten oder ein Standard-Gamepad lassen sich vergleichen. Die 2D-Sticks können direkt gezogen werden; Bewegung und Klick bleiben unabhängig.
-- **Kamera und Größe:** Gemeinsame Kameraposition für 3D; 240, 320 oder 480 Pixel pro Feld. Das Mausrad über 2D/3D zoomt, Shift + Mausrad scrollt horizontal. Das 2D-SVG folgt dem Zoom, bleibt aber frontal.
-- **Aktivfarben & Qt-Parameter:** Eigene Farben für 2D/3D mit optionaler Kopplung; Sync ist standardmäßig aktiv. Der Download enthält die tatsächlich gewählten Parameter und benennt offene native Arbeit. Eine subtile 3D-Außenkontur lässt sich im eingeklappten Darstellungsbereich für A/B-Vergleiche abschalten.
+Die originalen editierbaren Dateien bleiben unter `references/controllers/<layout-id>/` (2D) und `assets/<ModelId>/` (3D). Der Builder bearbeitet sie nicht.
 
-## Darstellung und Ressourcen
+~~~bash
+npm ci
+npm run build:controller-packs
+npm run build:controller-packs -- --models dualsense,dualshock4,gamecube,generic
+npm run build:controller-packs -- --out .workspace/my-controller-packs
+~~~
 
-Sichtbare Trigger werden nicht mehr anhand eines Kamerawinkels vollständig ausgeblendet. Der Tiefentest entscheidet über ihre sichtbaren Teile. Verdeckte Schultertasten erhalten gestrichelte Konturen mit dunkler Gegenkontur und eigenem Eingabefeedback. Die bewegliche Stick-Hierarchie kippt Kappe und Schaft gemeinsam in die angezeigte Richtung. Face-, quellgetreue materialgebundene D-Pad-Prägungen kommen aus den originalen SVG-Pfaden.
+Standardziel: `.workspace/controller-packs/` (gitignored). GitHub Actions stellt die Pakete zusätzlich als separates Download-Artefakt bereit; die generierten GLBs werden nicht als zweite manuell gepflegte Quelle ins Git-Repository eingecheckt.
 
-Ein originales Rig, ein WebGL-Kontext, eine Kamera und eine HDR-Probe versorgen die Ansicht. Das Modell wird einmal gerendert; dieselbe GPU-Textur wird auf die drei Hintergründe gelegt. Änderungen werden bedarfsgesteuert gezeichnet. Ein 3D-Materialwechsel zeichnet das unveränderte 2D-SVG nicht neu.
+~~~text
+.workspace/controller-packs/
+├── catalog.json
+├── dualsense/
+│   ├── source.svg         # Original, vollständig editierbar
+│   ├── mapping.json       # Original einschließlich nativer Zusatzfelder
+│   ├── elements/          # Aus den SVG-Gruppen erzeugt
+│   │   ├── body.svg
+│   │   ├── btn-cross.svg
+│   │   └── ...
+│   ├── model.glb          # Komplettes Modell mit vielen benannten Nodes
+│   ├── rig.json           # Nodes, Pivots, Mechanik, Control-Zuordnung
+│   ├── controls.json      # Gemeinsames 2D/3D-Control-Mapping
+│   └── manifest.json      # Version, Lizenzen, Herkunft, SHA-256
+└── gamecube/
+    └── ...
+~~~
 
-`shareEquivalentControlGeometry` teilt nur exakt nachgewiesene Geometrien und erhält individuelle Materialien und Bewegungen. Gemeinsame Buffer sparen Speicher; kompatible Stick-Instanzen sparen zusätzlich Draw Calls. Unterschiedliche Eingabe-/Materialzustände wechseln für das betroffene Paar zu getrennten Meshes. `node tools/audit-geometry-reuse.mjs --json` gibt die tatsächlichen Einsparungen pro Modell aus. Face- und D-Pad-Teile werden nicht aufgrund bloßer Ähnlichkeit vereinheitlicht.
+**Lizenzgrenzen:** Fehlt ein freigegebenes 3D-Modell, gibt es nur das 2D-Paket. Die WaveBird besitzt bisher keine passende 2D-Vorlage. Generic nutzt das freigegebene Xbox-One-Rig mit generischen Bedienelementen. SVG- und OBJ-Lizenzen sind getrennt: Beim GameCube stammt das 2D-Artwork aus GPL-3.0-only, das 3D-Quellmesh aus MIT. Die vollständigen Quellen und [Lizenznachweise](THIRD_PARTY_NOTICES.md) bleiben erhalten.
 
-Der Qt-Port verwendet einen kleinen, rendererneutralen Materialvertrag. Das Lab installiert keinen zusätzlichen Fresnel-Patch auf den PBR-Materialien. Die verdeckten Linien und der Hintergrund-Compositor benötigen dennoch eine eigene native Umsetzung und Bildprüfung; `nativeValidated` bleibt `false`. Details stehen im [aktuellen Handoff](docs/CONTROLLER_CONSOLIDATION.md).
+## Ein Control-Vertrag, zwei Darstellungen
 
-## Nintendo-Spieler-LEDs: nur Anzeige
+Nur der ExoSnap-Host liest SDL3/GameInput und liefert den aktuellen `GamepadState`. Weder SVG noch GLB noch QML öffnen selbst einen zusätzlichen Controller-Provider. `controller-pack-contract.js` übersetzt die bestehenden Browser-IDs, ohne die nativen Mappings zu überschreiben.
 
-Die Lab nutzt die vorhandenen Original-SVG-LEDs von Switch Pro und Joy-Con-Grip **auch auf der 3D-Oberfläche**. Die LED-Kästchen werden aus der 2D-Vorlage in den PBR-Shader der vorhandenen 3D-Gehäuseflächen projiziert; sie sind weder schwebende Rechtecke noch neue Meshes. Standard ist **Demo P1**. P1 bis P8 können manuell für das Overlay gewählt werden. Bei Joy-Con-Grip zeigen beide Seiten denselben Anzeigeindex. **Auto** zeigt nur dann einen tatsächlichen Spielerindex, wenn ein ausdrücklich angebundener Provider diesen verlässlich liefert; andernfalls erscheinen keine aktiven LEDs. Die Browser-Gamepad-Enumeration ist keine Spielerzuordnung und wird nicht als solche ausgegeben. Diese Browser-Lab liest keine physischen LED-Zustände und ändert keine Hardware-Einstellungen.
+| Control-ID | 2D | 3D |
+|---|---|---|
+| `south` | Kreuz/A/B je Layout einfärben | Physische südliche Taste bewegen/einfärben |
+| `dpad_up` | Oberen D-Pad-Sektor aktivieren | Oberen D-Pad-Node bewegen |
+| `left_stick` | Ring bei X/Y-Bewegung aktivieren | Stick-Pivot entlang zweier Achsen neigen |
+| `left_stick_click` | Kappenmitte separat aktivieren | Nur bei Klickfähigkeit L3 herunterdrücken |
+| `left_trigger` | Füllung entsprechend dem Druck | Trigger proportional neigen/verschieben |
+| `player_index` | Native LED-Maske | Material-LED aus vertrauenswürdiger Provider-Zuordnung |
 
-ExoSnap nutzt auf `next` aktuell GameInput v4; die SDL3-Migration läuft separat in [ExoSnap PR #530](https://github.com/Exoridus/exosnap/pull/530). Der Lab-Draft implementiert daher keinen nativen Controller-Provider.
+`b1/b2/b3/b4` sind die Übergangs-IDs für `south/east/west/north`. Die bisherigen `ls/rs` bedeuten **Stick-Klick**, nicht Analogbewegung. X/Y-Achsen bleiben separat. `player_index` ist ein Metadatum und bleibt `null`, solange keine verlässliche Provider-Zuordnung vorliegt; der Browser-`Gamepad.index` zählt **nicht** als Spielerindex.
 
-Die äußere 3D-Kante wird nur nach dem fertigen Controller-Render aus dessen Alpha im vorhandenen GPU-Compositor sehr dezent betont (etwa eine Bildschirmpixel breite Kante, abgeschwächtes Grau statt hartem Weiß). Zusätzlich gibt es eine einzelne GPU-Linienzeichnung ausschließlich für echte Gehäuse-Innenfalten: nur zusammenhängende, nicht-koplanare Originalflächen, keine Wireframe-Diagonalen und keine Kanten einzelner Bedienknöpfe. Beim Materialmix nimmt die Deckkraft von 26 % (Solid) kontinuierlich auf 0 % (Ghost) ab. Die einzelnen Meshes bekommen keine neuen Konturen; Innennähte und transparente Überdeckungen bleiben der ursprünglichen Darstellung vorbehalten. Technische Einzelheiten und Qt-Nicht-Parität stehen in [Final 3D Polish](docs/FINAL_3D_POLISH.md).
+Das ursprüngliche `mapping.json` wird bytegenau mitgeliefert, einschließlich der ExoSnap-Erweiterungen `control` und `clickControl`. `controls.json` und `rig.json` sind erzeugte Übersetzungsschichten, keine neuen Quellen, die getrennt gepflegt werden müssten.
 
-## Prüfung und Veröffentlichung
+## Qt Quick 3D
 
-`npm run verify` prüft Syntax und die vollständige Node-Suite. `tools/capture-pages.mjs` erzeugt echte Chromium-WebGL2-/SVG-Bilder und prüft zusätzlich Mix-Unabhängigkeit, einzelne verdeckte Eingaben, Originalsymbole, Kamerapositionen und Aktivfarben. Zusätzlich prüft die echte Browser-Abnahme Demo, mechanische Druckbewegung, Oberflächentexturen und den globalen Markings-Schalter und zeichnet eine Demo als WebM auf. Ein Fehler verhindert die Pages-Veröffentlichung. Bilder sind Rendernachweise; die finale ästhetische Auswahl trifft der Nutzer.
+Qt 6.12+ kann das GLB mit `QtQuick3D.AssetUtils.RuntimeLoader` laden. `qt-quick3d-port/ControllerPackRuntime.qml` zeigt das einmalige Auflösen benannter Pivots und deren Bewegung per gemeinsamem Input-Frame. Für eingebettete Produktionsmodelle ist ein **Buildzeit-Import über Balsam** effizienter.
 
-Der Workflow `.github/workflows/pages-and-screenshots.yml` archiviert erfolgreiche Aufnahmen dauerhaft im Branch `visual-history` unter ihrer Quell-SHA und veröffentlicht anschließend Pages. Der Arbeitsbranch führt alle Prüfungen mit Artefakten aus. GitHub Pages wird aufgrund der vorhandenen Umgebungsschutzregeln nur durch eine freigegebene Übernahme nach `main` veröffentlicht. Siehe auch [Pages-Setup](GITHUB_PAGES_SETUP.md).
+~~~bash
+balsam --outputPath qt-generated .workspace/controller-packs/dualsense/model.glb
+~~~
 
-**Modelle und Lizenzen:** Der sichtbare Generic Pro verwendet nun das bereits freigegebene MIT-Xbox-One-Rig (`XboxOneClean`) als markenlosen 3D-Proxy, kombiniert mit dem unveränderten generischen 2D-Layout. View/Home/Menu bleiben auf ihren echten Quell-Kappen; eine vierte Share-Kappe ist eine Geometriekopie derselben kleinen physischen Taste. Die vier Oberflächensymbole kommen direkt aus dem Generic-SVG, darunter das Häuschen statt eines Xbox-Logos. Die alten 23 eigenen Generic-OBJ-Teile bleiben ausschließlich als Archiv-/Vergleichsressource erhalten. Nur freigegebene Kernmodelle sind auswählbar; Xbox Series / Steam Controller 2026 werden nicht als freigegebene 3D-Modelle ausgegeben. Lizenzprüfung und Originaldateien bleiben Bestandteil des Repositories.
+Das erzeugt Qt-Quick-3D-Meshes und QML. Die beweglichen Nodes dürfen nicht durch `--preTransformVertices` flach zu einem starren Mesh werden. `rig.json` beschreibt Pivots und Eingaben für die native Anbindung.
 
-Die technische ältere Vorschau bleibt unter `index.html?layout=dualsense` erreichbar. Frühere Vergleichsrezepte sind erhalten; ihre Beschreibung steht in den [historischen v39/v40-Notizen](docs/ARCHIVE_V39_V40.md).
+**Noch nicht gleichbedeutend mit nativer ExoSnap-Parität:** Ghost-Material, Tiefen-/Occlusion-Regeln, Oberflächenbeschriftung, Nintendo-LEDs und der Screen-Space-Alpha-Edge-Compositor benötigen native Shader-/Materialarbeit und Bildprüfung. `nativeQtValidated` bleibt `false`. Der vorhandene Qt-Probe-Renderer ist kein fertiger ExoSnap-Port.
+
+## Topologie: vereinfachen ohne Qualitätsverlust
+
+Der GLB-Exporter lässt **alle Originaldreiecke, Wicklung, Normalen, UVs und beweglichen Nodes** erhalten. Er erzeugt nur einen Indexbuffer durch Zusammenführen exakt identischer Vertex-Tupel. Es gibt **keine automatische Dezimierung**, kein glattes Re-Meshing und keine nachträgliche Änderung von Griffkonturen oder Tastenformen.
+
+Im Browser-Lab existieren bereits konservative Optimierungen (exakt bewiesene gemeinsame Geometrie-Buffer, kompatible Stick-Instanzen, vorsichtiges Housing-Batching). Ein Buffer-Reuse ist nicht automatisch ein Draw-Call-Gewinn.
+
+~~~bash
+node tools/audit-geometry-reuse.mjs --json
+npm run verify
+~~~
+
+Die Tests prüfen Paket-Determinismus, Hashes, Geometriezahl, Node-Namen, Capabilities und Input-Semantik. In der CI folgen WebGL-Browseraufnahmen, Qt-Proben und die Pages-Prüfung. Die **visuelle Qt-Quick-Abnahme am Zielbackend** ist weiterhin erforderlich.
+
+## Lab benutzen
+
+`npm start` öffnet die Lab unter `http://127.0.0.1:8792/`. 2D- und 3D-Controller teilen sich Demo, Live-Gamepad, einzelne Buttons, Trigger, Stick-Bewegung und Klick. Drei Hintergründe, ein Materialmix nur für 3D, Kamerawinkel und 240/320/480-Pixel-Kacheln dienen der visuellen Kontrolle. Eingabefarbe und Darstellung bleiben unabhängig einstellbar.
+
+Aktuelle technische Details: [Controller Consolidation](docs/CONTROLLER_CONSOLIDATION.md), [Visual Finish / Qt-Gate](docs/VISUAL_FINISH_QT_GATE.md), [Quellen/Lizenzen](references/SOURCE_README.md). Historische Prototypen und gelöschte Zwischenberichte sind über die Git-Historie verfügbar.

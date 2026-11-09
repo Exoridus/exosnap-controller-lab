@@ -29,6 +29,16 @@ jobs:
         run: |
           node download-assets.mjs
           node tools/verify-licensed-assets.mjs
+      - name: Build deterministic native controller interchange packs
+        run: npm run build:controller-packs -- --out .workspace/controller-packs
+      - name: Attach Qt 2D/GLB controller packs
+        uses: actions/upload-artifact@v4
+        with:
+          name: controller-packs-${{ github.sha }}
+          path: .workspace/controller-packs/
+          retention-days: 90
+          if-no-files-found: error
+          include-hidden-files: true
       - name: Vendor cleared controller assets into the repository
         run: |
           git config user.name 'github-actions[bot]'
