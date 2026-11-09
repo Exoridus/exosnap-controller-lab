@@ -508,7 +508,10 @@ function filterNode(name,attrs={}){
   return node;
 }
 function paintEdgeRelief(reference,mode,scene,edgeLight,edgeShadow){
-  const outline=reference.svg.querySelector('[id="outline-strong"],[id$="-outline-strong"]');
+  // Some sources (notably Generic) also contain <clipPath> definitions named
+  // "*-outline-strong" in <defs>. Never attach visible border relief to an
+  // invisible definition; only the physical source body path is the contour.
+  const outline=reference.bodyShape?.querySelector('path[id="outline-strong"],path[id$="-outline-strong"]');
   if(!outline)return;
   const p=edgeReliefProfile(mode,scene,edgeLight,edgeShadow);
   const remove=()=>{
