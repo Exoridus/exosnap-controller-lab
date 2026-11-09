@@ -1,0 +1,105 @@
+name: Emergency Pages branch fallback
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/pages-branch-fallback.yml'
+  workflow_dispatch:
+
+# The Pages deployment API has been returning an empty status and timing out.
+# Publish the already QA-verified, successfully built site as a normal branch.
+# The repository owner can switch Settings > Pages > Source to this branch.
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Download exact green Pages artifact from PR 12 merge
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 42555000798
+          name: github-pages
+          github-token: ${{ github.token }}
+          path: .pages-artifact
+
+      - name: Recover fully built site without recomputing renderer output
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/pages-built"
+          tar -xf .pages-artifact/artifact.tar -C "$RUNNER_TEMP/pages-built"
+          test -f "$RUNNER_TEMP/pages-built/pbr-lab.html"
+          test -f "$RUNNER_TEMP/pages-built/pbr-lab.js"
+          test -f "$RUNNER_TEMP/pages-built/generic-xbox-proxy.js"
+          test -f "$RUNNER_TEMP/pages-built/interior-housing-contours.js"
+          test -f "$RUNNER_TEMP/pages-built/assets/XboxOneClean/info.json"
+          test -f "$RUNNER_TEMP/pages-built/.nojekyll"
+
+      - name: Keep linked screenshots, archive full visual evidence separately
+        env:
+          SITE: ${{ runner.temp }}/pages-built
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import os,re
+          site=Path(os.environ['SITE'])
+          shots=site/'screenshots'
+          # All original full-resolution evidence stays in Actions artifacts
+          # 13647241470 and the permanent 'visual-history' branch.
+          links=set()
+          for file in site.glob('*.html'):
+              links.update(re.findall(r'[/]screenshots/([\w.-]+\.(?:png|webm))',file.read_text(encoding='utf-8'),re.I))
+          links|={'latest.png','pressed.png','gamecube.png','generic.png','generic-pressed.png',
+                  '3d-final-model-genericpro-mix0-front-neutral.png',
+                  '3d-final-model-genericpro-mix70-front-neutral.png',
+                  '3d-final-model-genericpro-mix100-front-neutral.png',
+                  '3d-final-model-genericpro-mix70-angled-neutral.png',
+                  'controller-demo.webm'}
+          missing=sorted(name for name in links if not (shots/name).is_file())
+          if missing: raise RuntimeError('HTML screenshot reference missing in original verified artifact: '+str(missing))
+          count=0
+          for file in shots.iterdir():
+              if file.suffix.lower() in ('.png','.webm') and file.name not in links:
+                  file.unlink()
+                  count+=1
+          print('Pruned only unlinked PNG/WebM files:',count)
+          print('Kept screenshot links:',len(links))
+          print('Verified source files:',sum(1 for p in site.rglob('*') if p.is_file()))
+          print('Fallback site size MiB:',round(sum(p.stat().st_size for p in site.rglob('*') if p.is_file())/1048576,2))
+          PY
+
+      - name: Publish static site to dedicated pages-fallback branch
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          site="$RUNNER_TEMP/pages-built"
+          checkout="$RUNNER_TEMP/pages-fallback-branch"
+          mkdir -p "$checkout"
+          cd "$checkout"
+          git init --initial-branch=pages-fallback
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git ls-remote --exit-code origin refs/heads/pages-fallback >/dev/null; then
+            git fetch --depth=1 origin refs/heads/pages-fallback
+            git checkout -B pages-fallback FETCH_HEAD
+            git rm -r -q --ignore-unmatch .
+          fi
+          cp -a "$site/." "$checkout/"
+          test -f .nojekyll
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish verified Controller Lab ${GITHUB_SHA:0:12} to fallback Pages branch [skip ci]"
+            git push origin HEAD:refs/heads/pages-fallback
+          fi
+          git rev-parse HEAD
