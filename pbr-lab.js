@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {loadStudioEnvironment} from './hdr-probe.js';
 import {CONTROLLERS,CONTROL_IDS,isLicensedModel} from './models.js';
+import {controllerPresentationModel,prepareGenericCenterControls} from './generic-xbox-proxy.js';
 import {layoutForModel} from './controller-catalog.js';
 import {ControllerReference,isolateReferenceIds} from './controller-reference.js';
 import {prepareGhostOcclusion,setRearHintViewport,hideOccludedRearControls} from './ghost-depth-policy.js';
@@ -395,8 +396,9 @@ async function loadModel(id){
   setStatus(`Lade ${model.name} aus echten OBJ-Dateien …`);
   document.body.dataset.renderReady='loading';
   try{
-    const next=await loadNativeRig(model);
+    const next=await loadNativeRig(controllerPresentationModel(model));
     if(serial!==modelLoadSerial){disposeNativeRig(next);return;}
+    prepareGenericCenterControls(next);
     next.geometryReuse=shareEquivalentControlGeometry(next);
     prepare3DPlayerLedSurface(next);
     next.optimization=optimizeStaticHousing(next);
@@ -414,7 +416,9 @@ async function loadModel(id){
     state.scene.add(next.group);
     await loadFlatReferences(model);
     if(serial!==modelLoadSerial)return;
-    $('modelInfo').textContent=`${next.partCount} Originalteile · ${Math.round(next.triangles).toLocaleString('de-DE')} Quell-Dreiecke · ${next.optimization.savedCalls} statische Calls gespart`;
+    $('modelInfo').textContent=next.model.genericProxy?
+      `${next.originalPartCount} MIT-Originalteile (Xbox One) + 1 Share-Kappe · ${Math.round(next.triangles).toLocaleString('de-DE')} Dreiecke · ${next.optimization.savedCalls} statische Calls gespart`:
+      `${next.partCount} Originalteile · ${Math.round(next.triangles).toLocaleString('de-DE')} Quell-Dreiecke · ${next.optimization.savedCalls} statische Calls gespart`;
     if(state.renderer&&state.environmentMap){scheduleRender();}
     else if(!state.renderer){document.body.dataset.renderReady='webgl-unavailable';setStatus(`Original OBJ geladen (${next.partCount} Teile). Browser-WebGL blockiert; keine 3D-Bildabnahme.`);}
     else{document.body.dataset.renderReady='hdr-unavailable';setStatus('Original OBJ geladen, HDR-Lichtprobe jedoch nicht bereit; 3D wird nicht angezeigt.');}
