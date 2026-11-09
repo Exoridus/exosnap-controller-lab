@@ -1,6 +1,7 @@
 // Interactive 2D reference from the supplied Gamepad-Overlay artwork package.
 // This is a lab renderer, not a replacement for native GamepadSprites.
 import { semanticControlFrom2DLayer } from './controller-catalog.js';
+import {ensureSvgSafeArea} from './svg-safe-viewbox.js';
 import {EXO_PALETTE,stickSurfaceColor,triggerSurfaceColor} from './palette.js';
 import {appearanceCacheKey,resolve2DPaint} from './material-paint.js';
 const SVG_NS='http://www.w3.org/2000/svg';
@@ -75,6 +76,9 @@ export class ControllerReference{
       adopted.classList.add('controller-reference-artwork');
       adopted.setAttribute('preserveAspectRatio','xMidYMid meet');
       adopted.removeAttribute('width');adopted.removeAttribute('height');
+      // Give the complete original outline (including its outer stroke) equal
+      // breathing room on every side, in every 2D viewer and at every size.
+      ensureSvgSafeArea(adopted);
       const controls=match2DControls(adopted,mapping);
       this.installKnockouts(adopted,controls,mapping);
       this.container.replaceChildren(adopted);
@@ -158,7 +162,11 @@ export class ControllerReference{
     const sticks=controls.filter(c=>c.stickSide&&c.layer.knockout);
     const body=svg.querySelector('#body');
     if(!sticks.length||!body)return;
-    const viewBox=mapping.viewBox||[0,0,480,320];
+    // The knockout mask must cover the padded SVG viewport too. The old
+    // mapping-sized mask silently sheared half of edge strokes at x=0/right.
+    const viewBox=(svg.getAttribute('viewBox')||'').trim().split(/[\s,]+/).map(Number);
+    if(viewBox.length!==4||viewBox.some(v=>!Number.isFinite(v))||viewBox[2]<=0||viewBox[3]<=0)
+      throw new RangeError('Invalid safe SVG knockout bounds');
     const maskId=`ref-knockout-${mapping.id}`;
     let defs=svg.querySelector('defs');
     if(!defs){defs=svgElement('defs');svg.insertBefore(defs,svg.firstChild);}
