@@ -366,7 +366,10 @@ function render(now=performance.now()){
     flatSampleNodes.every(({stage})=>Boolean(stage.querySelector('svg')));
   document.body.dataset.renderReady=rendered===expected&&flatReady?'three-rendered':'incomplete';
   if(rendered===expected)document.body.dataset.renderRevision=String(1+(Number(document.body.dataset.renderRevision)||0));
-  $('modelInfo').textContent=`${state.native.partCount} Originalteile · ${state.native.geometryReuse?.pairs||0} Mesh-Buffers geteilt`;
+  const rig=state.native;
+  $('modelInfo').textContent=rig.model.genericProxy?
+    `${rig.originalPartCount} MIT-Originalteile (Xbox One) + 1 Share-Kappe · ${rig.geometryReuse?.pairs||0} Mesh-Buffers geteilt`:
+    `${rig.partCount} Originalteile · ${rig.geometryReuse?.pairs||0} Mesh-Buffers geteilt`;
   setStatus(`${state.native.model.name} · 2D + 3D synchron · ${pose.source==='demo'?'Demo':pose.source==='live'?'Live-Gamepad':pose.source==='manual'?'Manuelle Eingabe':'Neutral'}`);
   animate();
 }
