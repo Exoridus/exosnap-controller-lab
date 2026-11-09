@@ -9,7 +9,7 @@ import {resolveLabRecipe} from '../controller-lab-style.js';
 import {applyPbrRecipeToRig} from '../pbr-appearance.js';
 import {prepare3DPlayerLedSurface,apply3DPlayerLedLayout,update3DPlayerLedMask} from '../controller-player-leds-3d.js';
 import {ledStates} from '../controller-player-leds.js';
-import {createContrastCompositeMaterial,updateContrastComposite} from '../silhouette-composite.js';
+import {createContrastCompositeMaterial,updateContrastComposite,sceneContrastProfile,DEFAULT_OUTER_SILHOUETTE_EMPHASIS} from '../silhouette-composite.js';
 
 const read=p=>readFile(new URL('../'+p.replace(/^\.\//,''),import.meta.url),'utf8');
 const colorDistance=(a,b)=>Math.hypot(a.r-b.r,a.g-b.g,a.b-b.b);
@@ -98,7 +98,7 @@ test('subtle 3D silhouette boost changes only the existing compositing shader, n
  updateContrastComposite(m,'light',{width:320,height:214},true,.42);
  assert.equal(m.uniforms.silhouetteEmphasis.value,.42);
  assert.equal(m.uniforms.mode.value,1);
- assert.match(m.fragmentShader,/ring\(\.72\)-coverageHere/);
+ assert.match(m.fragmentShader,/ring\(\.66\)-coverageHere/);
  assert.match(m.fragmentShader,/Only faint transparent surfaces/);
  assert.match(m.fragmentShader,/No source-part, hidden-part or overlapping per-mesh contours/);
  updateContrastComposite(m,'dark',{width:320,height:214},true,0);
@@ -106,4 +106,20 @@ test('subtle 3D silhouette boost changes only the existing compositing shader, n
  updateContrastComposite(m,'mixed',{width:320,height:214},false,.42);
  assert.equal(m.uniforms.silhouetteEmphasis.value,0,'direct blit mode never adds outlines');
  m.dispose();
+});
+
+test('final 3D exterior is thin and quiet, with original depth/ghost materials unaffected',()=>{
+  assert.equal(DEFAULT_OUTER_SILHOUETTE_EMPHASIS,.18);
+  const dark=sceneContrastProfile('dark'),light=sceneContrastProfile('light'),mixed=sceneContrastProfile('mixed');
+  assert.ok(dark.lightStrength<=.54&&light.darkStrength<=.56&&mixed.darkStrength<=.52);
+  const m=createContrastCompositeMaterial(new THREE.Texture());
+  assert.match(m.fragmentShader,/ring\(1\.10\)-coverageHere/,'outer ring is just over a single source pixel');
+  assert.match(m.fragmentShader,/ring\(\.66\)-coverageHere/);
+  assert.match(m.fragmentShader,/lightInk=vec3\(\.82\)/);
+  assert.match(m.fragmentShader,/darkInk=vec3\(\.16\)/);
+  updateContrastComposite(m,'mixed',{width:320,height:214},true,DEFAULT_OUTER_SILHOUETTE_EMPHASIS);
+  assert.equal(m.uniforms.silhouetteEmphasis.value,.18);
+  updateContrastComposite(m,'mixed',{width:320,height:214},true,0);
+  assert.equal(m.uniforms.silhouetteEmphasis.value,0,'existing A/B switch can still disable extra outline');
+  m.dispose();
 });

@@ -8,6 +8,7 @@ import {mkdir,writeFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import path from 'node:path';
 import {verifyRenderedState} from './visual-capture-contract.mjs';
+import {verifySvgSafeEdges} from './verify-svg-safe-edges.mjs';
 import {captureConsolidated} from './capture-consolidated.mjs';
 import {captureFinalPolish} from './capture-final-polish.mjs';
 import {captureModelConsistency} from './capture-model-consistency.mjs';
@@ -74,6 +75,7 @@ try{
   };
   await mkdir(output,{recursive:true});
   const images=[];
+  await verifySvgSafeEdges(browser,{base,output,images});
   // Focused 3D final-polish evidence. Screenshot ONLY the 3D panel, not the
   // 2D LEDs or status text, so a P1/P4 change must affect real PBR pixels.
   await page.locator('#demoToggle').uncheck();

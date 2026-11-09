@@ -5,10 +5,13 @@
 import * as THREE from 'three';
 
 const profiles=Object.freeze({
-  dark:Object.freeze({mode:0,darkStrength:.08,lightStrength:.80,inkGain:0,preserveOpaque:true}),
-  light:Object.freeze({mode:1,darkStrength:.76,lightStrength:.08,inkGain:.79,preserveOpaque:true}),
-  mixed:Object.freeze({mode:2,darkStrength:.71,lightStrength:.35,inkGain:.41,preserveOpaque:true}),
+  dark:Object.freeze({mode:0,darkStrength:.05,lightStrength:.54,inkGain:0,preserveOpaque:true}),
+  light:Object.freeze({mode:1,darkStrength:.56,lightStrength:.05,inkGain:.79,preserveOpaque:true}),
+  mixed:Object.freeze({mode:2,darkStrength:.52,lightStrength:.24,inkGain:.41,preserveOpaque:true}),
 });
+// The accepted PBR shell remains untouched; only its composited outer
+// rim receives a small extra emphasis, never outlines for individual parts.
+export const DEFAULT_OUTER_SILHOUETTE_EMPHASIS=.18;
 export function sceneContrastProfile(scene){
   if(!Object.hasOwn(profiles,scene))throw new Error(`Unknown contrast backdrop ${scene}`);
   return profiles[scene];
@@ -49,16 +52,19 @@ void main(){
     return;
   }
   float coverageHere=coverage(src.a);
-  float wide=max(0.,ring(1.65)-coverageHere);
-  float narrow=max(0.,ring(.72)-coverageHere);
+  // A roughly one-pixel exterior instead of the old 1.65px bright halo.
+  float wide=max(0.,ring(1.10)-coverageHere);
+  float narrow=max(0.,ring(.66)-coverageHere);
   // Only faint transparent surfaces receive a background-specific ink correction.
   // Opaque pressed buttons retain exactly their source RGB and alpha.
   float fade=1.-smoothstep(.42,.92,src.a);
   vec3 ink=vec3(.12);
   vec3 rgb=mix(src.rgb,ink*src.a,inkGain*fade);
   float alpha=clamp(src.a*(1.+.58*inkGain*fade),0.,1.);
-  vec3 darkInk=vec3(.08);
-  vec3 lightInk=vec3(.94);
+  // Softer neutral inks. Strong near-white or near-black outlines distract
+  // from the materials, especially on bright mixed scene backgrounds.
+  vec3 darkInk=vec3(.16);
+  vec3 lightInk=vec3(.82);
   // Extend ONLY the outer edge of the already composed controller image.
   // No source-part, hidden-part or overlapping per-mesh contours are drawn.
   float extra=clamp(silhouetteEmphasis,0.,1.)*narrow;

@@ -4,7 +4,7 @@ import {CONTROLLERS,CONTROL_IDS,isLicensedModel} from './models.js';
 import {layoutForModel} from './controller-catalog.js';
 import {ControllerReference,isolateReferenceIds} from './controller-reference.js';
 import {prepareGhostOcclusion,setRearHintViewport,hideOccludedRearControls} from './ghost-depth-policy.js';
-import {createContrastCompositeMaterial,updateContrastComposite} from './silhouette-composite.js';
+import {createContrastCompositeMaterial,updateContrastComposite,DEFAULT_OUTER_SILHOUETTE_EMPHASIS} from './silhouette-composite.js';
 import {isHousingRole} from './model-semantics.js';
 import {loadNativeRig,disposeNativeRig} from './pbr-model.js';
 import {applyPbrRecipeToRig,applyControlPoseToRig} from './pbr-appearance.js';
@@ -154,10 +154,8 @@ async function loadFlatReferences(model){
     if(serial!==flatLoadSerial)return;
     if(!ref.svg){stage.textContent=`2D-Vorlage für ${layout.name} nicht ladbar`;return;}
     isolateReferenceIds(ref.svg,`pbr-${serial}-${index}`);
-    // Ensure a real margin around the authored full-width shell and triggers.
-    const vb=ref.svg.viewBox.baseVal;
-    const mx=vb.width*.055,my=vb.height*.035;
-    ref.svg.setAttribute('viewBox',[vb.x-mx,vb.y-my,vb.width+2*mx,vb.height+2*my].join(' '));
+    // ControllerReference.load already applies the identical shared SVG safe
+    // area to all 2D viewers and their knockout masks. Never pad twice here.
     stage.replaceChildren(ref.svg);ref.container=stage;
     ref.svg.addEventListener('dblclick',event=>{
       const entry=ref.controls.find(c=>c.stickSide&&c.group.contains(event.target));
@@ -333,7 +331,7 @@ function render(now=performance.now()){
         renderer.setViewport(r.left,r.bottom,r.width,r.height);
         renderer.setScissor(r.left,r.bottom,r.width,r.height);
         renderer.clear(true,true,true);
-        updateContrastComposite(state.compositeMaterial,scenes[i],target,true,state.outerContour?.42:0);
+        updateContrastComposite(state.compositeMaterial,scenes[i],target,true,state.outerContour?DEFAULT_OUTER_SILHOUETTE_EMPHASIS:0);
         renderer.info.reset();
         renderer.render(state.blitScene,state.blitCamera);
         blits.push(drawMetrics(renderer));rendered++;
