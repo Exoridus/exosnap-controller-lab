@@ -110,9 +110,13 @@ try{
         for(const p of lab.renderer.info.programs||[]){
           const program=p.program,loc=program&&gl.getUniformLocation(program,'playerLedActive[0]');
           if(!loc)continue;
+          const activeValues=Array.from({length:8},(_,i)=>{
+            const at=gl.getUniformLocation(program,'playerLedActive['+i+']');
+            return at?gl.getUniform(program,at):null;
+          });
           const countLoc=gl.getUniformLocation(program,'playerLedCount');
           const minLoc=gl.getUniformLocation(program,'playerLedFrontMinY');
-          programs.push({key:String(p.cacheKey).slice(-100),values:Array.from(gl.getUniform(program,loc)||[]),
+          programs.push({key:String(p.cacheKey).slice(-100),values:activeValues,
             count:countLoc?gl.getUniform(program,countLoc):null,
             frontMinY:minLoc?gl.getUniform(program,minLoc):null});
         }
