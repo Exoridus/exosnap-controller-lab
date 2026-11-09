@@ -8,6 +8,7 @@ import {mkdir,writeFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import path from 'node:path';
 import {verifyRenderedState} from './visual-capture-contract.mjs';
+import {verifySvgSafeEdges} from './verify-svg-safe-edges.mjs';
 import {captureConsolidated} from './capture-consolidated.mjs';
 import {captureFinalPolish} from './capture-final-polish.mjs';
 import {captureModelConsistency} from './capture-model-consistency.mjs';
@@ -74,6 +75,7 @@ try{
   };
   await mkdir(output,{recursive:true});
   const images=[];
+  await verifySvgSafeEdges(browser,{base,output,images});
   // Focused 3D final-polish evidence. Screenshot ONLY the 3D panel, not the
   // 2D LEDs or status text, so a P1/P4 change must affect real PBR pixels.
   await page.locator('#demoToggle').uncheck();
@@ -367,50 +369,6 @@ try{
       throw Error('Mismatch across six 2D sizes: '+JSON.stringify(dims));
   }
   await capturePolish('2d-dualsense-neutral-480.png','dualsense','solid+ghost neutral');
-
-  // A real Chromium geometry+stroke safety gate, not just unchanged SVG markup.
-  // Source viewBoxes touch some housing outlines on x=0/right; the SAME inset
-  // and knockout mask must preserve both complete sides at all 3 panel sizes.
-  const edgeLayouts=['dualsense','dualshock4','xbox_one','xbox_360','generic',
-    'switch_pro','joycon_grip','joycon_left','joycon_right','gamecube'];
-  for(const layout of edgeLayouts){
-    await select2D('layout',layout);
-    for(const [width] of sizes){
-      await select2D('size',String(width));
-      const measurements=await polish.evaluate(()=>{
-        return window.__exo2DPolish.refs.map(({reference,stage,mode,scene})=>{
-          const svg=reference.svg;
-          // Joy-Con Right uses an authored body path group without a single
-          // outline-strong ID; inspect its full native bounds instead.
-          const outline=svg.querySelector('[id$="-outline-strong"]')||reference.bodyShape;
-          if(!outline)return {mode,scene,error:'Missing source outer silhouette or housing group'};
-          const box=outline.getBoundingClientRect(),frame=stage.getBoundingClientRect();
-          const vb=svg.viewBox.baseVal;
-          const maskAttr=reference.bodyShape?.getAttribute('mask')||'';
-          const maskId=maskAttr.match(/^url\(#([^)]*)\)$/)?.[1]||null;
-          const mask=maskId?svg.querySelector('#'+CSS.escape(maskId)):null;
-          const m=mask?['x','y','width','height'].map(name=>Number(mask.getAttribute(name))):null;
-          const maskValid=maskId?Boolean(m&&[vb.x,vb.y,vb.width,vb.height]
-            .every((value,index)=>Math.abs(value-m[index])<1e-6)):true;
-          return {mode,scene,stroke:parseFloat(getComputedStyle(outline).strokeWidth)||0,
-            padLeft:box.left-frame.left,padRight:frame.right-box.right,
-            padTop:box.top-frame.top,padBottom:frame.bottom-box.bottom,
-            maskValid,masked:Boolean(maskId),safe:svg.getAttribute('data-exo-padded-viewbox')==='1'};
-        });
-      });
-      const bad=measurements.filter(m=>m.error||!m.safe||!m.maskValid||
-        [m.padLeft,m.padRight,m.padTop,m.padBottom].some(value=>!Number.isFinite(value)||value<2.0));
-      if(bad.length)throw Error('Clipped authored SVG silhouette at '+layout+' '+width+
-        'px: '+JSON.stringify(bad));
-      if(width===320&&['dualsense','switch_pro','generic','gamecube'].includes(layout))
-        await capturePolish('2d-safe-outline-'+layout+'-320.png',layout,
-          'real SVG front outline with symmetrical margins, no cropped left/right stroke',
-          '.stage[data-look="ghost"][data-scene="light"]');
-    }
-  }
-  await select2D('layout','dualsense');
-  await select2D('size','480');
-  await ready2D('dualsense');
 
   // Direct free-XY pointer movement must shift the SAME SVG stick layer in
   // all six panels, without implicitly pressing L3/R3.
