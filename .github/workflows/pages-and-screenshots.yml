@@ -86,6 +86,65 @@ jobs:
           fi
       - name: Export static site with current screenshot and history
         run: node tools/build-pages.mjs --out dist --capture .capture --history "$RUNNER_TEMP/visual-history/index.json"
+      # Refresh the fallback from THIS verified build; do not reuse the frozen
+      # artifact from the first emergency Pages deployment.
+      - name: Publish fresh verified site to pages-fallback
+        if: github.ref == 'refs/heads/main'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          site="$PWD/dist"
+          test -s "$site/pbr-lab.html"
+          test -s "$site/pbr-lab.js"
+          test -s "$site/control-glyphs.js"
+          test -s "$site/interior-housing-contours.js"
+          test -f "$site/.nojekyll"
+          # Full captures remain in immutable visual-history and CI artifacts.
+          SITE="$site" python3 - <<'PY'
+          import os,re
+          from pathlib import Path
+          site=Path(os.environ['SITE'])
+          shots=site/'screenshots'
+          links=set()
+          for file in site.glob('*.html'):
+              links.update(re.findall(r'[/]screenshots/([\w.-]+\.(?:png|webm))',
+                                      file.read_text(encoding='utf-8'),re.I))
+          links.update(('latest.png','pressed.png','gamecube.png','generic.png',
+                        'generic-pressed.png','controller-demo.webm',
+                        '3d-final-model-genericpro-mix0-front-neutral.png',
+                        '3d-final-model-genericpro-mix70-front-neutral.png',
+                        '3d-final-model-genericpro-mix100-front-neutral.png',
+                        '3d-final-model-genericpro-mix70-angled-neutral.png'))
+          missing=sorted(name for name in links if not (shots/name).is_file())
+          if missing:
+              raise RuntimeError('Referenced screenshot missing: '+str(missing))
+          for file in shots.iterdir():
+              if file.suffix.lower() in ('.png','.webm') and file.name not in links:
+                  file.unlink()
+          print('Live Pages fallback MiB:',
+                round(sum(p.stat().st_size for p in site.rglob('*') if p.is_file())/1048576,2))
+          PY
+          checkout="$RUNNER_TEMP/pages-live-fallback"
+          mkdir -p "$checkout"
+          cd "$checkout"
+          git init --initial-branch=pages-fallback
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git ls-remote --exit-code origin refs/heads/pages-fallback >/dev/null; then
+            git fetch --depth=1 origin refs/heads/pages-fallback
+            git checkout -B pages-fallback FETCH_HEAD
+            git rm -r -q --ignore-unmatch .
+          fi
+          cp -a "$site/." "$checkout/"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish verified Controller Lab ${GITHUB_SHA:0:12} [skip ci]"
+            git push origin HEAD:refs/heads/pages-fallback
+          fi
+          git rev-parse HEAD
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
