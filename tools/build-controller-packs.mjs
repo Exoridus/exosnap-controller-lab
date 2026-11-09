@@ -82,12 +82,15 @@ export async function buildControllerPacks({destination=path.join(root,'.workspa
       sources[mappingFile]=digest(Buffer.from(mappingText));
       const named=new Set();
       for(const layer of mapping.layers){
-        if(typeof layer.file!=='string'||!/^elements\/[a-z0-9_-]+\.svg$/i.test(layer.file))
-          throw Error('Untrusted SVG layer name: '+layout.id+'/'+layer.file);
-        if(named.has(layer.file))throw Error('Duplicate layer file: '+layer.file);
-        named.add(layer.file);
+        // A handful of reference-only layouts have mapping entries without
+        // individual filenames. Generate a stable one; never edit the source.
+        const file=layer.file||('elements/'+layer.id+'.svg');
+        if(!/^elements\/[a-z0-9_-]+\.svg$/i.test(file))
+          throw Error('Untrusted SVG layer name: '+layout.id+'/'+file);
+        if(named.has(file))throw Error('Duplicate layer file: '+file);
+        named.add(file);
         const text=isolateSvgElement(source,mapping,layer);
-        if(text)await write(layer.file,text);
+        if(text)await write(file,text);
         else missing2D.push(layer.id);
       }
     }
