@@ -124,8 +124,7 @@ export function prepareSurfaceArtwork(mesh,source,bounds,model){
  const file=mesh.userData.sourceFile;
  const face=faceButtonGlyph(file,model);
  const key=face?.toLowerCase()||String(file).match(/^dpad_(up|down|left|right)[.]obj$/)?.[1];
- // DualShock 4's directional symbols sit on the case OUTSIDE its D-pad arms.
- if(!key||(model?.id==='DS4Compact'&&/^(up|down|left|right)$/.test(key)))return false;
+ if(!key)return false; // Share/Options artwork above the surface is deliberately removed.
  const width=bounds.max.x-bounds.min.x,height=bounds.max.z-bounds.min.z;
  if(!(width>0&&height>0))return false;
  const positions=mesh.geometry.getAttribute('position'),uv=new Float32Array(positions.count*2);
@@ -166,54 +165,6 @@ export function setControllerMarkings(native,enabled){
   if(state)state.enabled.value=enabled?1:0;
  }
 }
-
-// Original DualShock 4 arrows are printed OUTSIDE the moving directional arms.
-// Project the source SVG paths onto the existing shell UVs without new meshes.
-export function applyDualShockHousingArrows(native,svg){
- if(native?.model?.id!=='DS4Compact'||!svg)return 0;
- const shell=native.meshes.find(m=>m.visible&&m.userData.sourceFile==='top_shell.obj');
- if(!shell)return 0;
- native.group.updateMatrixWorld(true);
- const inverse=new THREE.Matrix4().copy(native.group.matrixWorld).invert(),entries=[];
- for(const dir of ['up','right','down','left']){
-  const group=groupFor(svg,dir),face=group?.querySelector('path:not(.glyph)');
-  const glyphs=[...(group?.querySelectorAll('path.glyph')||[])].filter(p=>p.getAttribute('d'));
-  const button=native.meshes.find(m=>m.userData.sourceFile==='dpad_'+dir+'.obj');
-  if(!face||!glyphs.length||!button)return 0;
-  const bounds=pathFrame(face);
-  entries.push({dir,glyphs,x:(bounds.minX+bounds.maxX)/2,y:(bounds.minY+bounds.maxY)/2,
-   center:new THREE.Box3().setFromObject(button).getCenter(new THREE.Vector3()).applyMatrix4(inverse)});
- }
- const entry=Object.fromEntries(entries.map(e=>[e.dir,e]));
- const sx=(entry.right.center.x-entry.left.center.x)/(entry.right.x-entry.left.x);
- const sy=(entry.down.center.y-entry.up.center.y)/(entry.down.y-entry.up.y);
- if(!Number.isFinite(sx)||!Number.isFinite(sy)||Math.abs(sx)<1e-5||Math.abs(sy)<1e-5)return 0;
- const avg=f=>entries.reduce((sum,e)=>sum+f(e),0)/entries.length;
- const x2=avg(e=>e.x),y2=avg(e=>e.y),x3=avg(e=>e.center.x),y3=avg(e=>e.center.y);
- const paths=entries.flatMap(e=>e.glyphs),frames=paths.map(pathFrame);
- const minX=Math.min(...frames.map(f=>f.minX)),maxX=Math.max(...frames.map(f=>f.maxX));
- const minY=Math.min(...frames.map(f=>f.minY)),maxY=Math.max(...frames.map(f=>f.maxY));
- const margin=Math.max(maxX-minX,maxY-minY)*.07;
- const rect={minX:minX-margin,maxX:maxX+margin,minY:minY-margin,maxY:maxY+margin};
- const texture=authoredTexture(paths,rect);if(!texture)return 0;
- const pos=shell.geometry.getAttribute('position'),uv=new Float32Array(pos.count*2);
- const toRoot=new THREE.Matrix4().multiplyMatrices(inverse,shell.matrixWorld),point=new THREE.Vector3();
- for(let i=0;i<pos.count;i++){
-  point.set(pos.getX(i),pos.getY(i),pos.getZ(i)).applyMatrix4(toRoot);
-  const svgX=x2+(point.x-x3)/sx,svgY=y2+(point.y-y3)/sy;
-  uv[2*i]=(svgX-rect.minX)/(rect.maxX-rect.minX);
-  uv[2*i+1]=1-(svgY-rect.minY)/(rect.maxY-rect.minY);
- }
- shell.geometry.setAttribute('controllerMarkUv',new THREE.BufferAttribute(uv,2));
- const old=shell.material.userData.surfaceMarking;
- if(old){native.artworkTextures?.delete(old.mask.value);old.mask.value.dispose();old.mask.value=texture;}
- else installSurfaceMarking(shell,texture);
- native.artworkTextures??=new Set();native.artworkTextures.add(texture);
- Object.assign(shell.userData,{artworkKey:'dualshock-dpad-housing',surfaceArtwork:'housing-material',
-  artworkSource:'2d-svg',authoredPathCount:paths.length});
- return 4;
-}
-
 // Source symbols keep their actual position inside each authored 2D button.
 // One immutable alpha mask per surface, prepared once at model/artwork load.
 export function applyControllerArtwork(native,original2DSvg){
@@ -232,7 +183,6 @@ export function applyControllerArtwork(native,original2DSvg){
   native.artworkTextures.add(texture);
   mesh.userData.artworkSource='2d-svg';mesh.userData.authoredPathCount=paths.length;count++;
  }
- count+=applyDualShockHousingArrows(native,original2DSvg);
  return count;
 }
 export function applyGameCubeButtonArtwork(native,original2DSvg){
