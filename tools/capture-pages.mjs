@@ -206,7 +206,8 @@ try{
       originalSource:rig?.model?.source,triangles:rig?.triangles,legends,centers,
       genericLayout:[...window.__exoPbrLab.flatReferences.values()].every(ref=>ref.layout.id==='generic'),
       interiorSegments:rig?.interiorHousingContours?.segments,
-      interiorOpacity:rig?.interiorHousingContours?.material?.opacity};
+      interiorOpacity:rig?.interiorHousingContours?.material?.opacity,
+      modelStatus:document.querySelector('#modelInfo')?.textContent};
   });
   if(genericPartState.parts!==25||genericPartState.originalParts!==24||
       genericPartState.modelSource!=='XboxOneClean'||genericPartState.physicalSource!=='XboxOneClean'||
@@ -214,7 +215,8 @@ try{
       genericPartState.triangles<500||genericPartState.legends.sort().join(',')!=='A,B,X,Y'||
       genericPartState.centers?.length!==4||genericPartState.centers.some(m=>!m.markings||m.source!=='2d-svg')||
       genericPartState.centers.map(m=>m.artwork).sort().join(',')!=='home,menu,share,view'||
-      !Number.isFinite(genericPartState.interiorOpacity))
+      !Number.isFinite(genericPartState.interiorOpacity)||
+      !genericPartState.modelStatus?.includes('24 MIT-Originalteile (Xbox One) + 1 Share-Kappe'))
     throw Error('Generic 3D Xbox One proxy / 2D generic symbols or source seams incomplete: '+JSON.stringify(genericPartState));
   console.log('GENERIC_XBOX_PROXY_PASS '+JSON.stringify(genericPartState));
   for(const [file,pressed] of [['generic-neutral.png',false],['generic-pressed.png',true]]){
