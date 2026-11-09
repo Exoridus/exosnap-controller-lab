@@ -380,8 +380,10 @@ try{
       const measurements=await polish.evaluate(()=>{
         return window.__exo2DPolish.refs.map(({reference,stage,mode,scene})=>{
           const svg=reference.svg;
-          const outline=svg.querySelector('[id$="-outline-strong"]');
-          if(!outline)return {mode,scene,error:'Missing source outer silhouette'};
+          // Joy-Con Right uses an authored body path group without a single
+          // outline-strong ID; inspect its full native bounds instead.
+          const outline=svg.querySelector('[id$="-outline-strong"]')||reference.bodyShape;
+          if(!outline)return {mode,scene,error:'Missing source outer silhouette or housing group'};
           const box=outline.getBoundingClientRect(),frame=stage.getBoundingClientRect();
           const vb=svg.viewBox.baseVal;
           const maskAttr=reference.bodyShape?.getAttribute('mask')||'';
