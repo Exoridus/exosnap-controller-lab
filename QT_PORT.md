@@ -10,7 +10,7 @@ Die Hauptvorschau und ihre bestehenden WebGL-/Kontrast-Passes sind **unveränder
 Die Varianten gehören zur **separaten Diagnosegalerie** und sind kein Freigabebeleg für 3D.
 
 **Zu starten:** `qt-material-lab.html` per `npm start`, dann `http://127.0.0.1:8792/qt-material-lab.html`.
-Die alte, vollständig eingebettete `qt-material-standalone.html` wurde als redundantes Build-Artefakt entfernt. Für die Diagnosegalerie den lokalen Server verwenden; die frühere Fassung bleibt über die Git-Historie zugänglich.
+Alternativ die komplett offline funktionierende `qt-material-standalone.html` direkt öffnen.
 
 ## Warum Qt-kompatibel
 
