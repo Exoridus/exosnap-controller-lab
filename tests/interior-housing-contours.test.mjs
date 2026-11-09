@@ -125,3 +125,27 @@ test('GameCube lower-left D-pad recess receives a complete subtle contour beside
     assert.equal(rig.meshes.length,originalMeshes,'no new controller mesh or per-button draw');
   }finally{disposeNativeRig(rig);}
 });
+
+test('GameCube lower insets keep contrast at overlay size without thickening other internal seams',async()=>{
+  const rig=await loadNativeRig(CONTROLLERS.find(m=>m.id==='Gamecube'),read);
+  try{
+    const state=prepareInteriorHousingContours(rig);
+    const attr=state.geometry.getAttribute('color');
+    assert.equal(state.material.vertexColors,true,'native one-pass vertex RGBA ink');
+    assert.equal(attr?.itemSize,4,'color alpha per original line vertex');
+    assert.equal(attr.count,state.geometry.getAttribute('position').count);
+    assert.equal(state.lines.isLineSegments,true,'no extra mesh or heavy line primitives');
+    assert.ok(state.recessSegments>=45,'both lower recesses must get distinct contrast');
+    assert.ok(state.recessSegments<state.segments,'do not boost every body seam');
+    const alpha=new Set();
+    for(let i=0;i<attr.count;i++)alpha.add(Number(attr.getW(i).toFixed(2)));
+    assert.deepEqual([...alpha].sort((a,b)=>a-b),[INTERIOR_CONTOUR_POLICY.gameCubeRegularCoverage,1]);
+    updateInteriorHousingContours(rig,{mix:.7});
+    const strength=state.material.opacity;
+    assert.ok(strength>.4&&strength<.46,'recess remains optically legible at 70% material mix');
+    assert.ok(strength*INTERIOR_CONTOUR_POLICY.gameCubeRegularCoverage<.2,
+      'non-recess geometry must remain as quiet as before');
+    updateInteriorHousingContours(rig,{mix:1});
+    assert.equal(state.material.opacity,0,'full Ghost always hides internal seams');
+  }finally{disposeNativeRig(rig);}
+});
