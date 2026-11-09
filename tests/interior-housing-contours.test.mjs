@@ -78,3 +78,20 @@ test('source-based interior seam creation works on real licensed controllers and
  assert.ok(records.filter(x=>x.segments>0).length>=3,
   'Less than three physically authored models have eligible internal creases: '+JSON.stringify(records));
 });
+
+test('GameCube uses only genuine front inset opening edges in addition to structural creases',async()=>{
+  const rig=await loadNativeRig(CONTROLLERS.find(m=>m.id==='Gamecube'),read);
+  try{
+    const original=extractInteriorHousingEdges(rig.meshes,rig.group);
+    const insets=extractInteriorHousingEdges(rig.meshes,rig.group,{includeGameCubeInsets:true});
+    assert.ok(insets.length>original.length,
+      'original GameCube apertures must add visible interior lines to '+original.length+' ordinary creases');
+    const native=prepareInteriorHousingContours(rig);
+    assert.equal(native.gameCube,true);
+    assert.equal(native.segments,insets.length);
+    updateInteriorHousingContours(rig,{mix:.7});
+    assert.ok(native.material.opacity>interiorContourOpacity(.7));
+    updateInteriorHousingContours(rig,{mix:1});
+    assert.equal(native.material.opacity,0,'fully transparent Ghost still hides internal seams');
+  }finally{disposeNativeRig(rig);}
+});
