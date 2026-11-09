@@ -13,8 +13,6 @@ const MAX_SEGMENTS=1400;
 export const INTERIOR_CONTOUR_POLICY=Object.freeze({
   minimumAngleDegrees:37,minimumWorldLength:.011,maxSegments:MAX_SEGMENTS,
   tone:'#59697b',solidOpacity:.26,ghostOpacity:0,
-  // One draw for GameCube: stronger lower recess, unchanged regular seams.
-  gameCubeRecessTone:'#8093a5',gameCubeRegularCoverage:.43,gameCubeRecessOpacity:.56,
 });
 
 export function extractInteriorHousingEdges(meshes,root,{minimumAngleDegrees=INTERIOR_CONTOUR_POLICY.minimumAngleDegrees,maxSegments=MAX_SEGMENTS,includeGameCubeInsets=false}={}){
@@ -30,20 +28,8 @@ export function extractInteriorHousingEdges(meshes,root,{minimumAngleDegrees=INT
     .map(m=>{
       const b=new THREE.Box3().setFromObject(m),c=b.getCenter(new THREE.Vector3()).applyMatrix4(inv);
       const size=b.getSize(new THREE.Vector3());
-      return {file:m.userData.sourceFile,center:c,radius:Math.max(.26,Math.max(size.x,size.y)*1.25)};
+      return {center:c,radius:Math.max(.26,Math.max(size.x,size.y)*1.25)};
     }):[];
-  const padParts=insets.filter(({file})=>/^dpad_(?:up|down|left|right)[.]obj$/i.test(file));
-  const leftGameCubeInset=padParts.length===4?
-    padParts.reduce((center,{center:part})=>center.add(part),new THREE.Vector3()).multiplyScalar(.25):null;
-  const rightRing=(meshes||[]).find(m=>m?.userData?.sourceFile==='right_ring.obj');
-  const rightGameCubeInset=rightRing?new THREE.Box3().setFromObject(rightRing)
-    .getCenter(new THREE.Vector3()).applyMatrix4(inv):null;
-  // Limit the stronger ink to the real lower D-pad and C-stick housing folds.
-  // Do not promote the upper analog collar, shoulders, shell or outer border.
-  const nearFrontRecess=(mesh,mid,faces)=>includeGameCubeInsets&&
-    mesh.userData.sourceFile==='top_shell.obj'&&mid.z>.42&&
-    Math.max(...faces.map(face=>face.z))>.60&&
-    [leftGameCubeInset,rightGameCubeInset].some(c=>c&&Math.hypot(mid.x-c.x,mid.y-c.y)<.58);
   const edges=[];
   const minAngle=Math.max(5,Math.min(89,Number(minimumAngleDegrees)||37))*Math.PI/180;
   for(const mesh of meshes||[]){
@@ -82,25 +68,14 @@ export function extractInteriorHousingEdges(meshes,root,{minimumAngleDegrees=INT
             len<INTERIOR_CONTOUR_POLICY.minimumWorldLength||len>.40)continue;
         const bias=face.clone().multiplyScalar(.004);
         edges.push({a:edge.u.clone().add(bias),b:edge.v.clone().add(bias),
-          score:.55+Math.min(len,.2),len,
-          accent:nearFrontRecess(mesh,mid,edge.faces)});
+          score:.55+Math.min(len,.2),len});
         continue;
       }
       // Two-face creases only; one-face boundaries on other models are NOT seams.
       if(edge.faces.length!==2)continue;
       const [n1,n2]=edge.faces;
       const angle=Math.acos(clamp(n1.dot(n2)));
-      // GameCube's lower-left D-pad recess is a genuine, GENTLER curve than
-      // the right C-stick recess (~25-33° versus ~42-54°). The universal 37°
-      // threshold silently erased its outline while keeping the right one.
-      // Lower the threshold ONLY on the source-authored, front-facing left
-      // recess, not for its overall shell, the outer silhouette, or other rigs.
-      const mid=edge.u.clone().add(edge.v).multiplyScalar(.5);
-      const leftPadRecess=leftGameCubeInset&&mesh.userData.sourceFile==='top_shell.obj'&&
-        Math.hypot(mid.x-leftGameCubeInset.x,mid.y-leftGameCubeInset.y)<.58&&
-        Math.max(n1.z,n2.z)>.96&&Math.min(n1.z,n2.z)>.78;
-      const localMinimum=leftPadRecess?Math.min(minAngle,22*Math.PI/180):minAngle;
-      if(angle<localMinimum||angle>2.36)continue;
+      if(angle<minAngle||angle>2.36)continue;
       // The co/Exo source front (+Y) is +Z after native rig normalization.
       // Exclude hidden rear geometry and exterior silhouette front/back folds.
       if(Math.max(n1.z,n2.z)<.20||Math.min(n1.z,n2.z)<-.14)continue;
@@ -108,8 +83,7 @@ export function extractInteriorHousingEdges(meshes,root,{minimumAngleDegrees=INT
       if(len<INTERIOR_CONTOUR_POLICY.minimumWorldLength||len>.75)continue;
       const bias=tmpC.copy(n1).add(n2).normalize().multiplyScalar(.0035);
       edges.push({a:edge.u.clone().add(bias),b:edge.v.clone().add(bias),
-        score:angle*(.5+Math.min(len,.15)*2),len,
-        accent:nearFrontRecess(mesh,mid,edge.faces)});
+        score:angle*(.5+Math.min(len,.15)*2),len});
     }
   }
   edges.sort((a,b)=>b.score-a.score);
@@ -130,23 +104,8 @@ export function prepareInteriorHousingContours(native){
   edges.forEach(({a,b},i)=>{vertices.set(a.toArray(),6*i);vertices.set(b.toArray(),6*i+3);});
   const geometry=new THREE.BufferGeometry();
   geometry.setAttribute('position',new THREE.BufferAttribute(vertices,3));
-  if(gameCube){
-    // Native one-pass RGBA vertex colors: lower recesses have their own
-    // understated contrast, the remaining original shell edges stay quiet.
-    // No extra mesh or draw call; Qt Quick can carry the same per-vertex ink.
-    const colors=new Float32Array(edges.length*8);
-    const regular=new THREE.Color(INTERIOR_CONTOUR_POLICY.tone);
-    const inset=new THREE.Color(INTERIOR_CONTOUR_POLICY.gameCubeRecessTone);
-    edges.forEach((edge,i)=>{
-      const c=edge.accent?inset:regular;
-      const a=edge.accent?1:INTERIOR_CONTOUR_POLICY.gameCubeRegularCoverage;
-      colors.set([c.r,c.g,c.b,a,c.r,c.g,c.b,a],i*8);
-    });
-    geometry.setAttribute('color',new THREE.BufferAttribute(colors,4));
-  }
   const material=new THREE.LineBasicMaterial({
-    color:gameCube?'#ffffff':INTERIOR_CONTOUR_POLICY.tone,vertexColors:gameCube,
-    transparent:true,opacity:0,
+    color:INTERIOR_CONTOUR_POLICY.tone,transparent:true,opacity:0,
     depthTest:true,depthWrite:false,toneMapped:false,
     blending:THREE.NormalBlending
   });
@@ -155,19 +114,15 @@ export function prepareInteriorHousingContours(native){
   lines.renderOrder=-34;lines.frustumCulled=false;lines.visible=false;
   lines.userData.interiorHousingContour=true;
   native.group.add(lines);
-  native.interiorHousingContours={lines,geometry,material,segments:edges.length,gameCube,
-    recessSegments:gameCube?edges.filter(edge=>edge.accent).length:0};
+  native.interiorHousingContours={lines,geometry,material,segments:edges.length,gameCube};
   return native.interiorHousingContours;
 }
 export function updateInteriorHousingContours(native,recipe){
   const state=native?.interiorHousingContours;if(!state)return;
   const opacity=interiorContourOpacity(recipe?.mix);
-  // At 70% mix, GameCube's real lower recess is ~43% opacity while the
-  // remaining internal shell edges stay around the original ~18%.
-  // Both fade continuously to zero in full Ghost; other rigs are unchanged.
-  const mix=THREE.MathUtils.clamp(Number(recipe?.mix)||0,0,1);
-  state.material.opacity=state.gameCube?
-    INTERIOR_CONTOUR_POLICY.gameCubeRecessOpacity*(1-Math.pow(mix,4)):opacity;
+  // The recessed GameCube seams need a little more contrast at intermediate
+  // transparency; full Ghost still fades to zero and other rigs are unchanged.
+  state.material.opacity=state.gameCube?Math.min(.39,opacity*1.35):opacity;
   state.lines.visible=state.segments>0&&opacity>.004;
 }
 export function disposeInteriorHousingContours(native){
