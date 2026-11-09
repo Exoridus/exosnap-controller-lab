@@ -1,0 +1,108 @@
+// Source-topology-based INTERNAL housing contours, not an edge detector on
+// the composited image. Only manifold edges between two non-coplanar surface
+// triangles qualify; open mesh edges, outline silhouettes and triangulation
+// diagonals never qualify. Generated once per original rig, no CPU readback.
+import * as THREE from 'three';
+import {isHousingRole} from './model-semantics.js';
+
+const tmpA=new THREE.Vector3(),tmpB=new THREE.Vector3(),tmpC=new THREE.Vector3();
+const quantize=p=>[p.x,p.y,p.z].map(x=>Math.round(x*10000)).join(',');
+const edgeKey=(a,b)=>a<b?a+'|'+b:b+'|'+a;
+const clamp=n=>Math.max(-1,Math.min(1,n));
+const MAX_SEGMENTS=1400;
+export const INTERIOR_CONTOUR_POLICY=Object.freeze({
+  minimumAngleDegrees:37,minimumWorldLength:.011,maxSegments:MAX_SEGMENTS,
+  tone:'#59697b',solidOpacity:.26,ghostOpacity:0,
+});
+
+export function extractInteriorHousingEdges(meshes,root,{minimumAngleDegrees=INTERIOR_CONTOUR_POLICY.minimumAngleDegrees,maxSegments=MAX_SEGMENTS}={}){
+  if(!root?.isObject3D)throw new TypeError('Expected original rig root');
+  root.updateMatrixWorld(true);
+  const inv=new THREE.Matrix4().copy(root.matrixWorld).invert();
+  const edges=[];
+  const minAngle=Math.max(5,Math.min(89,Number(minimumAngleDegrees)||37))*Math.PI/180;
+  for(const mesh of meshes||[]){
+    if(!mesh?.isMesh||!mesh.visible||!isHousingRole(mesh.userData.role))continue;
+    if(!/^(?:top_shell|bottom_shell|extra)[.]obj$/i.test(mesh.userData.sourceFile||''))continue;
+    const pos=mesh.geometry?.getAttribute('position');
+    if(!pos?.count)continue;
+    mesh.updateWorldMatrix(true,false);
+    const transform=new THREE.Matrix4().multiplyMatrices(inv,mesh.matrixWorld);
+    const points=Array.from({length:pos.count},(_,i)=>
+      new THREE.Vector3(pos.getX(i),pos.getY(i),pos.getZ(i)).applyMatrix4(transform));
+    const index=mesh.geometry.index;
+    const size=index?.count||pos.count;
+    const incident=new Map();
+    for(let i=0;i+2<size;i+=3){
+      const ia=index?index.getX(i):i,ib=index?index.getX(i+1):i+1,ic=index?index.getX(i+2):i+2;
+      const a=points[ia],b=points[ib],c=points[ic];
+      const n=tmpA.copy(b).sub(a).cross(tmpB.copy(c).sub(a)).normalize().clone();
+      if(n.lengthSq()<.5)continue;
+      for(const [u,v] of [[a,b],[b,c],[c,a]]){
+        if(u.distanceToSquared(v)<1e-8)continue;
+        const ku=quantize(u),kv=quantize(v),key=edgeKey(ku,kv);
+        if(!incident.has(key))incident.set(key,{u:u.clone(),v:v.clone(),faces:[]});
+        const entry=incident.get(key);
+        if(entry.faces.length<3)entry.faces.push(n);
+      }
+    }
+    for(const edge of incident.values()){
+      // A physical seam between adjoining front facets has exactly two faces.
+      // A one-face edge is a mesh boundary, not an interior contour.
+      if(edge.faces.length!==2)continue;
+      const [n1,n2]=edge.faces;
+      const angle=Math.acos(clamp(n1.dot(n2)));
+      if(angle<minAngle||angle>2.36)continue;
+      // The co/Exo source front (+Y) is +Z after native rig normalization.
+      // Exclude hidden rear geometry and exterior silhouette front/back folds.
+      if(Math.max(n1.z,n2.z)<.20||Math.min(n1.z,n2.z)<-.14)continue;
+      const len=edge.u.distanceTo(edge.v);
+      if(len<INTERIOR_CONTOUR_POLICY.minimumWorldLength||len>.75)continue;
+      const bias=tmpC.copy(n1).add(n2).normalize().multiplyScalar(.0035);
+      edges.push({a:edge.u.clone().add(bias),b:edge.v.clone().add(bias),
+        score:angle*(.5+Math.min(len,.15)*2),len});
+    }
+  }
+  edges.sort((a,b)=>b.score-a.score);
+  return edges.slice(0,Math.max(0,Math.min(MAX_SEGMENTS,Math.floor(maxSegments)||0)));
+}
+
+export function interiorContourOpacity(mix){
+  const t=THREE.MathUtils.clamp(Number(mix)||0,0,1);
+  return INTERIOR_CONTOUR_POLICY.solidOpacity*(1-t*t);
+}
+
+export function prepareInteriorHousingContours(native){
+  if(!native?.meshes||!native.group)throw new TypeError('Expected original rig');
+  if(native.interiorHousingContours)return native.interiorHousingContours;
+  const edges=extractInteriorHousingEdges(native.meshes,native.group);
+  const vertices=new Float32Array(edges.length*6);
+  edges.forEach(({a,b},i)=>{vertices.set(a.toArray(),6*i);vertices.set(b.toArray(),6*i+3);});
+  const geometry=new THREE.BufferGeometry();
+  geometry.setAttribute('position',new THREE.BufferAttribute(vertices,3));
+  const material=new THREE.LineBasicMaterial({
+    color:INTERIOR_CONTOUR_POLICY.tone,transparent:true,opacity:0,
+    depthTest:true,depthWrite:false,toneMapped:false,
+    blending:THREE.NormalBlending
+  });
+  const lines=new THREE.LineSegments(geometry,material);
+  lines.name='Native shell internal seams (shared source topology)';
+  lines.renderOrder=-34;lines.frustumCulled=false;lines.visible=false;
+  lines.userData.interiorHousingContour=true;
+  native.group.add(lines);
+  native.interiorHousingContours={lines,geometry,material,segments:edges.length};
+  return native.interiorHousingContours;
+}
+export function updateInteriorHousingContours(native,recipe){
+  const state=native?.interiorHousingContours;if(!state)return;
+  const opacity=interiorContourOpacity(recipe?.mix);
+  state.material.opacity=opacity;
+  state.lines.visible=state.segments>0&&opacity>.004;
+}
+export function disposeInteriorHousingContours(native){
+  const state=native?.interiorHousingContours;if(!state)return;
+  state.lines.parent?.remove(state.lines);
+  state.geometry.dispose();
+  state.material.dispose();
+  native.interiorHousingContours=null;
+}
