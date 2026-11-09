@@ -7,6 +7,7 @@ import {isHousingRole} from './model-semantics.js';
 import {normalizeStickInput,stickVisualState} from './stick-activity.js';
 import {updateStickInstances} from './pbr-optimizer.js';
 import {depthPriority,updateGhostRearHints} from './ghost-depth-policy.js';
+import {updateInteriorHousingContours} from './interior-housing-contours.js';
 import {EXO_PALETTE} from './palette.js';
 import {setGhostFresnel} from './pbr-fresnel.js';
 import {stickMechanics,triggerMechanics} from './model-mechanics.js';
@@ -210,6 +211,7 @@ export function applyPbrRecipeToRig(native,recipe,input=false){
   }
   updateStickInstances(native,pose);
   updateGhostRearHints(native,recipe,pose);
+  updateInteriorHousingContours(native,recipe);
 }
 export function applyStickPoseToRig(native,input){
   const pose=normalizeVisualInput(input);

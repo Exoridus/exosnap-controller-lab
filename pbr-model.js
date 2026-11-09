@@ -8,13 +8,14 @@ import {frontFaceTransform} from './model-orientation.js';
 import {prepareRimSurface} from './control-surface-material.js';
 import {prepareSurfaceArtwork} from './control-glyphs.js';
 import {disposeSilhouette} from './pbr-silhouette.js';
+import {disposeInteriorHousingContours} from './interior-housing-contours.js';
 
 async function httpText(url){
   const response=await fetch(url,{cache:'force-cache'});
   if(!response.ok)throw new Error(`OBJ cache missing: ${url} (HTTP ${response.status}); run npm run download-assets -- MODEL_ID`);
   return response.text();
 }
-const assetPath=(model,file)=>`./assets/${encodeURIComponent(model.id)}/${encodeURIComponent(file)}`;
+const assetPath=(model,file)=>`./assets/${encodeURIComponent(model.assetId||model.id)}/${encodeURIComponent(file)}`;
 export async function loadNativeRig(model, readText=httpText){
   if(!model?.id||!model?.source)throw Error('Expected a known native OBJ model');
   const loader=new OBJLoader();
@@ -126,6 +127,7 @@ export async function loadNativeRig(model, readText=httpText){
 export function disposeNativeRig(native){
   if(!native)return;
   disposeSilhouette(native);
+  disposeInteriorHousingContours(native);
   const geometries=new Set(),materials=new Set(),instances=new Set();
   for(const m of native.meshes){
     if(m.isInstancedMesh)instances.add(m);
