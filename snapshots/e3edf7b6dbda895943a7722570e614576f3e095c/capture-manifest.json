@@ -1,0 +1,3344 @@
+{
+  "revision": "e3edf7b6dbda895943a7722570e614576f3e095c",
+  "capturedAt": "2026-11-09T07:30:31.816Z",
+  "url": "http://127.0.0.1:8792/pbr-lab.html",
+  "content": "Real Three.js/WebGL2 + original controller OBJ + authored SVG",
+  "looks": [
+    "white",
+    "cool"
+  ],
+  "viewports": [
+    "3D dark",
+    "3D light",
+    "3D mixed",
+    "2D dark",
+    "2D light",
+    "2D mixed"
+  ],
+  "images": [
+    {
+      "file": "2d-safe-outline-dualsense-320.png",
+      "modelId": "dualsense",
+      "variant": "full 2D SVG border",
+      "bytes": 22613,
+      "sha256": "4346b5bff05ae875b0e492d7aac0bf231ed5ccdee11f7d348baec67e348281ff",
+      "source": "Chromium authored SVG with symmetric viewBox and full knockout mask"
+    },
+    {
+      "file": "2d-safe-outline-generic-320.png",
+      "modelId": "generic",
+      "variant": "full 2D SVG border",
+      "bytes": 20459,
+      "sha256": "086c22deea78f47d0efd1004d9c27116b1d0d259a6d9666b74ff1ea289ed872f",
+      "source": "Chromium authored SVG with symmetric viewBox and full knockout mask"
+    },
+    {
+      "file": "2d-safe-outline-switch_pro-320.png",
+      "modelId": "switch_pro",
+      "variant": "full 2D SVG border",
+      "bytes": 20170,
+      "sha256": "370d26e1ab933cbe8d11b335771549d92db31915adc172ce894f45a149c5825a",
+      "source": "Chromium authored SVG with symmetric viewBox and full knockout mask"
+    },
+    {
+      "file": "2d-safe-outline-gamecube-320.png",
+      "modelId": "gamecube",
+      "variant": "full 2D SVG border",
+      "bytes": 23281,
+      "sha256": "76bbc7eb1873652515c8644e306cf3020c170017c21fcd784680e0737776d10e",
+      "source": "Chromium authored SVG with symmetric viewBox and full knockout mask"
+    },
+    {
+      "file": "final-3d-player-led-switchpro-p1.png",
+      "modelId": "SwitchPro",
+      "playerMask": 1,
+      "bytes": 14235,
+      "sha256": "eb986ebb44a2c0256a9bf53aa0425a94b6545d92d32f8a18c74ef3ba8b249177",
+      "source": "Actual WebGL2 source OBJ material LEDs; no physical LED readback"
+    },
+    {
+      "file": "final-3d-player-led-switchpro-p4.png",
+      "modelId": "SwitchPro",
+      "playerMask": 15,
+      "bytes": 14211,
+      "sha256": "c64324dd132da694f407b28f395f56d3f894d04ef089aa0e8e891c21121f87e8",
+      "source": "Actual WebGL2 source OBJ material LEDs; no physical LED readback"
+    },
+    {
+      "file": "final-3d-player-led-joycongrip-p1.png",
+      "modelId": "JoyconGrip",
+      "playerMask": 1,
+      "bytes": 13391,
+      "sha256": "9a4f8bc587754b5da0587b879a6ed629b32df9ce9a5a6df2b56ae4bdd7dc3cfe",
+      "source": "Actual WebGL2 source OBJ material LEDs; no physical LED readback"
+    },
+    {
+      "file": "final-3d-player-led-joycongrip-p4.png",
+      "modelId": "JoyconGrip",
+      "playerMask": 15,
+      "bytes": 13422,
+      "sha256": "953ecb81d8d56e3b2115941e7e9c94650dac056b85dcfce5871c9ce6c320d382",
+      "source": "Actual WebGL2 source OBJ material LEDs; no physical LED readback"
+    },
+    {
+      "file": "3d-final-demo-default.png",
+      "scenario": "Automatic demo and collapsed controls at startup",
+      "bytes": 276233,
+      "sha256": "f530b9b9dc37a77208541f807b062ad4215f6cf8a090eb2a9e8d6fff16efa158"
+    },
+    {
+      "file": "3d-final-neutral.png",
+      "scenario": "Neutral original button surfaces and dark D-pad ink",
+      "bytes": 436739,
+      "sha256": "6b04ac9924ffb8d38cfbeef545296c14f342865d2d0e26a178d106294f99c160"
+    },
+    {
+      "file": "3d-final-trigger-pressed.png",
+      "scenario": "Analog trigger rotated about authored hinge",
+      "bytes": 438455,
+      "sha256": "c25bd66b5755d84c0257039cc78713a8747e8f9fc7a5fc621cf11a4d8fa3151b"
+    },
+    {
+      "file": "3d-final-trigger-below.png",
+      "scenario": "Trigger mechanism visible from below",
+      "bytes": 446755,
+      "sha256": "9c442e50ad1c4335f9fb760ca14f5362dcefac1ea693903d87083f4acc2b5ddd"
+    },
+    {
+      "file": "2d-final-ring-motion.png",
+      "scenario": "Moving annulus, neutral L3/R3 center",
+      "bytes": 462508,
+      "sha256": "31dedf1492ed8b45910f1b4a2b9dc0d79d8de2e6e6937bee6d0cc3335b8c4cb9"
+    },
+    {
+      "file": "2d-final-ring-click.png",
+      "scenario": "Analog motion and independent L3 activation together",
+      "bytes": 461322,
+      "sha256": "4c6c03d699740c4057fc0c7388f065584dc95d9b57d57e489134a429633d298a"
+    },
+    {
+      "file": "3d-final-markings-off.png",
+      "scenario": "Global markings off leaves controller geometry and movement intact",
+      "bytes": 455948,
+      "sha256": "86b329805a08d5e6694bf03d50517d89a02d5984e4e082cc04e0e7eee51fa110"
+    },
+    {
+      "file": "controller-demo.webm",
+      "scenario": "Real-time default controller demo",
+      "bytes": 4014433,
+      "sha256": "7313708116b409c2369b4bf5710735e94a2efdd36c26d0a5a188e517633bf97c"
+    },
+    {
+      "file": "3d-final-socket-front.png",
+      "scenario": "Both original support domes, shell-linked material, neutral front",
+      "bytes": 455317,
+      "sha256": "5ddf44ebb37570aae9620a23a2948594a2215a19b77f0fa29b57066cb7233930"
+    },
+    {
+      "file": "3d-final-socket-angled.png",
+      "scenario": "Both original support domes, shell-linked material, neutral angled",
+      "bytes": 433138,
+      "sha256": "22e6e12f6c2d800616bf1ffe38bcc002245a40bd653249d0d708b160e92791e1"
+    },
+    {
+      "file": "3d-final-socket-top.png",
+      "scenario": "Both original support domes, shell-linked material, neutral top",
+      "bytes": 440990,
+      "sha256": "6978ea7530231125ce0ce747d874e16c1f7fc7b94851df8583c6a18fc36acb62"
+    },
+    {
+      "file": "3d-final-socket-profile.png",
+      "scenario": "Both original support domes, shell-linked material, neutral profile",
+      "bytes": 414552,
+      "sha256": "c6204869cf0dd2d886fa2f9e4338c3ab2f56b599c605f4302e325b10ca708a8e"
+    },
+    {
+      "file": "3d-final-socket-original.png",
+      "scenario": "Original opaque source colors retained at 0% Ghost mix",
+      "bytes": 391487,
+      "sha256": "cd67dbc7b8fbbbe6ca8215d50c7d496689941936f66cf0f2c6a56e8b03fa07ef"
+    },
+    {
+      "file": "2d-final-alpha-0-neutral.png",
+      "scenario": "2D transparency 0% / neutral / dark-light-mixed",
+      "bytes": 439779,
+      "sha256": "9958aefe44d7531df66adfeb9ed7b1cb32a25c42af00227d3e3c64811a274b34"
+    },
+    {
+      "file": "2d-final-alpha-0-pressed.png",
+      "scenario": "2D transparency 0% / pressed / dark-light-mixed",
+      "bytes": 446029,
+      "sha256": "7b5c485fefd4cf6a0a7447ff8152f1b2285d854b429de27612680001ce1b3b75"
+    },
+    {
+      "file": "2d-final-alpha-0-move.png",
+      "scenario": "2D transparency 0% / move / dark-light-mixed",
+      "bytes": 443799,
+      "sha256": "aac73be727d85a2b2b6c296a36b79837cfc1a3f5cd09b9e27a2e8d726e75a523"
+    },
+    {
+      "file": "2d-final-alpha-0-move-click.png",
+      "scenario": "2D transparency 0% / move-click / dark-light-mixed",
+      "bytes": 442923,
+      "sha256": "9501da39fa570c77e87b466b9ac6e0b0b2d38f778bc0a6896fde60758f259c62"
+    },
+    {
+      "file": "2d-final-alpha-30-neutral.png",
+      "scenario": "2D transparency 30% / neutral / dark-light-mixed",
+      "bytes": 451025,
+      "sha256": "9425914135494d2190a7adf15dae9cfe2553542d63484eced82113b1d7400a76"
+    },
+    {
+      "file": "2d-final-alpha-30-pressed.png",
+      "scenario": "2D transparency 30% / pressed / dark-light-mixed",
+      "bytes": 446375,
+      "sha256": "853927e81dcc381197f6fcd23c2ddbaa3300d175b37204098ea677d6fbcc9dbd"
+    },
+    {
+      "file": "2d-final-alpha-30-move.png",
+      "scenario": "2D transparency 30% / move / dark-light-mixed",
+      "bytes": 454707,
+      "sha256": "62ae307af955a2a4e1c034a48e85a310a9ec6dc4e0714905be7119790d4ac0e7"
+    },
+    {
+      "file": "2d-final-alpha-30-move-click.png",
+      "scenario": "2D transparency 30% / move-click / dark-light-mixed",
+      "bytes": 453872,
+      "sha256": "79b1ed59922d230457eaaa5f702b0506b88d11f9b0fd232d0fadc4bc520e9dbb"
+    },
+    {
+      "file": "2d-final-alpha-70-neutral.png",
+      "scenario": "2D transparency 70% / neutral / dark-light-mixed",
+      "bytes": 455171,
+      "sha256": "8c1df8f2f91ce36d5a9eeba3f0cf627c02a77e2d882fc786d98a260e2cfd1029"
+    },
+    {
+      "file": "2d-final-alpha-70-pressed.png",
+      "scenario": "2D transparency 70% / pressed / dark-light-mixed",
+      "bytes": 446931,
+      "sha256": "9d2c41135e4e41c5f7f10ef7e3ff1b70663b5efd670935cf889e1df3d3034521"
+    },
+    {
+      "file": "2d-final-alpha-70-move.png",
+      "scenario": "2D transparency 70% / move / dark-light-mixed",
+      "bytes": 458354,
+      "sha256": "2518c8d6426e97e62bd98c1800f6101470b92f07e9426ddda30f0a8abf6c7d65"
+    },
+    {
+      "file": "2d-final-alpha-70-move-click.png",
+      "scenario": "2D transparency 70% / move-click / dark-light-mixed",
+      "bytes": 457449,
+      "sha256": "413fb6cd715c06107f54abaf37184d91e8b19e7d845772fa09320b5538fc7e61"
+    },
+    {
+      "file": "2d-final-alpha-90-neutral.png",
+      "scenario": "2D transparency 90% / neutral / dark-light-mixed",
+      "bytes": 456370,
+      "sha256": "b23d6439c1a513c915cab91492f36f46f486cb139db1b1dc2b717a7c38429834"
+    },
+    {
+      "file": "2d-final-alpha-90-pressed.png",
+      "scenario": "2D transparency 90% / pressed / dark-light-mixed",
+      "bytes": 446986,
+      "sha256": "e8dd0d68d607c37e67c6b8899538e12f266a582ce01f4680f62b2227a25bedd8"
+    },
+    {
+      "file": "2d-final-alpha-90-move.png",
+      "scenario": "2D transparency 90% / move / dark-light-mixed",
+      "bytes": 459318,
+      "sha256": "b710f15b137ff89b62fcdc677cb0e2856a3f166822d2a114f8d929476e8ac16d"
+    },
+    {
+      "file": "2d-final-alpha-90-move-click.png",
+      "scenario": "2D transparency 90% / move-click / dark-light-mixed",
+      "bytes": 458380,
+      "sha256": "677f18efa67d30104877fb5e38bc4193c59588960a0973fb1342b98669b0b13f"
+    },
+    {
+      "file": "2d-final-alpha-markings-off.png",
+      "scenario": "Markings off preserves independent surface treatment",
+      "bytes": 449069,
+      "sha256": "fca94866869dcda2676d53c0d5110c3e5bd6c343d99338a878dfdeea8fe47c31"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-0-neutral.png",
+      "scenario": "DualSense / neutral / transparency 0 / 3 backgrounds / paired production renderers",
+      "bytes": 262277,
+      "sha256": "52dbe0cb8b84f59d92ff098ccb5ea4c3543863ec469391310040d65ed6702018"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-30-neutral.png",
+      "scenario": "DualSense / neutral / transparency 30 / 3 backgrounds / paired production renderers",
+      "bytes": 268573,
+      "sha256": "230a45efd991cd3b35cdf15bd8c08740deafedca3e7200c67fca6af31c993097"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-70-neutral.png",
+      "scenario": "DualSense / neutral / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 270938,
+      "sha256": "74f2bdca8dfe6f80040635ae029327584b886c280fea4828d31a816a0bdb76ab"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-70-b1.png",
+      "scenario": "DualSense / b1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 271138,
+      "sha256": "8e08e7f5d856f8195fadc63ad840ac88dc396cf54c0f532a012e7c38e14b95ed"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-70-l1.png",
+      "scenario": "DualSense / l1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 271073,
+      "sha256": "c73cdecaff795b8ddfec599e637c0abbf6d7930290dcf16a67f89a8754cb2869"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-70-l2.png",
+      "scenario": "DualSense / l2 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 271951,
+      "sha256": "b5be26eee048513cdb30d1a188d15a1185625549f838f81ca1ae5040d78cb879"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-70-r1.png",
+      "scenario": "DualSense / r1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 271253,
+      "sha256": "11ed420957f8fb63d43138a78caecc28b8d2ab61f154984de8017bec28ee001c"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-70-r2.png",
+      "scenario": "DualSense / r2 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 272150,
+      "sha256": "4c18ecaa41627d21c77364c6a2b72fcfd862dc234df12f3bb0d890484d706a70"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-70-up.png",
+      "scenario": "DualSense / up / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 270912,
+      "sha256": "dce3812742a52a0788eaaba93e7abbd00f99301b33f862b3431acec18eca4c07"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-70-right-move.png",
+      "scenario": "DualSense / right-move / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 272192,
+      "sha256": "e7d9c6311809edeff770b22a09917fc2e23c422ab7ab547d1a7ce41b90c51d0a"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-70-left-move.png",
+      "scenario": "DualSense / left-move / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 272576,
+      "sha256": "8c2b93e30b6dae55ca82e83f91bbe9511c515f9ba43d8320c854084d48907e1d"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-70-rs-click.png",
+      "scenario": "DualSense / rs-click / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 271245,
+      "sha256": "e0390af9f48973bae62e8608e0fb45ef3b85b99a88a0810263dd2c96d1b1dee4"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-70-ls-click.png",
+      "scenario": "DualSense / ls-click / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 271345,
+      "sha256": "a382a90059d0de28e62d8ca5206509e654874ab7170748eab3c9f977dd631cc2"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-70-combined.png",
+      "scenario": "DualSense / combined / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 270514,
+      "sha256": "69dbf013f082d3edc8cf876cb0a3cbec01490ca74f33eb483d8047a9f41b8d4a"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-90-neutral.png",
+      "scenario": "DualSense / neutral / transparency 90 / 3 backgrounds / paired production renderers",
+      "bytes": 271827,
+      "sha256": "e01e363507fb888be4d6adace7964188cae51ee77fe4199f09665d69c54595bc"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-mix0-front-neutral.png",
+      "scenario": "DualSense / mix 0 / front / neutral",
+      "bytes": 232478,
+      "sha256": "5e824f21c61192cf3ccd3ffafbead73fdbc8efb99edcec0f8e7ede802bfccf2f"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-mix0-front-combined.png",
+      "scenario": "DualSense / mix 0 / front / combined",
+      "bytes": 233556,
+      "sha256": "82a2eef85bcbcacaec8d25bf40dfcba702da1710cadfcf3e24da56914d8a6019"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-mix0-angled-neutral.png",
+      "scenario": "DualSense / mix 0 / angled / neutral",
+      "bytes": 235204,
+      "sha256": "c11aefa49672f04e9749dde96a66b0618e4f46a80326a85a6149aaa3f6c373bf"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-mix0-angled-combined.png",
+      "scenario": "DualSense / mix 0 / angled / combined",
+      "bytes": 235618,
+      "sha256": "bd5e0d0c23e147536e941b9ac4db1a24d47d9961482afd19a8e139f67732e99a"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-mix0-bottom-neutral.png",
+      "scenario": "DualSense / mix 0 / bottom / neutral",
+      "bytes": 236016,
+      "sha256": "c7b64d657c9514fdc6062d2b7044cb83b521a0694ee1dd6c92ad1aee99fd0c17"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-mix0-bottom-combined.png",
+      "scenario": "DualSense / mix 0 / bottom / combined",
+      "bytes": 236617,
+      "sha256": "1097a3530bdff05d69e5f42c1056d87b7fe998854f5138a5a886695436b91bb0"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-mix70-front-neutral.png",
+      "scenario": "DualSense / mix 70 / front / neutral",
+      "bytes": 270359,
+      "sha256": "6e3c6ce3a74c00f82c0bc7ca155ce661ac6c1099ef2cb32dd30fc11534f4fa45"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-mix70-front-combined.png",
+      "scenario": "DualSense / mix 70 / front / combined",
+      "bytes": 269965,
+      "sha256": "04a10b5594254ec79d839317ade5729fbcbe94fa3389a9e3fbf98d75dad05971"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-mix70-angled-neutral.png",
+      "scenario": "DualSense / mix 70 / angled / neutral",
+      "bytes": 257382,
+      "sha256": "b41998d8f10fd8fb430ca1b4de0502af931edb009232e93fadaf8aa1e8047c0c"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-mix70-angled-combined.png",
+      "scenario": "DualSense / mix 70 / angled / combined",
+      "bytes": 257758,
+      "sha256": "94bac6ee0301291769778a7bdbf15a266c92a4ada0a50bd18187c723c5e7b4a2"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-mix70-bottom-neutral.png",
+      "scenario": "DualSense / mix 70 / bottom / neutral",
+      "bytes": 260519,
+      "sha256": "c71e2e1be1966f2f42b65e228deaea7a01baa29a1903a51c95ae82a488db44ea"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-mix70-bottom-combined.png",
+      "scenario": "DualSense / mix 70 / bottom / combined",
+      "bytes": 260454,
+      "sha256": "29bf3765c7cdd769e0dcbf10ebd4caed3ab0f287a583866bd8944f579547bc92"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-mix100-front-neutral.png",
+      "scenario": "DualSense / mix 100 / front / neutral",
+      "bytes": 262113,
+      "sha256": "f2540b91a19319f5d38165ec446c8aabb578077bc1cdce23fbfea0fa1ba733ed"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-mix100-front-combined.png",
+      "scenario": "DualSense / mix 100 / front / combined",
+      "bytes": 261798,
+      "sha256": "21f2cbd5c687f62e593d9045ccd60315445156bfd6ceb4ea62c462a26ad624fc"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-mix100-angled-neutral.png",
+      "scenario": "DualSense / mix 100 / angled / neutral",
+      "bytes": 253400,
+      "sha256": "e378286e3e022a0e9bad0eec2ce6f3b5fb5e29685e84d27d732be10da36d0ff7"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-mix100-angled-combined.png",
+      "scenario": "DualSense / mix 100 / angled / combined",
+      "bytes": 253422,
+      "sha256": "5613e1680261aa2c4b8e72c0d811baf3d5b706be9ae4d6645407ff4c86170e3d"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-mix100-bottom-neutral.png",
+      "scenario": "DualSense / mix 100 / bottom / neutral",
+      "bytes": 255812,
+      "sha256": "f2681fb3673506e2dcddb57b4288a02c89f0e87e6dbdb7c9f73788bfe49a3a12"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-mix100-bottom-combined.png",
+      "scenario": "DualSense / mix 100 / bottom / combined",
+      "bytes": 256523,
+      "sha256": "ddacf67509d063d89bd2a1a8459fba444d23bc759bb14461a063e2167a035198"
+    },
+    {
+      "file": "3d-final-model-dualsensecompact-markings-off.png",
+      "scenario": "DualSense / global markings off",
+      "bytes": 266698,
+      "sha256": "17de532ac8e8ba5ce556a20f190a79c51cfc70e54a264339e4f8399946b4b140"
+    },
+    {
+      "file": "3d-final-model-ds4compact-0-neutral.png",
+      "scenario": "DualShock 4 / neutral / transparency 0 / 3 backgrounds / paired production renderers",
+      "bytes": 257641,
+      "sha256": "b4a6b16cbfef0ee03dc9b4678b109ec5e69e50e19249ea02a90328aee0ef722f"
+    },
+    {
+      "file": "3d-final-model-ds4compact-30-neutral.png",
+      "scenario": "DualShock 4 / neutral / transparency 30 / 3 backgrounds / paired production renderers",
+      "bytes": 262255,
+      "sha256": "4775b7545317d153fbd409bb3a298feb993722a455e19d27fa6c2296891bb489"
+    },
+    {
+      "file": "3d-final-model-ds4compact-70-neutral.png",
+      "scenario": "DualShock 4 / neutral / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 264427,
+      "sha256": "0de2f471c3d86396d728a62010ca51be99117e907b26f89038facd87e350acf6"
+    },
+    {
+      "file": "3d-final-model-ds4compact-70-b1.png",
+      "scenario": "DualShock 4 / b1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 264657,
+      "sha256": "8b7c9e1a9a6d62a83dddffac9c61848f1afac08ef0838f5ff862629e61e77f10"
+    },
+    {
+      "file": "3d-final-model-ds4compact-70-l1.png",
+      "scenario": "DualShock 4 / l1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 264548,
+      "sha256": "470add4b786f5320c553dd0089972a69d9850895d7d44d209228bab15df52509"
+    },
+    {
+      "file": "3d-final-model-ds4compact-70-l2.png",
+      "scenario": "DualShock 4 / l2 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 265137,
+      "sha256": "eea65bd2bb8b328012919aa37816499e768b5d3dc123f12070f57ad998d2492c"
+    },
+    {
+      "file": "3d-final-model-ds4compact-70-r1.png",
+      "scenario": "DualShock 4 / r1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 264729,
+      "sha256": "fe874904bb83c53cb1faa25d348b1391e041ac0c9ef0c0c7b5f3cdf238a66316"
+    },
+    {
+      "file": "3d-final-model-ds4compact-70-r2.png",
+      "scenario": "DualShock 4 / r2 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 265048,
+      "sha256": "d1fe4f949c96d2c6b86ac57a90c94d0bb2b916dfd1afd2e9ab4826eba2443ba3"
+    },
+    {
+      "file": "3d-final-model-ds4compact-70-up.png",
+      "scenario": "DualShock 4 / up / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 264377,
+      "sha256": "8d5bd88f4bd8cbab503af0e986a773917b48a91d8f9b8eafee0e2642ad099e95"
+    },
+    {
+      "file": "3d-final-model-ds4compact-70-left-move.png",
+      "scenario": "DualShock 4 / left-move / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 266233,
+      "sha256": "713eea1c027b78b21334b1af51ca436649acd1068db8ffcb5bb83a94a5f2b4e9"
+    },
+    {
+      "file": "3d-final-model-ds4compact-70-right-move.png",
+      "scenario": "DualShock 4 / right-move / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 266147,
+      "sha256": "2b6ae90ef8ffe66a67e1e65b0d085541b9ffed701bcb9a83c6c597b8f148c76e"
+    },
+    {
+      "file": "3d-final-model-ds4compact-70-ls-click.png",
+      "scenario": "DualShock 4 / ls-click / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 264960,
+      "sha256": "7b62473bd5334f9a019e4abdbcc1b2488146853f6557df2d28e9fc4f14ba1a33"
+    },
+    {
+      "file": "3d-final-model-ds4compact-70-rs-click.png",
+      "scenario": "DualShock 4 / rs-click / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 264964,
+      "sha256": "775e10dd683c3eb91d74181d57b09facaddaca50c251269db0ec8eb07801b20e"
+    },
+    {
+      "file": "3d-final-model-ds4compact-70-combined.png",
+      "scenario": "DualShock 4 / combined / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 264233,
+      "sha256": "db4310e3050b4b2fa67b58a550e1d344003f40c1ba057fada1c37d063a825c85"
+    },
+    {
+      "file": "3d-final-model-ds4compact-90-neutral.png",
+      "scenario": "DualShock 4 / neutral / transparency 90 / 3 backgrounds / paired production renderers",
+      "bytes": 265342,
+      "sha256": "18760f98be0034dd072156511a43a29fd1266741469f1922a1f5070991ceddc9"
+    },
+    {
+      "file": "3d-final-model-ds4compact-mix0-front-neutral.png",
+      "scenario": "DualShock 4 / mix 0 / front / neutral",
+      "bytes": 230248,
+      "sha256": "00f3472f121bf071a053cf8847964b3e488a23acab53b299e0f1e25000dfcd4a"
+    },
+    {
+      "file": "3d-final-model-ds4compact-mix0-front-combined.png",
+      "scenario": "DualShock 4 / mix 0 / front / combined",
+      "bytes": 231672,
+      "sha256": "8bdc8092a02d83d24f5476922ed29b737edf994a66ccb57f6d20f298bdefb384"
+    },
+    {
+      "file": "3d-final-model-ds4compact-mix0-angled-neutral.png",
+      "scenario": "DualShock 4 / mix 0 / angled / neutral",
+      "bytes": 234744,
+      "sha256": "6185f8822549ca963c8da3884232afafa6d550d9b76295affc86056f116f1330"
+    },
+    {
+      "file": "3d-final-model-ds4compact-mix0-angled-combined.png",
+      "scenario": "DualShock 4 / mix 0 / angled / combined",
+      "bytes": 235221,
+      "sha256": "1489c9a514386e4632b4742a89a8b83b4d758599fa5b708800296fe3cbf599fb"
+    },
+    {
+      "file": "3d-final-model-ds4compact-mix0-bottom-neutral.png",
+      "scenario": "DualShock 4 / mix 0 / bottom / neutral",
+      "bytes": 234603,
+      "sha256": "c84cf6feb4e181a82f8af8e8615f0e11e12658546b3522b1a0519c7fee48ba8c"
+    },
+    {
+      "file": "3d-final-model-ds4compact-mix0-bottom-combined.png",
+      "scenario": "DualShock 4 / mix 0 / bottom / combined",
+      "bytes": 235856,
+      "sha256": "6138d6f0e6ac40f2085f6929885d3cb4c9c93b8e967bc651f2524403b6d49a60"
+    },
+    {
+      "file": "3d-final-model-ds4compact-mix70-front-neutral.png",
+      "scenario": "DualShock 4 / mix 70 / front / neutral",
+      "bytes": 264321,
+      "sha256": "e514f7271cd3b31b693d972e95a47a1764cdb92e9c6e188d03477880c34d871c"
+    },
+    {
+      "file": "3d-final-model-ds4compact-mix70-front-combined.png",
+      "scenario": "DualShock 4 / mix 70 / front / combined",
+      "bytes": 264529,
+      "sha256": "4300cf50aa35acd530287b9191c73e6546d3da105ff6714bb11016108b318112"
+    },
+    {
+      "file": "3d-final-model-ds4compact-mix70-angled-neutral.png",
+      "scenario": "DualShock 4 / mix 70 / angled / neutral",
+      "bytes": 254128,
+      "sha256": "d827c06ab73e5b63fabc61e9af7d8ffbd2b45463081c20263977a3208d758986"
+    },
+    {
+      "file": "3d-final-model-ds4compact-mix70-angled-combined.png",
+      "scenario": "DualShock 4 / mix 70 / angled / combined",
+      "bytes": 254490,
+      "sha256": "6e54778761273744fb8f443b893ca640ed3025aa6c246c94f8b65591cae0bb94"
+    },
+    {
+      "file": "3d-final-model-ds4compact-mix70-bottom-neutral.png",
+      "scenario": "DualShock 4 / mix 70 / bottom / neutral",
+      "bytes": 256916,
+      "sha256": "0bd082cee882ba8e1fed61a85b87e614054b126ba92fb2e45994ee129f640ec8"
+    },
+    {
+      "file": "3d-final-model-ds4compact-mix70-bottom-combined.png",
+      "scenario": "DualShock 4 / mix 70 / bottom / combined",
+      "bytes": 257535,
+      "sha256": "b083d66c9bbc28c6f46d64072a4170367ec97a036d41fdf9b65b86c595ce5526"
+    },
+    {
+      "file": "3d-final-model-ds4compact-mix100-front-neutral.png",
+      "scenario": "DualShock 4 / mix 100 / front / neutral",
+      "bytes": 255595,
+      "sha256": "8b28cfaf4988f8c991d563cf26f0af61195b340e856201c7eebc1df793a9033b"
+    },
+    {
+      "file": "3d-final-model-ds4compact-mix100-front-combined.png",
+      "scenario": "DualShock 4 / mix 100 / front / combined",
+      "bytes": 256632,
+      "sha256": "f49762eb101097882090a249767d2587c950b4e1b6265b8f97e58b8ee2691059"
+    },
+    {
+      "file": "3d-final-model-ds4compact-mix100-angled-neutral.png",
+      "scenario": "DualShock 4 / mix 100 / angled / neutral",
+      "bytes": 249206,
+      "sha256": "31513840d45cb395af78f7889f794b1dd7c8d95474ed56bf9f2b0e96abc418c1"
+    },
+    {
+      "file": "3d-final-model-ds4compact-mix100-angled-combined.png",
+      "scenario": "DualShock 4 / mix 100 / angled / combined",
+      "bytes": 249576,
+      "sha256": "f3e1afa9bb2be78922abe5228bd3faed32047132deea89dd22441a9ca042ee8e"
+    },
+    {
+      "file": "3d-final-model-ds4compact-mix100-bottom-neutral.png",
+      "scenario": "DualShock 4 / mix 100 / bottom / neutral",
+      "bytes": 252864,
+      "sha256": "d345231011c58dd78a8f049bdf5c8225352a06ac278cd2da5e52d92394b64dcc"
+    },
+    {
+      "file": "3d-final-model-ds4compact-mix100-bottom-combined.png",
+      "scenario": "DualShock 4 / mix 100 / bottom / combined",
+      "bytes": 253638,
+      "sha256": "5f0a2af7e6311c66dda6a16edefc910cce72c7ce59ad14d6fb43743930fa052b"
+    },
+    {
+      "file": "3d-final-model-ds4compact-markings-off.png",
+      "scenario": "DualShock 4 / global markings off",
+      "bytes": 259692,
+      "sha256": "5d5fd1407c4753330adb484c40e230c85958808d0db7262416477bd48e3264a1"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-0-neutral.png",
+      "scenario": "Xbox One / neutral / transparency 0 / 3 backgrounds / paired production renderers",
+      "bytes": 262362,
+      "sha256": "66d71e07aac9f6cb082ead9d9b12fcf846808823be78e8651075d1764db6cb62"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-30-neutral.png",
+      "scenario": "Xbox One / neutral / transparency 30 / 3 backgrounds / paired production renderers",
+      "bytes": 267319,
+      "sha256": "2e3b0dda5ef346ca372dcc7054b72ee31c37b0339dd25675511f11414fc903d7"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-70-neutral.png",
+      "scenario": "Xbox One / neutral / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 269246,
+      "sha256": "744972a7374ac728b76f9b44625f77afaca1839f394897caca96ff3bc096661c"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-70-b1.png",
+      "scenario": "Xbox One / b1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 269403,
+      "sha256": "5a9e6cc422af9e08dde798e1320e103ab8aba8ef947c1f4d9c79ab0dadc72632"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-70-l1.png",
+      "scenario": "Xbox One / l1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 269861,
+      "sha256": "8e0c79ec113cd8e2d8e02d4bfa5ca0bada13e540578deb186be8c53a42edab32"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-70-l2.png",
+      "scenario": "Xbox One / l2 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 270000,
+      "sha256": "83d127cb29d7f5f78addb45ef85b1999877a1d72393117495ae7fd7bc0064e74"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-70-r1.png",
+      "scenario": "Xbox One / r1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 270235,
+      "sha256": "75127f07a749a631d3042ebed12b188d66ab28943f9568ca7a9a6d3576322189"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-70-r2.png",
+      "scenario": "Xbox One / r2 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 270305,
+      "sha256": "2e0588b6d372e2190a0816df9661e562a243c448f05d4327b656372f19ce138b"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-70-up.png",
+      "scenario": "Xbox One / up / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 269473,
+      "sha256": "5e7b40cfb92b77bc0e4f66880466b5aceb5166ff20b646049813259e327491db"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-70-right-move.png",
+      "scenario": "Xbox One / right-move / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 269648,
+      "sha256": "8474e208cd33a2fcd6db5c8b567153e0a342cf9445c2f617220178f7cfc99dc0"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-70-left-move.png",
+      "scenario": "Xbox One / left-move / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 269867,
+      "sha256": "b87768c1654b46c64858ee6fc5b34714b5e964fdfc38afdab47558632a37a5df"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-70-rs-click.png",
+      "scenario": "Xbox One / rs-click / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 269801,
+      "sha256": "9326d57ddeb7307df1b8bcaf354bce78c94f5cc5c3d1c52da8614ea9bb91de97"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-70-ls-click.png",
+      "scenario": "Xbox One / ls-click / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 269549,
+      "sha256": "2a920a52cdaa9512084a1ccc67f8b598d61b3dcaf83cd38ecae3e20dd82db516"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-70-combined.png",
+      "scenario": "Xbox One / combined / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 268331,
+      "sha256": "70e02d2a47db50f9ee79076707ff73c246651a88a39ffdebf6e245fcd5923bca"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-90-neutral.png",
+      "scenario": "Xbox One / neutral / transparency 90 / 3 backgrounds / paired production renderers",
+      "bytes": 269902,
+      "sha256": "2d98c4735db6c1baa179c8fc43dad7f189dde011a7e0e56237f0e4fc2a4250cb"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-mix0-front-neutral.png",
+      "scenario": "Xbox One / mix 0 / front / neutral",
+      "bytes": 229687,
+      "sha256": "cb59c70ffde24aa26d48627a8aaba29785969fd00385db9d99a57b2c6c80f5c2"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-mix0-front-combined.png",
+      "scenario": "Xbox One / mix 0 / front / combined",
+      "bytes": 229485,
+      "sha256": "e69c2a0385fc9cf21d1ac126568e3d7e1c456aa0cf9b67064c9a046f4cd99dfb"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-mix0-angled-neutral.png",
+      "scenario": "Xbox One / mix 0 / angled / neutral",
+      "bytes": 232353,
+      "sha256": "5e5832712e8236f18573ffb32346cfcf1357d79ca88d98d4e6d485f0f676cd60"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-mix0-angled-combined.png",
+      "scenario": "Xbox One / mix 0 / angled / combined",
+      "bytes": 231849,
+      "sha256": "1204578838f5165392433838ae92b8de484e78f620bc6203d1a4942c86d927ba"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-mix0-bottom-neutral.png",
+      "scenario": "Xbox One / mix 0 / bottom / neutral",
+      "bytes": 231822,
+      "sha256": "ca03547551a6c5e56c5b637ae652af7b7e316325d921f6f579f475e68479d774"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-mix0-bottom-combined.png",
+      "scenario": "Xbox One / mix 0 / bottom / combined",
+      "bytes": 231265,
+      "sha256": "00c9c9a9a8852785e7118e2339367e4ed5ae088cbcf00ad4ab4c767b74097e0d"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-mix70-front-neutral.png",
+      "scenario": "Xbox One / mix 70 / front / neutral",
+      "bytes": 269130,
+      "sha256": "31f53ada796d1e2714c69a5d4c69b7963f48ba02b5de7420cd2ca3f61f4877cb"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-mix70-front-combined.png",
+      "scenario": "Xbox One / mix 70 / front / combined",
+      "bytes": 267891,
+      "sha256": "51611eaf4c8d119b266379522bbec8bf262fe3188d3811e032332b7a7c4de492"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-mix70-angled-neutral.png",
+      "scenario": "Xbox One / mix 70 / angled / neutral",
+      "bytes": 252832,
+      "sha256": "c634ba05e261bd9cfa254e484bc71e6423112561000bcf358955406a0eaabe31"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-mix70-angled-combined.png",
+      "scenario": "Xbox One / mix 70 / angled / combined",
+      "bytes": 253163,
+      "sha256": "b59692ecb0d47e5f916944e77ae1bcbc74875376bc85e03c381d078f74ffc863"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-mix70-bottom-neutral.png",
+      "scenario": "Xbox One / mix 70 / bottom / neutral",
+      "bytes": 257795,
+      "sha256": "c18fb3b8f36cd803a867631cce8788cc1245b5e6a6dd38329ed5815998c93899"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-mix70-bottom-combined.png",
+      "scenario": "Xbox One / mix 70 / bottom / combined",
+      "bytes": 257307,
+      "sha256": "7fd8606a6fb936241391b168a99d6181bed60a1fe25eb6e688a043907198e1a9"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-mix100-front-neutral.png",
+      "scenario": "Xbox One / mix 100 / front / neutral",
+      "bytes": 260226,
+      "sha256": "a44e9246a2d6ca8441397af3cb361291e09f97aa7b546477ee35ee61c8110663"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-mix100-front-combined.png",
+      "scenario": "Xbox One / mix 100 / front / combined",
+      "bytes": 259488,
+      "sha256": "eca89ae0276076f7ed598b1282bd3137a430af75a08ec03e799ee730531ccbca"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-mix100-angled-neutral.png",
+      "scenario": "Xbox One / mix 100 / angled / neutral",
+      "bytes": 248569,
+      "sha256": "5a23a5e6e50801e3377f475ff69777551994c010794a6fd453818bd1a7a72f3a"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-mix100-angled-combined.png",
+      "scenario": "Xbox One / mix 100 / angled / combined",
+      "bytes": 248642,
+      "sha256": "3c7fc4e7df29625c9ed2ebaeb3c82167d036f2eb2e14a47aaec6e9847794090f"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-mix100-bottom-neutral.png",
+      "scenario": "Xbox One / mix 100 / bottom / neutral",
+      "bytes": 252997,
+      "sha256": "89c9375ede767e96673e10f571bea7c02186d23b46c2f48a9e814e001e57f589"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-mix100-bottom-combined.png",
+      "scenario": "Xbox One / mix 100 / bottom / combined",
+      "bytes": 252889,
+      "sha256": "2959343c154205323486a4672b73d72390edb2a9638e0e5b1330748a4ade7236"
+    },
+    {
+      "file": "3d-final-model-xboxoneclean-markings-off.png",
+      "scenario": "Xbox One / global markings off",
+      "bytes": 264784,
+      "sha256": "d9ce1357b6fbdd31b0db28a8ac20b9bf3397c5e558f5066aba95e4cadc9157cd"
+    },
+    {
+      "file": "3d-final-model-xbox360-0-neutral.png",
+      "scenario": "Xbox 360 / neutral / transparency 0 / 3 backgrounds / paired production renderers",
+      "bytes": 259603,
+      "sha256": "fee7a3e0eb29be6209c3a53f234d3b220668c4ab1423ce85ab9abd7b6cd6bd2b"
+    },
+    {
+      "file": "3d-final-model-xbox360-30-neutral.png",
+      "scenario": "Xbox 360 / neutral / transparency 30 / 3 backgrounds / paired production renderers",
+      "bytes": 264252,
+      "sha256": "38e85f799a83abe84945a4196905554dea1d7131e5a2a50c31f004e45e2fd7c7"
+    },
+    {
+      "file": "3d-final-model-xbox360-70-neutral.png",
+      "scenario": "Xbox 360 / neutral / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 266511,
+      "sha256": "136e26d4dab560e6f7538bc9fd9a66def53b69bfd0ab29755d79297d6aa66359"
+    },
+    {
+      "file": "3d-final-model-xbox360-70-b1.png",
+      "scenario": "Xbox 360 / b1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 266359,
+      "sha256": "fb4e319ec6a505b186a98e15ff7bbbe284d32d013f77767c7638ea16d5598d73"
+    },
+    {
+      "file": "3d-final-model-xbox360-70-l1.png",
+      "scenario": "Xbox 360 / l1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 266378,
+      "sha256": "b3fab8536fab29fb92c823dfe8edccdd22def4ad24bb1ea7edc4ea2259407dce"
+    },
+    {
+      "file": "3d-final-model-xbox360-70-l2.png",
+      "scenario": "Xbox 360 / l2 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 267120,
+      "sha256": "270442452eb5d15244c6b10ed76a745c1717921bcb7823d06c7b229d3a0b2b7c"
+    },
+    {
+      "file": "3d-final-model-xbox360-70-r1.png",
+      "scenario": "Xbox 360 / r1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 266736,
+      "sha256": "9456201a9594c6726f0f1505204786090101a88025ba9c6a7704b97c3f1ffdf8"
+    },
+    {
+      "file": "3d-final-model-xbox360-70-r2.png",
+      "scenario": "Xbox 360 / r2 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 267262,
+      "sha256": "df62429de483c1efbe43c77f01c498eca20b0a1202deb2dc5e84bf6cd80fd38c"
+    },
+    {
+      "file": "3d-final-model-xbox360-70-up.png",
+      "scenario": "Xbox 360 / up / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 266714,
+      "sha256": "1ad5b173956ee63e139a8567e31dea99846ea0168683b932a78a612f2664804f"
+    },
+    {
+      "file": "3d-final-model-xbox360-70-right-move.png",
+      "scenario": "Xbox 360 / right-move / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 267257,
+      "sha256": "5315fb4e66c3b61e9bfb0d70633808e6f31ac9c1e9ece3bf3a3374f0d3317e60"
+    },
+    {
+      "file": "3d-final-model-xbox360-70-left-move.png",
+      "scenario": "Xbox 360 / left-move / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 267297,
+      "sha256": "7b527e21653c6ae5799d1040a5dff0fd9bd95b4689ce99d59d99fb6d89d70981"
+    },
+    {
+      "file": "3d-final-model-xbox360-70-rs-click.png",
+      "scenario": "Xbox 360 / rs-click / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 267105,
+      "sha256": "38f9b3c3d2caaaf8af696a95c7066d664084783310b283081d786eb49d55b16b"
+    },
+    {
+      "file": "3d-final-model-xbox360-70-ls-click.png",
+      "scenario": "Xbox 360 / ls-click / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 266866,
+      "sha256": "0ba9505d1e0795564852464ca8ab2a4ee6b8d00244afac07b914d70dd21dddb2"
+    },
+    {
+      "file": "3d-final-model-xbox360-70-combined.png",
+      "scenario": "Xbox 360 / combined / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 264582,
+      "sha256": "acd86d4968956f48ef7b612c680e4feafd79526d2aa72f394b35ebc77636d4a6"
+    },
+    {
+      "file": "3d-final-model-xbox360-90-neutral.png",
+      "scenario": "Xbox 360 / neutral / transparency 90 / 3 backgrounds / paired production renderers",
+      "bytes": 267170,
+      "sha256": "0da3b9b97169177188d5c49924c8ee6d36e4efcc2ada0103eb8acc59f31a811b"
+    },
+    {
+      "file": "3d-final-model-xbox360-mix0-front-neutral.png",
+      "scenario": "Xbox 360 / mix 0 / front / neutral",
+      "bytes": 230945,
+      "sha256": "cfae983c6060b38bfcb2fb6d5f4c6633712ab19b5bc67f97804aac18abf454d4"
+    },
+    {
+      "file": "3d-final-model-xbox360-mix0-front-combined.png",
+      "scenario": "Xbox 360 / mix 0 / front / combined",
+      "bytes": 230604,
+      "sha256": "da85d3d6f8b3e63d0a0252b2f43b7af7422d4a89dd766ca2d61475d69c326bf4"
+    },
+    {
+      "file": "3d-final-model-xbox360-mix0-angled-neutral.png",
+      "scenario": "Xbox 360 / mix 0 / angled / neutral",
+      "bytes": 230810,
+      "sha256": "e0c49d6fadc2d34b9fc50935c4af6dcf992c6e940cbc783f9cc980358d1bdbff"
+    },
+    {
+      "file": "3d-final-model-xbox360-mix0-angled-combined.png",
+      "scenario": "Xbox 360 / mix 0 / angled / combined",
+      "bytes": 229985,
+      "sha256": "6a56b542cc8fc3773f377fab71c1c982206be0e3869eec7f2a05b1eca5a8b878"
+    },
+    {
+      "file": "3d-final-model-xbox360-mix0-bottom-neutral.png",
+      "scenario": "Xbox 360 / mix 0 / bottom / neutral",
+      "bytes": 232286,
+      "sha256": "278f7f8ee123ef2128a569abce1bcad465e87425bdf0de9f9805ffd5a6f3fba6"
+    },
+    {
+      "file": "3d-final-model-xbox360-mix0-bottom-combined.png",
+      "scenario": "Xbox 360 / mix 0 / bottom / combined",
+      "bytes": 231743,
+      "sha256": "1e27bebe570c66f0fca8829e6a1c724cf626547b2f8830751bf35f5cc1b31cff"
+    },
+    {
+      "file": "3d-final-model-xbox360-mix70-front-neutral.png",
+      "scenario": "Xbox 360 / mix 70 / front / neutral",
+      "bytes": 266393,
+      "sha256": "ce58c24de3d76e3068613f9f5b1fb87d92ec7ac627057daeb28d7d55284804e6"
+    },
+    {
+      "file": "3d-final-model-xbox360-mix70-front-combined.png",
+      "scenario": "Xbox 360 / mix 70 / front / combined",
+      "bytes": 264848,
+      "sha256": "c30d8c3859c697b2f13b98718ef02352d4a5ee90c25b3dff3d32e474fa96360a"
+    },
+    {
+      "file": "3d-final-model-xbox360-mix70-angled-neutral.png",
+      "scenario": "Xbox 360 / mix 70 / angled / neutral",
+      "bytes": 249490,
+      "sha256": "41b1c97f99cae45118fbd5957632d1cceaace8d3a3a238dab904cd901f699ef1"
+    },
+    {
+      "file": "3d-final-model-xbox360-mix70-angled-combined.png",
+      "scenario": "Xbox 360 / mix 70 / angled / combined",
+      "bytes": 248330,
+      "sha256": "19feb06115c9d98f127fb45029d6c3c54d67484322a7729ede4a8e98847ab8a8"
+    },
+    {
+      "file": "3d-final-model-xbox360-mix70-bottom-neutral.png",
+      "scenario": "Xbox 360 / mix 70 / bottom / neutral",
+      "bytes": 255934,
+      "sha256": "7408423bbbdd68e9d04bb684e2ca78bdff541dca2c2e4cf3818d7e429dadf5c0"
+    },
+    {
+      "file": "3d-final-model-xbox360-mix70-bottom-combined.png",
+      "scenario": "Xbox 360 / mix 70 / bottom / combined",
+      "bytes": 255349,
+      "sha256": "d10f6afa25f23b7fc278ca61cbb8f440fcd38e8b43cc4b5b92993e2196bbd95f"
+    },
+    {
+      "file": "3d-final-model-xbox360-mix100-front-neutral.png",
+      "scenario": "Xbox 360 / mix 100 / front / neutral",
+      "bytes": 256891,
+      "sha256": "5c278893910108c792afb9fe6bdb2a463d40ac19e9d90bf498dcf8834dbaf838"
+    },
+    {
+      "file": "3d-final-model-xbox360-mix100-front-combined.png",
+      "scenario": "Xbox 360 / mix 100 / front / combined",
+      "bytes": 256715,
+      "sha256": "bc52ab8d371a7e68a3fa1b2ce270544376fb002b987a7defaac5204b693111fd"
+    },
+    {
+      "file": "3d-final-model-xbox360-mix100-angled-neutral.png",
+      "scenario": "Xbox 360 / mix 100 / angled / neutral",
+      "bytes": 243943,
+      "sha256": "5222f803df063985a6499dffae04ab3e25dcc66310ef39a3fe402e5515366eb0"
+    },
+    {
+      "file": "3d-final-model-xbox360-mix100-angled-combined.png",
+      "scenario": "Xbox 360 / mix 100 / angled / combined",
+      "bytes": 242967,
+      "sha256": "733d3bcb37c740f1838a57f20584f802055a940903e0314c95f4bcce50bef934"
+    },
+    {
+      "file": "3d-final-model-xbox360-mix100-bottom-neutral.png",
+      "scenario": "Xbox 360 / mix 100 / bottom / neutral",
+      "bytes": 249836,
+      "sha256": "2cf7a0e8fd07fad44e5eb64ae0d96a9ebe3133b85cbb5f0b6ebd448b6b1dfeca"
+    },
+    {
+      "file": "3d-final-model-xbox360-mix100-bottom-combined.png",
+      "scenario": "Xbox 360 / mix 100 / bottom / combined",
+      "bytes": 248654,
+      "sha256": "cdecbf48cfc42015c62b2aba222ab85bcb83316fa34b9497af8615b4ad8649e6"
+    },
+    {
+      "file": "3d-final-model-xbox360-markings-off.png",
+      "scenario": "Xbox 360 / global markings off",
+      "bytes": 262630,
+      "sha256": "9c64245ca0622b91b00d0153f48c34924bb18367ac4e74a81ea46defc4f5f93e"
+    },
+    {
+      "file": "3d-final-model-switchpro-0-neutral.png",
+      "scenario": "Switch Pro / neutral / transparency 0 / 3 backgrounds / paired production renderers",
+      "bytes": 262234,
+      "sha256": "bbbb7c74e3a01da26ddd0727a4616f414598a8f1d6b3720ddb1fb946ed9f677e"
+    },
+    {
+      "file": "3d-final-model-switchpro-30-neutral.png",
+      "scenario": "Switch Pro / neutral / transparency 30 / 3 backgrounds / paired production renderers",
+      "bytes": 265252,
+      "sha256": "dc5ecf8eb5b58396f81e5120b0a51e1c9c2b9fb93934b8edb6b1b35179f2a2bb"
+    },
+    {
+      "file": "3d-final-model-switchpro-70-neutral.png",
+      "scenario": "Switch Pro / neutral / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 267047,
+      "sha256": "86728d394f758bb7d6fd5ba6cd03f64d6744706d427bf39c7840e378b7264370"
+    },
+    {
+      "file": "3d-final-model-switchpro-70-b1.png",
+      "scenario": "Switch Pro / b1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 267347,
+      "sha256": "8490c2d6ec398d79234a42075a2f28342cc27a9044b41d6c3d0ccf93ff7f6beb"
+    },
+    {
+      "file": "3d-final-model-switchpro-70-l1.png",
+      "scenario": "Switch Pro / l1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 266508,
+      "sha256": "f9d53d3252b40cfb086907cf4f9fee5afda0ab12a44d3470c243eb68cd996559"
+    },
+    {
+      "file": "3d-final-model-switchpro-70-l2.png",
+      "scenario": "Switch Pro / l2 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 267036,
+      "sha256": "038bdcef6707e20f373e640f24f8eba14b875bc9926cef29b2d6e8831cbae962"
+    },
+    {
+      "file": "3d-final-model-switchpro-70-r1.png",
+      "scenario": "Switch Pro / r1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 267390,
+      "sha256": "08c23d41982d1cda5429d89173bd5f97613ee1b4348a76c66e43b40d0d62d601"
+    },
+    {
+      "file": "3d-final-model-switchpro-70-r2.png",
+      "scenario": "Switch Pro / r2 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 267120,
+      "sha256": "1cabece0e096e4701c592f594af949a97f1e4c6d7386692e713b919dbda564d6"
+    },
+    {
+      "file": "3d-final-model-switchpro-70-up.png",
+      "scenario": "Switch Pro / up / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 266822,
+      "sha256": "56ec313978381b8fadf3ddf363be0d77261d8f74822c485051dc12ace7377168"
+    },
+    {
+      "file": "3d-final-model-switchpro-70-right-move.png",
+      "scenario": "Switch Pro / right-move / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 267424,
+      "sha256": "79425e60ddc2e5cc3f2683adda2ee48fa598ce7a8e3567ce86ebfe71d0056c0a"
+    },
+    {
+      "file": "3d-final-model-switchpro-70-left-move.png",
+      "scenario": "Switch Pro / left-move / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 267371,
+      "sha256": "85d03de459d6e9d631720d52f977695d7ef2e8873381604a5a1ed80259bfd413"
+    },
+    {
+      "file": "3d-final-model-switchpro-70-rs-click.png",
+      "scenario": "Switch Pro / rs-click / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 267487,
+      "sha256": "cb0a9d702a03420a063f40fe00972aee56da4d6b0785c454aba53b47499a508c"
+    },
+    {
+      "file": "3d-final-model-switchpro-70-ls-click.png",
+      "scenario": "Switch Pro / ls-click / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 267386,
+      "sha256": "537ae642e553a259b1dba88734a32960a3c43fbae6d0569a46b2b8168b325f9b"
+    },
+    {
+      "file": "3d-final-model-switchpro-70-combined.png",
+      "scenario": "Switch Pro / combined / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 265483,
+      "sha256": "303ed7ec408875071786ea036312b3c2fd7f81107c8cc553843ed2162cddc836"
+    },
+    {
+      "file": "3d-final-model-switchpro-90-neutral.png",
+      "scenario": "Switch Pro / neutral / transparency 90 / 3 backgrounds / paired production renderers",
+      "bytes": 267628,
+      "sha256": "a16be674254c1f35cb2abeb13dea9c1f65b86138f963378d21b29be65bb1b411"
+    },
+    {
+      "file": "3d-final-model-switchpro-mix0-front-neutral.png",
+      "scenario": "Switch Pro / mix 0 / front / neutral",
+      "bytes": 232596,
+      "sha256": "94c96a44d987a6c624171dd9d7cd67bddd346347da0fccfbe898b29cc61a9ef4"
+    },
+    {
+      "file": "3d-final-model-switchpro-mix0-front-combined.png",
+      "scenario": "Switch Pro / mix 0 / front / combined",
+      "bytes": 233028,
+      "sha256": "fa457c76a67ef716985ded83584b038e48835805e191cbf15f0c78a67c59bd23"
+    },
+    {
+      "file": "3d-final-model-switchpro-mix0-angled-neutral.png",
+      "scenario": "Switch Pro / mix 0 / angled / neutral",
+      "bytes": 235025,
+      "sha256": "f3af1187c6ee861f63b90bc048006142f23f211ea06d70198b041bcd5566ac81"
+    },
+    {
+      "file": "3d-final-model-switchpro-mix0-angled-combined.png",
+      "scenario": "Switch Pro / mix 0 / angled / combined",
+      "bytes": 235734,
+      "sha256": "84b60148c270a3b4b8c2fbeacdf3f1333c5c5e50f50b1f6495e69afe13161aa6"
+    },
+    {
+      "file": "3d-final-model-switchpro-mix0-bottom-neutral.png",
+      "scenario": "Switch Pro / mix 0 / bottom / neutral",
+      "bytes": 238005,
+      "sha256": "01a11711afd06fdc634e20469e6a87c42a00023eb2b0c4a243539eeb392c07e9"
+    },
+    {
+      "file": "3d-final-model-switchpro-mix0-bottom-combined.png",
+      "scenario": "Switch Pro / mix 0 / bottom / combined",
+      "bytes": 238304,
+      "sha256": "4a22dd9083e65ca58cb20795a1fc5daa6c27ec33a7f95b26ffa6be40717ba463"
+    },
+    {
+      "file": "3d-final-model-switchpro-mix70-front-neutral.png",
+      "scenario": "Switch Pro / mix 70 / front / neutral",
+      "bytes": 266761,
+      "sha256": "b32c4b4ee1758370a4e2e782c3e5323246667b6f212d8bdc3b9d411d52cca515"
+    },
+    {
+      "file": "3d-final-model-switchpro-mix70-front-combined.png",
+      "scenario": "Switch Pro / mix 70 / front / combined",
+      "bytes": 265466,
+      "sha256": "7c666d290dfa3e2f4692c5bd575962a82700157abb1c6511e0f5ecb6217675f7"
+    },
+    {
+      "file": "3d-final-model-switchpro-mix70-angled-neutral.png",
+      "scenario": "Switch Pro / mix 70 / angled / neutral",
+      "bytes": 253490,
+      "sha256": "f3a794727883b8ad6df1af153f807d0417ce2d4f231f98ee8368989903a3062b"
+    },
+    {
+      "file": "3d-final-model-switchpro-mix70-angled-combined.png",
+      "scenario": "Switch Pro / mix 70 / angled / combined",
+      "bytes": 253908,
+      "sha256": "c70bc3e2779dba4277a153aa4be45e6e9c83829a7fa812dc3d0a4ef93b8ab407"
+    },
+    {
+      "file": "3d-final-model-switchpro-mix70-bottom-neutral.png",
+      "scenario": "Switch Pro / mix 70 / bottom / neutral",
+      "bytes": 259547,
+      "sha256": "64a583319b50eb70130ff19cd8e1e8ab8ef3a2776575bf34abe95f6ea056c12d"
+    },
+    {
+      "file": "3d-final-model-switchpro-mix70-bottom-combined.png",
+      "scenario": "Switch Pro / mix 70 / bottom / combined",
+      "bytes": 258981,
+      "sha256": "4e17f5aa2170ff86032988e4f80e87c5f65a556341a3aeecc70a7f61585ff747"
+    },
+    {
+      "file": "3d-final-model-switchpro-mix100-front-neutral.png",
+      "scenario": "Switch Pro / mix 100 / front / neutral",
+      "bytes": 258491,
+      "sha256": "8279aceff162df3aadf41ba2d890beb4078d4e6cb702ffb24668933d5fd92348"
+    },
+    {
+      "file": "3d-final-model-switchpro-mix100-front-combined.png",
+      "scenario": "Switch Pro / mix 100 / front / combined",
+      "bytes": 258124,
+      "sha256": "837fd1288ed2f4d5bb344ddc623a6bcb2d5d19be60863349f34a52bdde47e698"
+    },
+    {
+      "file": "3d-final-model-switchpro-mix100-angled-neutral.png",
+      "scenario": "Switch Pro / mix 100 / angled / neutral",
+      "bytes": 249675,
+      "sha256": "0422b3df6a43836ab1b8ad666ca9c2b395cfd3670b6186c9faed067c9a6e54b1"
+    },
+    {
+      "file": "3d-final-model-switchpro-mix100-angled-combined.png",
+      "scenario": "Switch Pro / mix 100 / angled / combined",
+      "bytes": 250031,
+      "sha256": "0e7a2612ab911de2ad3cbd44ff68795715a84665275172b6d095966f65d428b7"
+    },
+    {
+      "file": "3d-final-model-switchpro-mix100-bottom-neutral.png",
+      "scenario": "Switch Pro / mix 100 / bottom / neutral",
+      "bytes": 255373,
+      "sha256": "9d3151110b5bbcc5ab10fb1c6f35031f53c1c511407a84f022a6cd4426eb20a0"
+    },
+    {
+      "file": "3d-final-model-switchpro-mix100-bottom-combined.png",
+      "scenario": "Switch Pro / mix 100 / bottom / combined",
+      "bytes": 255318,
+      "sha256": "7d30c0c3babdf918870f1f0ff9cdaa6b841827090cbfbcfc8482dda4aa70d477"
+    },
+    {
+      "file": "3d-final-model-switchpro-markings-off.png",
+      "scenario": "Switch Pro / global markings off",
+      "bytes": 262536,
+      "sha256": "58ab6cd1ac09b7452871ac15174eb2d0c0f863193579414a03373bacf2b79908"
+    },
+    {
+      "file": "3d-final-model-joycongrip-0-neutral.png",
+      "scenario": "Joy-Cons · Grip / neutral / transparency 0 / 3 backgrounds / paired production renderers",
+      "bytes": 252292,
+      "sha256": "1e40bc1af82fa402a36f7a9125097969d2fa9a8c86e458f8d44f99bd389481cb"
+    },
+    {
+      "file": "3d-final-model-joycongrip-30-neutral.png",
+      "scenario": "Joy-Cons · Grip / neutral / transparency 30 / 3 backgrounds / paired production renderers",
+      "bytes": 253272,
+      "sha256": "9eaeb91f4399daf8d1e5e070d0f5439783f7b5547481148266ca463e667c303e"
+    },
+    {
+      "file": "3d-final-model-joycongrip-70-neutral.png",
+      "scenario": "Joy-Cons · Grip / neutral / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 253650,
+      "sha256": "b6fa0cb42b4c71caad44cef4a6cf04a04d60c0fb8d19325dde5ea31a17bdae88"
+    },
+    {
+      "file": "3d-final-model-joycongrip-70-b1.png",
+      "scenario": "Joy-Cons · Grip / b1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 253761,
+      "sha256": "bd3670a1b47a8f7043ebaa50b3378ac86f6d8898c9b9f505d7c89e7c65d076cc"
+    },
+    {
+      "file": "3d-final-model-joycongrip-70-l1.png",
+      "scenario": "Joy-Cons · Grip / l1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 254062,
+      "sha256": "1d51a59f3c1a313b1041258edf9a94c63d00f00f1526696cfdc1b00c4af9be63"
+    },
+    {
+      "file": "3d-final-model-joycongrip-70-l2.png",
+      "scenario": "Joy-Cons · Grip / l2 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 254533,
+      "sha256": "cd6a26dd154f4498cedf47c42d788c66007a93cc84ec322681a3437411df94f3"
+    },
+    {
+      "file": "3d-final-model-joycongrip-70-r1.png",
+      "scenario": "Joy-Cons · Grip / r1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 254572,
+      "sha256": "abda6c4735ac161854c8979f66bb356491b8de66ec49fbdbfc08181c76eeb494"
+    },
+    {
+      "file": "3d-final-model-joycongrip-70-r2.png",
+      "scenario": "Joy-Cons · Grip / r2 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 254705,
+      "sha256": "25b9b540fe2136d22b5d17cb8b3af7311024f3a36518be5d4d2be315be4cc168"
+    },
+    {
+      "file": "3d-final-model-joycongrip-70-up.png",
+      "scenario": "Joy-Cons · Grip / up / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 253926,
+      "sha256": "21616be6d4711d07037856a9d0e1748defe1d638a9f15908278bbb5b5f6d0748"
+    },
+    {
+      "file": "3d-final-model-joycongrip-70-right-move.png",
+      "scenario": "Joy-Cons · Grip / right-move / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 255385,
+      "sha256": "c01fa7b0ac07dfa7b3f37cb3b4f3c71340f4d694772286aa1cfce78b15298c4e"
+    },
+    {
+      "file": "3d-final-model-joycongrip-70-left-move.png",
+      "scenario": "Joy-Cons · Grip / left-move / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 255178,
+      "sha256": "899702aad5da833cb01cd8291220cf91f19418326f3ed0881237a1082eb1051c"
+    },
+    {
+      "file": "3d-final-model-joycongrip-70-rs-click.png",
+      "scenario": "Joy-Cons · Grip / rs-click / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 253837,
+      "sha256": "1f79a4c4c17f2073dcad525fc1cfa97e2c0a5ce857dc877903818cffd158ec85"
+    },
+    {
+      "file": "3d-final-model-joycongrip-70-ls-click.png",
+      "scenario": "Joy-Cons · Grip / ls-click / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 253898,
+      "sha256": "23f128f8a8698abf56b7763fe9ab01617280b97bc26606516042b879d875f826"
+    },
+    {
+      "file": "3d-final-model-joycongrip-70-combined.png",
+      "scenario": "Joy-Cons · Grip / combined / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 255493,
+      "sha256": "4b19cc3aad99f166928ee393eb3687c4899f4113ecefb7cfd36f30f353ed3d53"
+    },
+    {
+      "file": "3d-final-model-joycongrip-90-neutral.png",
+      "scenario": "Joy-Cons · Grip / neutral / transparency 90 / 3 backgrounds / paired production renderers",
+      "bytes": 253944,
+      "sha256": "681d4ad65bcf709bf373d3f9ccbae41c6dbd58866a640eb2b9f3bcdb30d83162"
+    },
+    {
+      "file": "3d-final-model-joycongrip-mix0-front-neutral.png",
+      "scenario": "Joy-Cons · Grip / mix 0 / front / neutral",
+      "bytes": 214736,
+      "sha256": "97786878c7c30fe198590b79dad201c4de006015c0a3e95f09d326570ef33ca0"
+    },
+    {
+      "file": "3d-final-model-joycongrip-mix0-front-combined.png",
+      "scenario": "Joy-Cons · Grip / mix 0 / front / combined",
+      "bytes": 217610,
+      "sha256": "7a7c6fd9752eaa449da7678ce46723436cf14630e449591b0388adaa5a2889dd"
+    },
+    {
+      "file": "3d-final-model-joycongrip-mix0-angled-neutral.png",
+      "scenario": "Joy-Cons · Grip / mix 0 / angled / neutral",
+      "bytes": 221875,
+      "sha256": "2e2899d92163c6a36a98baabbcb4e02b19c9e0b0d8d44d0b0a5b42207ac761b3"
+    },
+    {
+      "file": "3d-final-model-joycongrip-mix0-angled-combined.png",
+      "scenario": "Joy-Cons · Grip / mix 0 / angled / combined",
+      "bytes": 224441,
+      "sha256": "76a1d9ddea78775600937b422aae7bc09b0fce916e1e5e07d70dd6a812c7129a"
+    },
+    {
+      "file": "3d-final-model-joycongrip-mix0-bottom-neutral.png",
+      "scenario": "Joy-Cons · Grip / mix 0 / bottom / neutral",
+      "bytes": 224033,
+      "sha256": "12a99ab7489dea42a1e534e94409969af7b503b6a2a46166920014771d0f814a"
+    },
+    {
+      "file": "3d-final-model-joycongrip-mix0-bottom-combined.png",
+      "scenario": "Joy-Cons · Grip / mix 0 / bottom / combined",
+      "bytes": 226653,
+      "sha256": "5f2a910d44528c2fe085493ab001d210e45d788ac6d85bed703112766eda19a1"
+    },
+    {
+      "file": "3d-final-model-joycongrip-mix70-front-neutral.png",
+      "scenario": "Joy-Cons · Grip / mix 70 / front / neutral",
+      "bytes": 253887,
+      "sha256": "0e0df752dc176836854af4ed1c745642e4c6f1e7fbed8f2fcd76f479e562c170"
+    },
+    {
+      "file": "3d-final-model-joycongrip-mix70-front-combined.png",
+      "scenario": "Joy-Cons · Grip / mix 70 / front / combined",
+      "bytes": 255384,
+      "sha256": "bc7965b79ac76747c9a90ba482e4072b432977acecef3957fc18fc5b18b1b43a"
+    },
+    {
+      "file": "3d-final-model-joycongrip-mix70-angled-neutral.png",
+      "scenario": "Joy-Cons · Grip / mix 70 / angled / neutral",
+      "bytes": 243899,
+      "sha256": "09766e4a7fdf317a8fca04cba13743ad0cac903994071abfb9a7e64970a1d710"
+    },
+    {
+      "file": "3d-final-model-joycongrip-mix70-angled-combined.png",
+      "scenario": "Joy-Cons · Grip / mix 70 / angled / combined",
+      "bytes": 246836,
+      "sha256": "7d4c3620d96b1837580c2062f748e0fcd95029e94f50304cbca27865a9193826"
+    },
+    {
+      "file": "3d-final-model-joycongrip-mix70-bottom-neutral.png",
+      "scenario": "Joy-Cons · Grip / mix 70 / bottom / neutral",
+      "bytes": 254518,
+      "sha256": "63267e640003dbd51235a1df2839b627d6077dd73fec54366881868752754be6"
+    },
+    {
+      "file": "3d-final-model-joycongrip-mix70-bottom-combined.png",
+      "scenario": "Joy-Cons · Grip / mix 70 / bottom / combined",
+      "bytes": 256368,
+      "sha256": "a1716e58bfaa798dce2b681889c2c77b5738cf6128bda89351cc5f239e702b87"
+    },
+    {
+      "file": "3d-final-model-joycongrip-mix100-front-neutral.png",
+      "scenario": "Joy-Cons · Grip / mix 100 / front / neutral",
+      "bytes": 246967,
+      "sha256": "df2c2cc82cdbdecfbb1a2d025516bd450a696fa5530485b9e767c8bfba64253e"
+    },
+    {
+      "file": "3d-final-model-joycongrip-mix100-front-combined.png",
+      "scenario": "Joy-Cons · Grip / mix 100 / front / combined",
+      "bytes": 249187,
+      "sha256": "6867e0712959721fd241ffdebbbd7282fab13b9976dadeda22516de67b6f1bf5"
+    },
+    {
+      "file": "3d-final-model-joycongrip-mix100-angled-neutral.png",
+      "scenario": "Joy-Cons · Grip / mix 100 / angled / neutral",
+      "bytes": 238355,
+      "sha256": "7951c37fb2e64825f96147224b23dfa3292ccc728cd93efe55cd631f11c14cbd"
+    },
+    {
+      "file": "3d-final-model-joycongrip-mix100-angled-combined.png",
+      "scenario": "Joy-Cons · Grip / mix 100 / angled / combined",
+      "bytes": 241339,
+      "sha256": "9933a17db5e35e9d14275797c7e7550bf6d0ec391b47eb4d0eb39232a6c1ed8c"
+    },
+    {
+      "file": "3d-final-model-joycongrip-mix100-bottom-neutral.png",
+      "scenario": "Joy-Cons · Grip / mix 100 / bottom / neutral",
+      "bytes": 247082,
+      "sha256": "d0a10fa9d24f289a62fa1e1dabf8d25d2121d0ad6d1dc4d9108e7c7e88a11bf9"
+    },
+    {
+      "file": "3d-final-model-joycongrip-mix100-bottom-combined.png",
+      "scenario": "Joy-Cons · Grip / mix 100 / bottom / combined",
+      "bytes": 249415,
+      "sha256": "81c9e367b0a630acb820926134f11f809d6bd81b6fff17c2bd86ab73b4b8f85b"
+    },
+    {
+      "file": "3d-final-model-joycongrip-markings-off.png",
+      "scenario": "Joy-Cons · Grip / global markings off",
+      "bytes": 251447,
+      "sha256": "b214f9825ac4caf4e1363c2e90a169af1960e7e7be9e2516acfc2742d48899da"
+    },
+    {
+      "file": "3d-final-model-joyconleft-0-neutral.png",
+      "scenario": "Joy-Con · left / neutral / transparency 0 / 3 backgrounds / paired production renderers",
+      "bytes": 199253,
+      "sha256": "0f599e23fcbb7cfe3ef75cdd65017857c9c175e9d444cc6fd5c5866b6ced03dc"
+    },
+    {
+      "file": "3d-final-model-joyconleft-30-neutral.png",
+      "scenario": "Joy-Con · left / neutral / transparency 30 / 3 backgrounds / paired production renderers",
+      "bytes": 199899,
+      "sha256": "1eac7457759b29ef98f259c2871582b79bae98d0ed3bc9786122d79b8cce2848"
+    },
+    {
+      "file": "3d-final-model-joyconleft-70-neutral.png",
+      "scenario": "Joy-Con · left / neutral / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 200186,
+      "sha256": "5ddf2126d2ebb0de545de62db4abe8149d083f4a8151570a538d6fdad924d84f"
+    },
+    {
+      "file": "3d-final-model-joyconleft-70-l1.png",
+      "scenario": "Joy-Con · left / l1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 200664,
+      "sha256": "7bef98951e03e936858904833ab72e589071b401de6b942a28ba27eb5ede40fa"
+    },
+    {
+      "file": "3d-final-model-joyconleft-70-l2.png",
+      "scenario": "Joy-Con · left / l2 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 200811,
+      "sha256": "c4ce4fbb70bd0748fe9e6b9c2a8959f60343a7acf31a11fa8cf875bd2b4dc671"
+    },
+    {
+      "file": "3d-final-model-joyconleft-70-up.png",
+      "scenario": "Joy-Con · left / up / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 200528,
+      "sha256": "e73e32bba3b52310191ac13b965fdfd9148a02ed1171d4ef1412627fb463e76e"
+    },
+    {
+      "file": "3d-final-model-joyconleft-70-left-move.png",
+      "scenario": "Joy-Con · left / left-move / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 201633,
+      "sha256": "ffa5f593d5ffebc8bf2971d31827549a94b9e12e9c3a5e2af34e61bb40e26725"
+    },
+    {
+      "file": "3d-final-model-joyconleft-70-ls-click.png",
+      "scenario": "Joy-Con · left / ls-click / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 200254,
+      "sha256": "f46d96ca5dc8e2327787569bf5e717947e8da96cb4a399aadf35f70553c8ac8f"
+    },
+    {
+      "file": "3d-final-model-joyconleft-70-combined.png",
+      "scenario": "Joy-Con · left / combined / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 200983,
+      "sha256": "4b5628bb01731ae84eb4f62b8a3d66acd7bfa569eb6b40caab218a0b0120a725"
+    },
+    {
+      "file": "3d-final-model-joyconleft-90-neutral.png",
+      "scenario": "Joy-Con · left / neutral / transparency 90 / 3 backgrounds / paired production renderers",
+      "bytes": 200387,
+      "sha256": "74099f39901855292d21ec21e50ac29cd8b84e1d57af56b984aadcaec72d1d3c"
+    },
+    {
+      "file": "3d-final-model-joyconleft-mix0-front-neutral.png",
+      "scenario": "Joy-Con · left / mix 0 / front / neutral",
+      "bytes": 186321,
+      "sha256": "1c249eb1d4bacfbbcde11882e8a42eb5efcf715dcbef8158c786ea67e246791e"
+    },
+    {
+      "file": "3d-final-model-joyconleft-mix0-front-combined.png",
+      "scenario": "Joy-Con · left / mix 0 / front / combined",
+      "bytes": 187772,
+      "sha256": "cdd44b22c860b3c35491b31f9fd55944f82b61ac1ddf530d0b42466021ccb551"
+    },
+    {
+      "file": "3d-final-model-joyconleft-mix0-angled-neutral.png",
+      "scenario": "Joy-Con · left / mix 0 / angled / neutral",
+      "bytes": 188694,
+      "sha256": "0db59383ab749b2833b513a63ac9c11d3c7a9b45e0d480f3f49751d0d93bad29"
+    },
+    {
+      "file": "3d-final-model-joyconleft-mix0-angled-combined.png",
+      "scenario": "Joy-Con · left / mix 0 / angled / combined",
+      "bytes": 190034,
+      "sha256": "1b8c2b97b6a4932da98db0a06c0f00478019a98103ce4550f1d7d29f53e17c9e"
+    },
+    {
+      "file": "3d-final-model-joyconleft-mix0-bottom-neutral.png",
+      "scenario": "Joy-Con · left / mix 0 / bottom / neutral",
+      "bytes": 189801,
+      "sha256": "83b1b6c9e96d33d6a0f3da75291833c6fa4c656b90d8632e51463a28ca5e160b"
+    },
+    {
+      "file": "3d-final-model-joyconleft-mix0-bottom-combined.png",
+      "scenario": "Joy-Con · left / mix 0 / bottom / combined",
+      "bytes": 191122,
+      "sha256": "48bb6fb14197927d51b0ab10efd0fbf8afce64d036e46be900092597f43c5c98"
+    },
+    {
+      "file": "3d-final-model-joyconleft-mix70-front-neutral.png",
+      "scenario": "Joy-Con · left / mix 70 / front / neutral",
+      "bytes": 200385,
+      "sha256": "56949e795e779f54fd5d0737ea9a10abda4b455d37ace1df78db816af7645b95"
+    },
+    {
+      "file": "3d-final-model-joyconleft-mix70-front-combined.png",
+      "scenario": "Joy-Con · left / mix 70 / front / combined",
+      "bytes": 201159,
+      "sha256": "3d59af7eb4a7770ac8209804921e3ef93aa4f2e4fdc4f00d1934bf2a25ea2583"
+    },
+    {
+      "file": "3d-final-model-joyconleft-mix70-angled-neutral.png",
+      "scenario": "Joy-Con · left / mix 70 / angled / neutral",
+      "bytes": 201097,
+      "sha256": "d86132a4a2366e8d9223a8b9870d7de324059ec1c3bebad6538797328201bccb"
+    },
+    {
+      "file": "3d-final-model-joyconleft-mix70-angled-combined.png",
+      "scenario": "Joy-Con · left / mix 70 / angled / combined",
+      "bytes": 201796,
+      "sha256": "79f5a70ed5bed14e8bf1fc7e687b419e384fd833009b9014fb3fbc3f03dbf50e"
+    },
+    {
+      "file": "3d-final-model-joyconleft-mix70-bottom-neutral.png",
+      "scenario": "Joy-Con · left / mix 70 / bottom / neutral",
+      "bytes": 201385,
+      "sha256": "74809abb8277aa4e24fdb0868045fbd930fc7820b959927d9177eccf7f46a80c"
+    },
+    {
+      "file": "3d-final-model-joyconleft-mix70-bottom-combined.png",
+      "scenario": "Joy-Con · left / mix 70 / bottom / combined",
+      "bytes": 202119,
+      "sha256": "ca0455c8c48f2a38c9ac8d9558a84707d6d85470ce505af2cc6b804940c45148"
+    },
+    {
+      "file": "3d-final-model-joyconleft-mix100-front-neutral.png",
+      "scenario": "Joy-Con · left / mix 100 / front / neutral",
+      "bytes": 198153,
+      "sha256": "42070c90d6983b10d62cbbb4de3f17e748b946a1a6b1a0b20e570a519d390793"
+    },
+    {
+      "file": "3d-final-model-joyconleft-mix100-front-combined.png",
+      "scenario": "Joy-Con · left / mix 100 / front / combined",
+      "bytes": 198924,
+      "sha256": "171a65aa5d46b0aba15a66e8d3bb370e6932cbb3dd9785d1b4f3ab999f86e18f"
+    },
+    {
+      "file": "3d-final-model-joyconleft-mix100-angled-neutral.png",
+      "scenario": "Joy-Con · left / mix 100 / angled / neutral",
+      "bytes": 198792,
+      "sha256": "f2e829009d00a8c90952bf97415fb6976d0a48f2f412b1712ae56ba621cc9895"
+    },
+    {
+      "file": "3d-final-model-joyconleft-mix100-angled-combined.png",
+      "scenario": "Joy-Con · left / mix 100 / angled / combined",
+      "bytes": 199646,
+      "sha256": "d8971144c5d8ca516a96dbab8b4ddb86a48f30654225aae57faf73d51be35bca"
+    },
+    {
+      "file": "3d-final-model-joyconleft-mix100-bottom-neutral.png",
+      "scenario": "Joy-Con · left / mix 100 / bottom / neutral",
+      "bytes": 199200,
+      "sha256": "c6a248ef84594efd8a954e5e0922c65962a826fd46d4bcb8ed8703b8895af95d"
+    },
+    {
+      "file": "3d-final-model-joyconleft-mix100-bottom-combined.png",
+      "scenario": "Joy-Con · left / mix 100 / bottom / combined",
+      "bytes": 200133,
+      "sha256": "b50d746e22bea430e8deb12ce1ba8fab3593feb62a8219cab106ba0f9ec0b73b"
+    },
+    {
+      "file": "3d-final-model-joyconleft-markings-off.png",
+      "scenario": "Joy-Con · left / global markings off",
+      "bytes": 199098,
+      "sha256": "029a78445905795fcfc99e1718a9929df4c241c8cbe2d5ca479d15b454d41f5f"
+    },
+    {
+      "file": "3d-final-model-joyconright-0-neutral.png",
+      "scenario": "Joy-Con · right / neutral / transparency 0 / 3 backgrounds / paired production renderers",
+      "bytes": 200932,
+      "sha256": "616ab854b06f16a7ae44a6fe22ad7e58692bfc73d30b5fa2dcbbc3cde5c72748"
+    },
+    {
+      "file": "3d-final-model-joyconright-30-neutral.png",
+      "scenario": "Joy-Con · right / neutral / transparency 30 / 3 backgrounds / paired production renderers",
+      "bytes": 201530,
+      "sha256": "fb07c211bc0f3ead26e67e6abef56b3d88a119a451fe0fc116d09e9ce51e6c7b"
+    },
+    {
+      "file": "3d-final-model-joyconright-70-neutral.png",
+      "scenario": "Joy-Con · right / neutral / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 201892,
+      "sha256": "c83019df72ff0649f366a7b42eabc4749db17eee8dc66282b1892d9514c5dae2"
+    },
+    {
+      "file": "3d-final-model-joyconright-70-b1.png",
+      "scenario": "Joy-Con · right / b1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 201997,
+      "sha256": "efe4d15f093a6201fd11d44b48e7070a0488286a9bc1344a0451cf9b5eaad957"
+    },
+    {
+      "file": "3d-final-model-joyconright-70-r1.png",
+      "scenario": "Joy-Con · right / r1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 202502,
+      "sha256": "b924d1e7c6ba59aab23662629f54908a541d289d57fb1cbd3a15c6ee49e658f7"
+    },
+    {
+      "file": "3d-final-model-joyconright-70-r2.png",
+      "scenario": "Joy-Con · right / r2 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 202569,
+      "sha256": "0683ea003111ddd087b0c570cf3c47eaeed84352897c29d027cbaf2244d1161f"
+    },
+    {
+      "file": "3d-final-model-joyconright-70-right-move.png",
+      "scenario": "Joy-Con · right / right-move / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 203820,
+      "sha256": "83886db11ec26405703796dce7ee8cd3cbe0016057845f04892d9c75209495fd"
+    },
+    {
+      "file": "3d-final-model-joyconright-70-rs-click.png",
+      "scenario": "Joy-Con · right / rs-click / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 202261,
+      "sha256": "010d2e13949acf8dfd38737a56f97c1c186de53639ad7a96aebe6bd2f830cd69"
+    },
+    {
+      "file": "3d-final-model-joyconright-70-combined.png",
+      "scenario": "Joy-Con · right / combined / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 203177,
+      "sha256": "af1902720030b2f9577bfeaa9f76586ea59d7ea7798993c688a84ec4960fb0b7"
+    },
+    {
+      "file": "3d-final-model-joyconright-90-neutral.png",
+      "scenario": "Joy-Con · right / neutral / transparency 90 / 3 backgrounds / paired production renderers",
+      "bytes": 202082,
+      "sha256": "f34351fc820b8459dd5d1bb8c3f35fb6a472bba59c39e93f74697f74614aef82"
+    },
+    {
+      "file": "3d-final-model-joyconright-mix0-front-neutral.png",
+      "scenario": "Joy-Con · right / mix 0 / front / neutral",
+      "bytes": 188828,
+      "sha256": "72bc7b8891fa8183d4f7f6ed50ea0ff0d2603e5a041d450adcba7b5e07602210"
+    },
+    {
+      "file": "3d-final-model-joyconright-mix0-front-combined.png",
+      "scenario": "Joy-Con · right / mix 0 / front / combined",
+      "bytes": 190381,
+      "sha256": "d83fd4dea93f6b4b0e8e792190a72695d17050641e6ab064e2a827da1f04a56d"
+    },
+    {
+      "file": "3d-final-model-joyconright-mix0-angled-neutral.png",
+      "scenario": "Joy-Con · right / mix 0 / angled / neutral",
+      "bytes": 191172,
+      "sha256": "5b347bcd9fe19c47ef6d0836a6834aae1f1e20cc0fe18a70f86c653718d81245"
+    },
+    {
+      "file": "3d-final-model-joyconright-mix0-angled-combined.png",
+      "scenario": "Joy-Con · right / mix 0 / angled / combined",
+      "bytes": 192664,
+      "sha256": "3862be934fa0a6e2c686bdac8f40f6b073abf993d5212cdfb37c0a5b296dc739"
+    },
+    {
+      "file": "3d-final-model-joyconright-mix0-bottom-neutral.png",
+      "scenario": "Joy-Con · right / mix 0 / bottom / neutral",
+      "bytes": 191978,
+      "sha256": "9a0f42c161ed8be52a2ebc8d3e9d73fcda92a8808d06e1ee5ed4e91655af3c1b"
+    },
+    {
+      "file": "3d-final-model-joyconright-mix0-bottom-combined.png",
+      "scenario": "Joy-Con · right / mix 0 / bottom / combined",
+      "bytes": 193390,
+      "sha256": "d8d037d2970e3ad356fe220e7f10dc6a1c23168d777db4a1a4374c915233c2c1"
+    },
+    {
+      "file": "3d-final-model-joyconright-mix70-front-neutral.png",
+      "scenario": "Joy-Con · right / mix 70 / front / neutral",
+      "bytes": 201952,
+      "sha256": "9a9a217c6262c07cad3398a0ad4dbf7d79ec6d7a7cde5de18d2b0362daf9108e"
+    },
+    {
+      "file": "3d-final-model-joyconright-mix70-front-combined.png",
+      "scenario": "Joy-Con · right / mix 70 / front / combined",
+      "bytes": 203277,
+      "sha256": "45f8878580065f2099231f980b055277a11a17fe70206a453ad7f7e22894e293"
+    },
+    {
+      "file": "3d-final-model-joyconright-mix70-angled-neutral.png",
+      "scenario": "Joy-Con · right / mix 70 / angled / neutral",
+      "bytes": 202458,
+      "sha256": "c6ecad19c1edc1606585f72a28ed18d5732a8c66f22a9712b6451fd8441e1e61"
+    },
+    {
+      "file": "3d-final-model-joyconright-mix70-angled-combined.png",
+      "scenario": "Joy-Con · right / mix 70 / angled / combined",
+      "bytes": 203756,
+      "sha256": "92a8f34f5b3d078c291b9cc5920ca9ddecc67a50b452b4ab9d4c7d465af926f3"
+    },
+    {
+      "file": "3d-final-model-joyconright-mix70-bottom-neutral.png",
+      "scenario": "Joy-Con · right / mix 70 / bottom / neutral",
+      "bytes": 203151,
+      "sha256": "453e5fac3464c3d18d621272d3e396df36a3d5b090d7de4740b2506e12e60586"
+    },
+    {
+      "file": "3d-final-model-joyconright-mix70-bottom-combined.png",
+      "scenario": "Joy-Con · right / mix 70 / bottom / combined",
+      "bytes": 204203,
+      "sha256": "cf745883a0469583d2fca7feb4d3f5349eab80b7b45dca86c608746b6d7ec617"
+    },
+    {
+      "file": "3d-final-model-joyconright-mix100-front-neutral.png",
+      "scenario": "Joy-Con · right / mix 100 / front / neutral",
+      "bytes": 200045,
+      "sha256": "d505e4338397cdcb77527b424f0bc18a4987df134210da22e6eacb6e428a40aa"
+    },
+    {
+      "file": "3d-final-model-joyconright-mix100-front-combined.png",
+      "scenario": "Joy-Con · right / mix 100 / front / combined",
+      "bytes": 201399,
+      "sha256": "01b8dd8574ecc39c1e8f0771b01b06c91200d8c3f9560345f5f7659205087ec8"
+    },
+    {
+      "file": "3d-final-model-joyconright-mix100-angled-neutral.png",
+      "scenario": "Joy-Con · right / mix 100 / angled / neutral",
+      "bytes": 200250,
+      "sha256": "de487f8071544a0e43a51d6d6d408b98963d39d79daf5bd370791ef09bc5b83c"
+    },
+    {
+      "file": "3d-final-model-joyconright-mix100-angled-combined.png",
+      "scenario": "Joy-Con · right / mix 100 / angled / combined",
+      "bytes": 201778,
+      "sha256": "d42013624204d03dd6b3ef6962b84d80f0643bd14a9454ed53bd91b536497950"
+    },
+    {
+      "file": "3d-final-model-joyconright-mix100-bottom-neutral.png",
+      "scenario": "Joy-Con · right / mix 100 / bottom / neutral",
+      "bytes": 200987,
+      "sha256": "fd14fd1f493279b1d9138cda10aa440c3d10e80be72ae76250e66509f15bc74d"
+    },
+    {
+      "file": "3d-final-model-joyconright-mix100-bottom-combined.png",
+      "scenario": "Joy-Con · right / mix 100 / bottom / combined",
+      "bytes": 202114,
+      "sha256": "f430015446d3df47ca3e936425e38cabbf542ef2d86d030afd93c142e7cf3e5f"
+    },
+    {
+      "file": "3d-final-model-joyconright-markings-off.png",
+      "scenario": "Joy-Con · right / global markings off",
+      "bytes": 200667,
+      "sha256": "736e7d8891adf58e0bb331d7c001ae8c7a873aee94990900dd1b2d3df04a1426"
+    },
+    {
+      "file": "3d-final-model-gamecube-0-neutral.png",
+      "scenario": "GameCube / neutral / transparency 0 / 3 backgrounds / paired production renderers",
+      "bytes": 275763,
+      "sha256": "160f272a6d28d69295fbcfad99283d95c877d1955f8ed468baf37569628d6751"
+    },
+    {
+      "file": "3d-final-model-gamecube-30-neutral.png",
+      "scenario": "GameCube / neutral / transparency 30 / 3 backgrounds / paired production renderers",
+      "bytes": 278367,
+      "sha256": "c4731a388497441ed2311f35bcbe95a6ceed3ba749bf3a0fd09d9ed041fd3810"
+    },
+    {
+      "file": "3d-final-model-gamecube-70-neutral.png",
+      "scenario": "GameCube / neutral / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 279607,
+      "sha256": "1a9c24f827401a9c1248a8c8da625169dd6afdaec3de3e0bde2160404d9e6d36"
+    },
+    {
+      "file": "3d-final-model-gamecube-70-b1.png",
+      "scenario": "GameCube / b1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 279377,
+      "sha256": "144859400a9b7508720ac127fe940ed9af99b68b0e4904bb01fa73e0670ee31e"
+    },
+    {
+      "file": "3d-final-model-gamecube-70-l2.png",
+      "scenario": "GameCube / l2 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 280049,
+      "sha256": "7ed66bdec1d0207e56bb9666805467914ba7c1203d756683694ab63dfae6d3f9"
+    },
+    {
+      "file": "3d-final-model-gamecube-70-r1.png",
+      "scenario": "GameCube / r1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 279845,
+      "sha256": "b9a37fe06633a5b38b5cd5d9b5477d758121b85d3256de2ad2cf5427c8bbc806"
+    },
+    {
+      "file": "3d-final-model-gamecube-70-r2.png",
+      "scenario": "GameCube / r2 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 280853,
+      "sha256": "9a863efbd6b6f4b878680b2c6768dfb01a48125927d938e07f8b670e339ec77a"
+    },
+    {
+      "file": "3d-final-model-gamecube-70-up.png",
+      "scenario": "GameCube / up / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 279620,
+      "sha256": "c2b1f806800ed783585f3486a2f749a317fb39f5e93056ec83ebf87859368183"
+    },
+    {
+      "file": "3d-final-model-gamecube-70-right-move.png",
+      "scenario": "GameCube / right-move / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 280209,
+      "sha256": "7259f94911de3d71404e483d8c3642a9637ea7e2235dd8f21ecd1fed2b6f1004"
+    },
+    {
+      "file": "3d-final-model-gamecube-70-left-move.png",
+      "scenario": "GameCube / left-move / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 279956,
+      "sha256": "7a65d46dc1c374cdc49ae0c14dfd66361cf217df4e354dbd244296ca26446a98"
+    },
+    {
+      "file": "3d-final-model-gamecube-70-combined.png",
+      "scenario": "GameCube / combined / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 281142,
+      "sha256": "efcd908c418ddea2be7f39b8f38229377d29c8973cab7cdbc9b788e5706cfd25"
+    },
+    {
+      "file": "3d-final-model-gamecube-90-neutral.png",
+      "scenario": "GameCube / neutral / transparency 90 / 3 backgrounds / paired production renderers",
+      "bytes": 279865,
+      "sha256": "b87ca0f9c082d0c2349b42ba2489341f298f6957d306d8101eb103f3acbf9e94"
+    },
+    {
+      "file": "3d-final-model-gamecube-mix0-front-neutral.png",
+      "scenario": "GameCube / mix 0 / front / neutral",
+      "bytes": 248556,
+      "sha256": "dced4d085d96af495e93db16036e59ccadb7adcfa840e86e1e47349a8cdebbbd"
+    },
+    {
+      "file": "3d-final-model-gamecube-mix0-front-combined.png",
+      "scenario": "GameCube / mix 0 / front / combined",
+      "bytes": 248685,
+      "sha256": "7d8675e1c2563074a178cf67224d7184b8b1e7ea65b4b6def664041e77c83985"
+    },
+    {
+      "file": "3d-final-model-gamecube-mix0-angled-neutral.png",
+      "scenario": "GameCube / mix 0 / angled / neutral",
+      "bytes": 246015,
+      "sha256": "45a1a5b8d114ea850b506a4c07485d28b44c7dccb38e0bcb93c11f552dfe0166"
+    },
+    {
+      "file": "3d-final-model-gamecube-mix0-angled-combined.png",
+      "scenario": "GameCube / mix 0 / angled / combined",
+      "bytes": 245934,
+      "sha256": "af7780ae74d58d03aba594a15a6d589b4e40b8267b3cb3b39cfe16f63e0ab262"
+    },
+    {
+      "file": "3d-final-model-gamecube-mix0-bottom-neutral.png",
+      "scenario": "GameCube / mix 0 / bottom / neutral",
+      "bytes": 246509,
+      "sha256": "7b099d971c8d734b68f8ed7226b3bc009837e4299dc9ff727b9939447fed3646"
+    },
+    {
+      "file": "3d-final-model-gamecube-mix0-bottom-combined.png",
+      "scenario": "GameCube / mix 0 / bottom / combined",
+      "bytes": 246376,
+      "sha256": "9d06927c3e77c031c04a903e2f76d8e1eca377ef8714774fbffd8e27f810516d"
+    },
+    {
+      "file": "3d-final-model-gamecube-mix70-front-neutral.png",
+      "scenario": "GameCube / mix 70 / front / neutral",
+      "bytes": 279061,
+      "sha256": "ea8d5335e296e4836bf3a974015042b82f9b59ff9cb21a15763669025c662e72"
+    },
+    {
+      "file": "3d-final-model-gamecube-mix70-front-combined.png",
+      "scenario": "GameCube / mix 70 / front / combined",
+      "bytes": 280691,
+      "sha256": "4f59696dbeac53a337528a7d56ea2c74a70002117f7762f8987bc50cca6cffa6"
+    },
+    {
+      "file": "3d-final-model-gamecube-mix70-angled-neutral.png",
+      "scenario": "GameCube / mix 70 / angled / neutral",
+      "bytes": 262843,
+      "sha256": "7f69b4306c4eacccc664f3247ba9a665c0cbc635fb972ef2f366cd9e078feec2"
+    },
+    {
+      "file": "3d-final-model-gamecube-mix70-angled-combined.png",
+      "scenario": "GameCube / mix 70 / angled / combined",
+      "bytes": 263171,
+      "sha256": "c3d23c1e4fbbc178da3a2bb07bb7693994819f77434c846784d36c0ce35b8fde"
+    },
+    {
+      "file": "3d-final-model-gamecube-mix70-bottom-neutral.png",
+      "scenario": "GameCube / mix 70 / bottom / neutral",
+      "bytes": 267317,
+      "sha256": "b7f492b8a03ed1d21436baa77b913231e36288a72a733f8a3c44dd61f9fa8ccc"
+    },
+    {
+      "file": "3d-final-model-gamecube-mix70-bottom-combined.png",
+      "scenario": "GameCube / mix 70 / bottom / combined",
+      "bytes": 268230,
+      "sha256": "43c520a49a5311868284009ecde504a8e81d33d004e6b2ecdecd167aaacc6f8f"
+    },
+    {
+      "file": "3d-final-model-gamecube-mix100-front-neutral.png",
+      "scenario": "GameCube / mix 100 / front / neutral",
+      "bytes": 269808,
+      "sha256": "bb1bffeec5491968b4e29cf7daed2a0f023e1f21e75e9ef01f6400b6680259c4"
+    },
+    {
+      "file": "3d-final-model-gamecube-mix100-front-combined.png",
+      "scenario": "GameCube / mix 100 / front / combined",
+      "bytes": 271637,
+      "sha256": "bc3d5cfe64cc25451807a8b9aba69f0bffbfc9895dab992f92f1cb963a54dc38"
+    },
+    {
+      "file": "3d-final-model-gamecube-mix100-angled-neutral.png",
+      "scenario": "GameCube / mix 100 / angled / neutral",
+      "bytes": 257401,
+      "sha256": "51345906bd1294dba2d7dfab513b2aafa8af866770d9fd3a09ec72be4e858956"
+    },
+    {
+      "file": "3d-final-model-gamecube-mix100-angled-combined.png",
+      "scenario": "GameCube / mix 100 / angled / combined",
+      "bytes": 258383,
+      "sha256": "c18e0474284572950a533d3aa0e7c91751f861801e6918a68ce74579ae8539bf"
+    },
+    {
+      "file": "3d-final-model-gamecube-mix100-bottom-neutral.png",
+      "scenario": "GameCube / mix 100 / bottom / neutral",
+      "bytes": 259676,
+      "sha256": "9f06883239db1ba681a7450fd67a7ea0ef116f11742b8effd3b1237c2bedb97f"
+    },
+    {
+      "file": "3d-final-model-gamecube-mix100-bottom-combined.png",
+      "scenario": "GameCube / mix 100 / bottom / combined",
+      "bytes": 260865,
+      "sha256": "821a6a8cd4e9c2a5088c38fa9b8414f22e37a6d5a09934c65e4db1c61da2f61d"
+    },
+    {
+      "file": "3d-final-model-gamecube-markings-off.png",
+      "scenario": "GameCube / global markings off",
+      "bytes": 271032,
+      "sha256": "022b532b800a1bad714af8c575af43be61ff7159e272a75e9d7bcee10e0c95d9"
+    },
+    {
+      "file": "3d-final-model-genericpro-0-neutral.png",
+      "scenario": "Generic Pro / neutral / transparency 0 / 3 backgrounds / paired production renderers",
+      "bytes": 264630,
+      "sha256": "47145e5c5ba6dd326623ff44ef9d5773cee108c37c305bd5366f4737209eeb9d"
+    },
+    {
+      "file": "3d-final-model-genericpro-30-neutral.png",
+      "scenario": "Generic Pro / neutral / transparency 30 / 3 backgrounds / paired production renderers",
+      "bytes": 268128,
+      "sha256": "810f2e2b2f9851bfff165547138d2b952f3e4616129342656851bcbe6e61fadb"
+    },
+    {
+      "file": "3d-final-model-genericpro-70-neutral.png",
+      "scenario": "Generic Pro / neutral / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 269413,
+      "sha256": "21d2ce8da55930be6932da91ce5c02c3f1957cfb4cb4238fa98db6e9447e078e"
+    },
+    {
+      "file": "3d-final-model-genericpro-70-b1.png",
+      "scenario": "Generic Pro / b1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 269579,
+      "sha256": "43d8a1996927456cc1f87d896ebcf42aa7f9e6f6b6d306fdf0c425eede634f1d"
+    },
+    {
+      "file": "3d-final-model-genericpro-70-l1.png",
+      "scenario": "Generic Pro / l1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 269875,
+      "sha256": "7c696e9861b642db79280c61eb2d378e3103920aa37a8ef42548e7aade5a6dd1"
+    },
+    {
+      "file": "3d-final-model-genericpro-70-l2.png",
+      "scenario": "Generic Pro / l2 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 270215,
+      "sha256": "3fcdedec8e5a2c1a0ef3c7a330d4a737c2358106ba76fd4391dbbc25be3a702b"
+    },
+    {
+      "file": "3d-final-model-genericpro-70-r1.png",
+      "scenario": "Generic Pro / r1 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 270041,
+      "sha256": "b33a85e9f78fabe550de79dbabe0ed048b963d3d3a3982d54139aed8e47fbd75"
+    },
+    {
+      "file": "3d-final-model-genericpro-70-r2.png",
+      "scenario": "Generic Pro / r2 / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 270391,
+      "sha256": "f25db984d1be1e8dea05d4a36a955fac781ad91af0912274d752d7a19201ffa6"
+    },
+    {
+      "file": "3d-final-model-genericpro-70-up.png",
+      "scenario": "Generic Pro / up / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 269748,
+      "sha256": "e9ddbff120aa40ed4a56704b1628c7dfc00a561493c79e03e6c56c0e809624fa"
+    },
+    {
+      "file": "3d-final-model-genericpro-70-right-move.png",
+      "scenario": "Generic Pro / right-move / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 269955,
+      "sha256": "2827324289654a8b8798879d384bec88b9c2af0af314f841147f87aa193de665"
+    },
+    {
+      "file": "3d-final-model-genericpro-70-left-move.png",
+      "scenario": "Generic Pro / left-move / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 270093,
+      "sha256": "1280eefc2ab4dd2bcd377d532fc38ba6006543ca3879db200325640302db100b"
+    },
+    {
+      "file": "3d-final-model-genericpro-70-rs-click.png",
+      "scenario": "Generic Pro / rs-click / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 269950,
+      "sha256": "b0a9d382d4ad78d23dc085df29ef1052eb80e9d12ea802d99a3a9d53e9d05334"
+    },
+    {
+      "file": "3d-final-model-genericpro-70-ls-click.png",
+      "scenario": "Generic Pro / ls-click / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 269777,
+      "sha256": "30bf1b824ef7938b7fd63e4b6db492c97c0c401c53f265a332d789c9dc04a6eb"
+    },
+    {
+      "file": "3d-final-model-genericpro-70-combined.png",
+      "scenario": "Generic Pro / combined / transparency 70 / 3 backgrounds / paired production renderers",
+      "bytes": 268923,
+      "sha256": "a763ae0a8639b693270a5d656886f060685e6de3982bf9995ad114be22fb92ab"
+    },
+    {
+      "file": "3d-final-model-genericpro-90-neutral.png",
+      "scenario": "Generic Pro / neutral / transparency 90 / 3 backgrounds / paired production renderers",
+      "bytes": 269817,
+      "sha256": "8cf4230f5aeb09c75aff6ce5542bf8462b13f4f165f2dfa690719e1412faba8c"
+    },
+    {
+      "file": "3d-final-model-genericpro-mix0-front-neutral.png",
+      "scenario": "Generic Pro / mix 0 / front / neutral",
+      "bytes": 229555,
+      "sha256": "d8f340a0e684b7acd56310905dfa31d10507becc3492a484f80b5255a6ea8f6e"
+    },
+    {
+      "file": "3d-final-model-genericpro-mix0-front-combined.png",
+      "scenario": "Generic Pro / mix 0 / front / combined",
+      "bytes": 229764,
+      "sha256": "bbf97ab1acd74a73cf32eac3b20ba108801e8bab1f8c6e75d0a1a5cd9834dc5b"
+    },
+    {
+      "file": "3d-final-model-genericpro-mix0-angled-neutral.png",
+      "scenario": "Generic Pro / mix 0 / angled / neutral",
+      "bytes": 232134,
+      "sha256": "171731d32ad4c20cc01d765c72d2d59283f4368ce73d68c1b4e10cc80095736d"
+    },
+    {
+      "file": "3d-final-model-genericpro-mix0-angled-combined.png",
+      "scenario": "Generic Pro / mix 0 / angled / combined",
+      "bytes": 231767,
+      "sha256": "32a4c29d824e8b13c9d4855c22db758a1ea889638fb5f395c2f7dd39cc6e147e"
+    },
+    {
+      "file": "3d-final-model-genericpro-mix0-bottom-neutral.png",
+      "scenario": "Generic Pro / mix 0 / bottom / neutral",
+      "bytes": 231278,
+      "sha256": "cd1c8a6d297fe69a145679ab7d009368d5f9bbe80bd6d1faecec11d26beabd21"
+    },
+    {
+      "file": "3d-final-model-genericpro-mix0-bottom-combined.png",
+      "scenario": "Generic Pro / mix 0 / bottom / combined",
+      "bytes": 231034,
+      "sha256": "d3a5638b2e39375423527c8804042283e84f1028e127a441ab900f01d25d020a"
+    },
+    {
+      "file": "3d-final-model-genericpro-mix70-front-neutral.png",
+      "scenario": "Generic Pro / mix 70 / front / neutral",
+      "bytes": 269109,
+      "sha256": "906fa498e110e1d6fe76b17288d4fd5500fb4144df95e8fa118b7d806e816ecd"
+    },
+    {
+      "file": "3d-final-model-genericpro-mix70-front-combined.png",
+      "scenario": "Generic Pro / mix 70 / front / combined",
+      "bytes": 268253,
+      "sha256": "443d5c98004b4be124b2739f2b27adff45ffd03da7badb763eb900af4195f43b"
+    },
+    {
+      "file": "3d-final-model-genericpro-mix70-angled-neutral.png",
+      "scenario": "Generic Pro / mix 70 / angled / neutral",
+      "bytes": 253344,
+      "sha256": "da488496059b8c65b2691fead35a73526f82ef45faccaabb99feb07e63144f9b"
+    },
+    {
+      "file": "3d-final-model-genericpro-mix70-angled-combined.png",
+      "scenario": "Generic Pro / mix 70 / angled / combined",
+      "bytes": 253540,
+      "sha256": "c99e5479aaea2a453f56e9f3fc951cea850b4a7d6b22590c21fe8b4d72cf2039"
+    },
+    {
+      "file": "3d-final-model-genericpro-mix70-bottom-neutral.png",
+      "scenario": "Generic Pro / mix 70 / bottom / neutral",
+      "bytes": 257846,
+      "sha256": "1211a96991ee38c252dbf0c56a0fe892da0158cd6bc4909874ca5d33c43174ed"
+    },
+    {
+      "file": "3d-final-model-genericpro-mix70-bottom-combined.png",
+      "scenario": "Generic Pro / mix 70 / bottom / combined",
+      "bytes": 258092,
+      "sha256": "71360e23cfb024ccc64884e6cec0dea2d36fa558970423f841a02c325c471707"
+    },
+    {
+      "file": "3d-final-model-genericpro-mix100-front-neutral.png",
+      "scenario": "Generic Pro / mix 100 / front / neutral",
+      "bytes": 260481,
+      "sha256": "ac9c00b1ce30c95a9d8f927e8a2c6a2a3f1c04f841d9ec5e6a676dd8e1cca40b"
+    },
+    {
+      "file": "3d-final-model-genericpro-mix100-front-combined.png",
+      "scenario": "Generic Pro / mix 100 / front / combined",
+      "bytes": 260331,
+      "sha256": "ac28f001ac3385464c8409f1a7a048a8f68970f79c70f5bc41cc2eca963fae86"
+    },
+    {
+      "file": "3d-final-model-genericpro-mix100-angled-neutral.png",
+      "scenario": "Generic Pro / mix 100 / angled / neutral",
+      "bytes": 248479,
+      "sha256": "3e28dd5db528c9224784da5438e4322ba53cbb83677e574dedfe50952b781d88"
+    },
+    {
+      "file": "3d-final-model-genericpro-mix100-angled-combined.png",
+      "scenario": "Generic Pro / mix 100 / angled / combined",
+      "bytes": 249134,
+      "sha256": "673bf362c53179dfccee1914ea340fcca460deecb8d471c9266a55d1c8f0b324"
+    },
+    {
+      "file": "3d-final-model-genericpro-mix100-bottom-neutral.png",
+      "scenario": "Generic Pro / mix 100 / bottom / neutral",
+      "bytes": 253286,
+      "sha256": "f8c7b1ebd8edc8da2c5a18a06a9297a81ada6abd53be83b56d1e66ce7032f4bf"
+    },
+    {
+      "file": "3d-final-model-genericpro-mix100-bottom-combined.png",
+      "scenario": "Generic Pro / mix 100 / bottom / combined",
+      "bytes": 253085,
+      "sha256": "c1707a00fa69faceed721e156f3168b2289c04313f4df28187ed318fd731785e"
+    },
+    {
+      "file": "3d-final-model-genericpro-markings-off.png",
+      "scenario": "Generic Pro / global markings off",
+      "bytes": 263616,
+      "sha256": "63f7a347c5edb4b8f0aefe9641844883ec03f686c242a5face7e5d2c28ad71a4"
+    },
+    {
+      "file": "overview-neutral.png",
+      "pressed": false,
+      "bytes": 296401,
+      "sha256": "677f707d5b418d785a1b3d21744fcbc3f0908c3b6dea332bfe4a79c3985dbbec",
+      "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "revision": 1619,
+      "drawStats": {
+        "white": {
+          "mode": "shared",
+          "calls": 34,
+          "triangles": 7004,
+          "sourceCalls": 31,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 31
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 31
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 31
+            }
+          }
+        }
+      }
+    },
+    {
+      "file": "overview-pressed.png",
+      "pressed": true,
+      "bytes": 293464,
+      "sha256": "633acb8d4f1623021ef29bd35f6582dc90eed3c8e3a500b5be4b10654c21ef81",
+      "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "revision": 1620,
+      "drawStats": {
+        "white": {
+          "mode": "shared",
+          "calls": 38,
+          "triangles": 8126,
+          "sourceCalls": 35,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 35
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 35
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 35
+            }
+          }
+        }
+      }
+    },
+    {
+      "file": "3d-consolidated-original.png",
+      "scenario": "Materialmix 0%, neutral; one source-colored 3D recipe",
+      "bytes": 409881,
+      "sha256": "a00f1989d669658f1ee7f3ac9fd4029ae7b77d4aba06f6d36575cd316b952d32",
+      "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "revision": 1626,
+      "drawStats": {
+        "white": {
+          "mode": "shared",
+          "calls": 34,
+          "triangles": 7004,
+          "sourceCalls": 31,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 31
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 31
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 31
+            }
+          }
+        }
+      }
+    },
+    {
+      "file": "3d-consolidated-ghost.png",
+      "scenario": "Materialmix 100%, neutral; independent 2D",
+      "bytes": 461880,
+      "sha256": "bf0e610f287e06cb4361de21888e089f924a7d619b7d8affcaf921b30ae10486",
+      "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "revision": 1628,
+      "drawStats": {
+        "white": {
+          "mode": "shared",
+          "calls": 33,
+          "triangles": 7004,
+          "sourceCalls": 30,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 30
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 30
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 30
+            }
+          }
+        }
+      }
+    },
+    {
+      "file": "3d-consolidated-hidden-r1.png",
+      "scenario": "Front, Ghost 100%, only r1 active",
+      "bytes": 463241,
+      "sha256": "3132044234572937c7e07d9726f6b8a6e6bb5ec759f4cbb4e20a420536395b1a",
+      "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "revision": 1630,
+      "drawStats": {
+        "white": {
+          "mode": "shared",
+          "calls": 34,
+          "triangles": 7205,
+          "sourceCalls": 31,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 31
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 31
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 31
+            }
+          }
+        }
+      }
+    },
+    {
+      "file": "3d-consolidated-hidden-l2.png",
+      "scenario": "Front, Ghost 100%, only l2 active",
+      "bytes": 464384,
+      "sha256": "9f1287431afa04addb0a36c78f8c36da45c1054162bc8de107bda75023f67b39",
+      "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "revision": 1631,
+      "drawStats": {
+        "white": {
+          "mode": "shared",
+          "calls": 34,
+          "triangles": 7364,
+          "sourceCalls": 31,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 31
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 31
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 31
+            }
+          }
+        }
+      }
+    },
+    {
+      "file": "3d-consolidated-top.png",
+      "scenario": "High camera angle, both triggers physically rendered",
+      "bytes": 454243,
+      "sha256": "c526cbe494377fa366c1c03b9b254300fd53f707979c753a249a5b3762812233",
+      "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "revision": 1636,
+      "drawStats": {
+        "white": {
+          "mode": "shared",
+          "calls": 33,
+          "triangles": 7004,
+          "sourceCalls": 30,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 30
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 30
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 30
+            }
+          }
+        }
+      }
+    },
+    {
+      "file": "3d-consolidated-feedback.png",
+      "scenario": "Materialmix 0%, only cross active: white feedback",
+      "bytes": 410988,
+      "sha256": "947b7d385321aa6581a36069f1711aee7131055a697694bff638e50316720413",
+      "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "revision": 1641,
+      "drawStats": {
+        "white": {
+          "mode": "shared",
+          "calls": 34,
+          "triangles": 7004,
+          "sourceCalls": 31,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 31
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 31
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 31
+            }
+          }
+        }
+      }
+    },
+    {
+      "file": "3d-consolidated-sticks.png",
+      "scenario": "Analog motion: ring feedback and complete moving assembly",
+      "bytes": 484265,
+      "sha256": "0db682057143c6f320e52b5491b728b58228d2bcb9055c9b07993f6d44c4a757",
+      "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "revision": 1645,
+      "drawStats": {
+        "white": {
+          "mode": "shared",
+          "calls": 35,
+          "triangles": 7004,
+          "sourceCalls": 32,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 32
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 32
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 32
+            }
+          }
+        }
+      }
+    },
+    {
+      "file": "gamecube-neutral.png",
+      "modelId": "Gamecube",
+      "pressed": false,
+      "bytes": 304441,
+      "sha256": "cb96adaf99f1d5465e7b2cec7373b00dd4a045f80aa0bfc639682e4bbf3109c9",
+      "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "revision": 1652,
+      "drawStats": {
+        "white": {
+          "mode": "shared",
+          "calls": 29,
+          "triangles": 7208,
+          "sourceCalls": 26,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 26
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 26
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 26
+            }
+          }
+        }
+      }
+    },
+    {
+      "file": "generic-neutral.png",
+      "modelId": "GenericPro",
+      "pressed": false,
+      "bytes": 294373,
+      "sha256": "e86ad842eaf856f4f8cb7c04722b3bb0fcc516cfa091a746108063a85cfa81fa",
+      "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "revision": 1654,
+      "drawStats": {
+        "white": {
+          "mode": "shared",
+          "calls": 36,
+          "triangles": 7084,
+          "sourceCalls": 33,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 33
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 33
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 33
+            }
+          }
+        }
+      }
+    },
+    {
+      "file": "generic-pressed.png",
+      "modelId": "GenericPro",
+      "pressed": true,
+      "bytes": 296375,
+      "sha256": "6d3b5901d947801c29a1ebeef7c556d9021922e106fc8994257486b7db8ea838",
+      "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "revision": 1655,
+      "drawStats": {
+        "white": {
+          "mode": "shared",
+          "calls": 40,
+          "triangles": 8076,
+          "sourceCalls": 37,
+          "panels": {
+            "dark": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 37
+            },
+            "light": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 37
+            },
+            "mixed": {
+              "calls": 1,
+              "compositeCalls": 1,
+              "triangles": 2,
+              "sourceCallsShared": 37
+            }
+          }
+        }
+      }
+    },
+    {
+      "file": "3d-joycon-grip-neutral.png",
+      "modelId": "JoyconGrip",
+      "pressed": false,
+      "bytes": 278304,
+      "sha256": "4bd295a26f11249481b469f827b2ae90bfced37f194438c9c8572367c53272d2",
+      "source": "Real WebGL/OBJ neutral material, not native Qt 3D"
+    },
+    {
+      "file": "3d-joycon-left-neutral.png",
+      "modelId": "JoyconLeft",
+      "pressed": false,
+      "bytes": 224274,
+      "sha256": "eccbc97e589a8e9965549c1e7c7bfcb311ff846295593ca7172d913499040528",
+      "source": "Real WebGL/OBJ neutral material, not native Qt 3D"
+    },
+    {
+      "file": "3d-joycon-right-neutral.png",
+      "modelId": "JoyconRight",
+      "pressed": false,
+      "bytes": 226859,
+      "sha256": "52794b8633bec97397671c45d1f4fcaa3ea0b26d3752d984eac83140b4b8cb9b",
+      "source": "Real WebGL/OBJ neutral material, not native Qt 3D"
+    },
+    {
+      "file": "2d-dualsense-neutral-480.png",
+      "modelId": "dualsense",
+      "variant": "solid+ghost neutral",
+      "bytes": 494694,
+      "sha256": "4645192a94817b57bd1cb6bbda244375f25d197f9d3fb91f5082a758e28b9537",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-dualsense-free-xy-drag.png",
+      "modelId": "dualsense",
+      "variant": "Left stick true pointer XY drag, no L3",
+      "bytes": 69134,
+      "sha256": "5f3c4ff235737101b34aa0ac084cc8ef6317f131c6acf806e19d7e05951611df",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-dualsense-isolated-l3.png",
+      "modelId": "dualsense",
+      "variant": "Only L3 center pressed; neutral stick travel",
+      "bytes": 69073,
+      "sha256": "af85587e5782b329c6e5b6c7d5cac99e51ec1af6abee9aa86bf85107e2d8e30c",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-dualsense-trigger-neutral.png",
+      "modelId": "dualsense",
+      "variant": "L2/R2 neutral, rendered surface",
+      "bytes": 68291,
+      "sha256": "c09d8bbbb6c32d1a6a2fabc570da72a1ee9fddf1e034a05f1d5108cf96242430",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-dualsense-trigger-100.png",
+      "modelId": "dualsense",
+      "variant": "L2/R2 100%, rendered surface",
+      "bytes": 71359,
+      "sha256": "5d7d069339668ed6784a0f66967c53b9cea7c40b92458f024c5dd187388ab4e3",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-dualsense-stick-ring.png",
+      "modelId": "dualsense",
+      "variant": "100% motion + L3/R3",
+      "bytes": 500318,
+      "sha256": "39e7be5c8f7ed80b9c8a9a5caa1c9ebc53fffaca059cd88ce9d31a3b930c2131",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-dualsense-motion-ring.png",
+      "modelId": "dualsense",
+      "variant": "100% movement without click",
+      "bytes": 498471,
+      "sha256": "4065cba20170ad9744ad841f001cb8179fc80b7fb2bc129e3c8abf273e252899",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-dualsense-stick-click.png",
+      "modelId": "dualsense",
+      "variant": "L3/R3 click with zero stick movement",
+      "bytes": 501041,
+      "sha256": "4de04734d85742ef1876f4cd93b4e00b98eb3b3328793fa2a8016368a0b78ace",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-dualsense-face-symbols-on.png",
+      "modelId": "dualsense",
+      "variant": "face symbols on; faces pressed",
+      "bytes": 500811,
+      "sha256": "0636f6ac623a4a93707591ecd3ff62c41e27f15baa02144c66ae79a5161510db",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-dualsense-face-symbols-off.png",
+      "modelId": "dualsense",
+      "variant": "face symbols off; faces pressed",
+      "bytes": 494811,
+      "sha256": "cd4626e469b637db1d1c9825c47717a68b6a7ddf715239f67540d93f9ec23cf3",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-xbox-series-auto.png",
+      "modelId": "xbox_series",
+      "variant": "Auto dark",
+      "bytes": 433655,
+      "sha256": "f3d36f556831f219636a187ae7eff1517ab7024e223daf504bcedbcf1e454ed5",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-xbox-series-solid-fixed.png",
+      "modelId": "xbox_series",
+      "variant": "Original shoulder contours + filled moving ring",
+      "bytes": 55703,
+      "sha256": "f4e0d61920fcee07607b995169740405ffb8a54e4a3480959f89a1aad41cbc39",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-xbox-series-solid-pressed.png",
+      "modelId": "xbox_series",
+      "variant": "White moving annulus + readable labels, bounded shoulder",
+      "bytes": 58860,
+      "sha256": "909cdc0a0cb4903a51b3d24e0b7fca3766d01381cae29b1791ffd372cadf96fb",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-xbox-series-light.png",
+      "modelId": "xbox_series",
+      "variant": "Light",
+      "bytes": 440955,
+      "sha256": "c477ea77f8ea99a69ba2aae0697405f9ee12243e836034d3b8a36bcfa5b24c10",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-dualshock4-auto.png",
+      "modelId": "dualshock4",
+      "variant": "Auto light",
+      "bytes": 472858,
+      "sha256": "8fd082dc3b2a2381b7b990349bdebfa1e28b9e19f7617114316db6b469da26fe",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-dualshock4-dark.png",
+      "modelId": "dualshock4",
+      "variant": "Dark",
+      "bytes": 466236,
+      "sha256": "706b3ffc28bbee39741cc904d5772748400141a1ae43e3f00dbe4ae40c634a98",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-switch-pro-solid-fixed.png",
+      "modelId": "switch_pro",
+      "variant": "Solid original contours and material-filled moving sticks",
+      "bytes": 58266,
+      "sha256": "820804e26e05ec7a98d4ab7c00a29e87809d75b96509f06413d2b2f612dd2aac",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-gamecube-solid-fixed.png",
+      "modelId": "gamecube",
+      "variant": "Solid original contours and material-filled moving sticks",
+      "bytes": 63711,
+      "sha256": "ceaaf206a0f82d41c0e94e6678a592e4d96705680c88ca263e8aaf8bbd809c9d",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-generic-solid-fixed.png",
+      "modelId": "generic",
+      "variant": "Solid original contours and material-filled moving sticks",
+      "bytes": 62636,
+      "sha256": "0fdc6f31c8147078d0f000b6d09e0824b73054e11e7c15d74cad2432b23dae13",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-dark-off.png",
+      "modelId": "dualsense",
+      "variant": "dark Ghost edge light 0% / shadow 0%",
+      "bytes": 98970,
+      "sha256": "c24e2dfc6d166a8beaab74807e5ec185b56af78ad18560a169d026f4df7b6414",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-dark-light.png",
+      "modelId": "dualsense",
+      "variant": "dark Ghost edge light 100% / shadow 0%",
+      "bytes": 106700,
+      "sha256": "6cbe51c45716629aae4bcdd2d8368e5de18dacedb4c3e4f2e296236a312f42fc",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-dark-shadow.png",
+      "modelId": "dualsense",
+      "variant": "dark Ghost edge light 0% / shadow 100%",
+      "bytes": 103488,
+      "sha256": "e86aeb7d5622457e395a354e7b3cc0cbb9ce904928e7d7d64f910b9117e7f75b",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-dark-combined.png",
+      "modelId": "dualsense",
+      "variant": "dark Ghost edge light 65% / shadow 65%",
+      "bytes": 104561,
+      "sha256": "c0e3466154a978b4dbe369663e403058b2fb0821fea5628dda630bf69abc246f",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-light-off.png",
+      "modelId": "dualsense",
+      "variant": "light Ghost edge light 0% / shadow 0%",
+      "bytes": 39542,
+      "sha256": "c987bab9e7ead83e9780cda7137b6d1affd968d58e69808cc964438bb3f2ff86",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-light-light.png",
+      "modelId": "dualsense",
+      "variant": "light Ghost edge light 100% / shadow 0%",
+      "bytes": 45682,
+      "sha256": "2e3fb6eb9184b602cd9794183b54bdc72d85b81032beefb60bd664870bb5d81d",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-light-shadow.png",
+      "modelId": "dualsense",
+      "variant": "light Ghost edge light 0% / shadow 100%",
+      "bytes": 45648,
+      "sha256": "97c1709e6f410d52eed88f9be28d88a4694a34dfb26b6f556cfdc78de395b687",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-light-combined.png",
+      "modelId": "dualsense",
+      "variant": "light Ghost edge light 65% / shadow 65%",
+      "bytes": 45093,
+      "sha256": "c469fa10f472ec23d4bc5db20b998af7cb821428a9ecf20bfd4a7dc964794b43",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-mixed-off.png",
+      "modelId": "dualsense",
+      "variant": "mixed Ghost edge light 0% / shadow 0%",
+      "bytes": 85478,
+      "sha256": "bcc89dddb64904a416075ba4d034b0212394c0963419b62c6e8c8ba648458bfd",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-mixed-light.png",
+      "modelId": "dualsense",
+      "variant": "mixed Ghost edge light 100% / shadow 0%",
+      "bytes": 95360,
+      "sha256": "6481e8ac9e55baf66248348cf466fdbec58c8ce110fce26dcc0640a48faf1ad9",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-mixed-shadow.png",
+      "modelId": "dualsense",
+      "variant": "mixed Ghost edge light 0% / shadow 100%",
+      "bytes": 93632,
+      "sha256": "9da7f7cc1ae3ab0582a63e4f401835ddcd2ab3a835b0a48f1575c005c3aabd20",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-edge-mixed-combined.png",
+      "modelId": "dualsense",
+      "variant": "mixed Ghost edge light 65% / shadow 65%",
+      "bytes": 92549,
+      "sha256": "ab612b8c9c5c0a8e83626b6bbf242c00ed493da8802a380d5d4feb79cd0cf22a",
+      "source": "Chromium authored SVG; not native Qt/D3D11"
+    },
+    {
+      "file": "2d-ghost-review-neutral.png",
+      "bytes": 494142,
+      "sha256": "172f777d491cd43fb88b57e0fb9fdc525152c522b65767a9d86c8c6bcbb40251",
+      "source": "Real browser SVG Ghost A/B/C, not native Qt/ExoSnap"
+    },
+    {
+      "file": "2d-ghost-review-pure.png",
+      "bytes": 137372,
+      "sha256": "66f1daf788aedd0654019c62a367ebcb41e3828551c157d4476a84d11a09821e",
+      "source": "Real browser SVG Ghost A/B/C, not native Qt/ExoSnap"
+    },
+    {
+      "file": "2d-ghost-review-soft.png",
+      "bytes": 143729,
+      "sha256": "d3b18810f07918b2c51c8373b28e2046c4d2b11f63ac05501e904b68ead19c7a",
+      "source": "Real browser SVG Ghost A/B/C, not native Qt/ExoSnap"
+    },
+    {
+      "file": "2d-ghost-review-shadow.png",
+      "bytes": 147209,
+      "sha256": "f949ee3e55dc37834ef841773909689aaa38dcccf2e304967ebde3562991419e",
+      "source": "Real browser SVG Ghost A/B/C, not native Qt/ExoSnap"
+    },
+    {
+      "file": "2d-ghost-review-active.png",
+      "bytes": 498925,
+      "sha256": "b00ed8871f166918d48077b39b1918da8186bca1d8cf4a5c1dc110da41dc42ff",
+      "source": "Real browser SVG Ghost A/B/C, not native Qt/ExoSnap"
+    },
+    {
+      "file": "2d-ghost-review-all-controls.png",
+      "bytes": 498935,
+      "sha256": "dbf29dededc099ab83c326faec769cb2437118535e771b010a69466683cb1979",
+      "source": "Real browser SVG Ghost A/B/C, not native Qt/ExoSnap"
+    },
+    {
+      "file": "2d-source-solid-ghost-dualsense.png",
+      "modelId": "2DSourceReview",
+      "bytes": 303737,
+      "sha256": "f2f13336c66f527c02f19d81f7df7a7cd6cfba3c2a25f0ac5eb4b7deb3762d87",
+      "source": "Existing repository SVG; not byte-verified alternate ZIP"
+    },
+    {
+      "file": "2d-source-solid-ghost-xbox-series.png",
+      "modelId": "2DSourceReview",
+      "bytes": 276089,
+      "sha256": "64e5f971df47d5f4407d4a6569cf5b67d01c1bbc8769e798408c47e63a1a9a35",
+      "source": "Existing repository SVG; not byte-verified alternate ZIP"
+    }
+  ],
+  "scenarios": {
+    "consolidated": {
+      "artwork": [
+        "circle",
+        "cross",
+        "down",
+        "left",
+        "right",
+        "square",
+        "triangle",
+        "up"
+      ],
+      "flatMixInvariant": true,
+      "singleWhiteFeedback": true,
+      "independent": [
+        {
+          "control": "l1",
+          "hints": [
+            {
+              "control": "l2",
+              "visible": true,
+              "opacity": 0.28,
+              "fill": false,
+              "fillOpacity": 0,
+              "depth": 6,
+              "outline": true
+            },
+            {
+              "control": "r2",
+              "visible": true,
+              "opacity": 0.28,
+              "fill": false,
+              "fillOpacity": 0,
+              "depth": 6,
+              "outline": true
+            },
+            {
+              "control": "l1",
+              "visible": true,
+              "opacity": 0.9,
+              "fill": true,
+              "fillOpacity": 0.12,
+              "depth": 6,
+              "outline": true
+            },
+            {
+              "control": "r1",
+              "visible": true,
+              "opacity": 0.28,
+              "fill": false,
+              "fillOpacity": 0,
+              "depth": 6,
+              "outline": true
+            }
+          ]
+        },
+        {
+          "control": "r1",
+          "hints": [
+            {
+              "control": "l2",
+              "visible": true,
+              "opacity": 0.28,
+              "fill": false,
+              "fillOpacity": 0,
+              "depth": 6,
+              "outline": true
+            },
+            {
+              "control": "r2",
+              "visible": true,
+              "opacity": 0.28,
+              "fill": false,
+              "fillOpacity": 0,
+              "depth": 6,
+              "outline": true
+            },
+            {
+              "control": "l1",
+              "visible": true,
+              "opacity": 0.28,
+              "fill": false,
+              "fillOpacity": 0,
+              "depth": 6,
+              "outline": true
+            },
+            {
+              "control": "r1",
+              "visible": true,
+              "opacity": 0.9,
+              "fill": true,
+              "fillOpacity": 0.12,
+              "depth": 6,
+              "outline": true
+            }
+          ]
+        },
+        {
+          "control": "l2",
+          "hints": [
+            {
+              "control": "l2",
+              "visible": true,
+              "opacity": 0.9,
+              "fill": true,
+              "fillOpacity": 0.12,
+              "depth": 6,
+              "outline": true
+            },
+            {
+              "control": "r2",
+              "visible": true,
+              "opacity": 0.28,
+              "fill": false,
+              "fillOpacity": 0,
+              "depth": 6,
+              "outline": true
+            },
+            {
+              "control": "l1",
+              "visible": true,
+              "opacity": 0.28,
+              "fill": false,
+              "fillOpacity": 0,
+              "depth": 6,
+              "outline": true
+            },
+            {
+              "control": "r1",
+              "visible": true,
+              "opacity": 0.28,
+              "fill": false,
+              "fillOpacity": 0,
+              "depth": 6,
+              "outline": true
+            }
+          ]
+        },
+        {
+          "control": "r2",
+          "hints": [
+            {
+              "control": "l2",
+              "visible": true,
+              "opacity": 0.28,
+              "fill": false,
+              "fillOpacity": 0,
+              "depth": 6,
+              "outline": true
+            },
+            {
+              "control": "r2",
+              "visible": true,
+              "opacity": 0.9,
+              "fill": true,
+              "fillOpacity": 0.12,
+              "depth": 6,
+              "outline": true
+            },
+            {
+              "control": "l1",
+              "visible": true,
+              "opacity": 0.28,
+              "fill": false,
+              "fillOpacity": 0,
+              "depth": 6,
+              "outline": true
+            },
+            {
+              "control": "r1",
+              "visible": true,
+              "opacity": 0.28,
+              "fill": false,
+              "fillOpacity": 0,
+              "depth": 6,
+              "outline": true
+            }
+          ]
+        }
+      ],
+      "angles": [
+        {
+          "view": "front",
+          "triggers": [
+            {
+              "control": "l2",
+              "visible": true,
+              "colorWrite": true,
+              "depthWrite": true
+            },
+            {
+              "control": "r2",
+              "visible": true,
+              "colorWrite": true,
+              "depthWrite": true
+            }
+          ]
+        },
+        {
+          "view": "angled",
+          "triggers": [
+            {
+              "control": "l2",
+              "visible": true,
+              "colorWrite": true,
+              "depthWrite": true
+            },
+            {
+              "control": "r2",
+              "visible": true,
+              "colorWrite": true,
+              "depthWrite": true
+            }
+          ]
+        },
+        {
+          "view": "top",
+          "triggers": [
+            {
+              "control": "l2",
+              "visible": true,
+              "colorWrite": true,
+              "depthWrite": true
+            },
+            {
+              "control": "r2",
+              "visible": true,
+              "colorWrite": true,
+              "depthWrite": true
+            }
+          ]
+        },
+        {
+          "view": "profile",
+          "triggers": [
+            {
+              "control": "l2",
+              "visible": true,
+              "colorWrite": true,
+              "depthWrite": true
+            },
+            {
+              "control": "r2",
+              "visible": true,
+              "colorWrite": true,
+              "depthWrite": true
+            }
+          ]
+        },
+        {
+          "view": "rear",
+          "triggers": [
+            {
+              "control": "l2",
+              "visible": true,
+              "colorWrite": true,
+              "depthWrite": true
+            },
+            {
+              "control": "r2",
+              "visible": true,
+              "colorWrite": true,
+              "depthWrite": true
+            }
+          ]
+        }
+      ],
+      "clicks": [
+        {
+          "source": "left_cap.obj",
+          "alpha": 1,
+          "emissive": 0.16,
+          "visible": true
+        },
+        {
+          "source": "right_cap.obj",
+          "alpha": 1,
+          "emissive": 0,
+          "visible": true
+        }
+      ]
+    },
+    "A": {
+      "genericModel": "GenericPro",
+      "parts": 25,
+      "neutralAndPressed": true
+    },
+    "B": {
+      "coreSmoke": [
+        {
+          "id": "GenericPro",
+          "threeViewports": 3,
+          "svgViewports": 3,
+          "rendered": true,
+          "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+        },
+        {
+          "id": "DualSenseCompact",
+          "threeViewports": 3,
+          "svgViewports": 3,
+          "rendered": true,
+          "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+        },
+        {
+          "id": "DS4Compact",
+          "threeViewports": 3,
+          "svgViewports": 3,
+          "rendered": true,
+          "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+        },
+        {
+          "id": "XboxOneClean",
+          "threeViewports": 3,
+          "svgViewports": 3,
+          "rendered": true,
+          "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+        },
+        {
+          "id": "SwitchPro",
+          "threeViewports": 3,
+          "svgViewports": 3,
+          "rendered": true,
+          "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+        },
+        {
+          "id": "Gamecube",
+          "threeViewports": 3,
+          "svgViewports": 3,
+          "rendered": true,
+          "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+        },
+        {
+          "id": "JoyconGrip",
+          "threeViewports": 3,
+          "svgViewports": 3,
+          "rendered": true,
+          "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+        },
+        {
+          "id": "JoyconLeft",
+          "threeViewports": 3,
+          "svgViewports": 3,
+          "rendered": true,
+          "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+        },
+        {
+          "id": "JoyconRight",
+          "threeViewports": 3,
+          "svgViewports": 3,
+          "rendered": true,
+          "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+        }
+      ],
+      "notCleared": [
+        "XboxSeries",
+        "SteamController2026"
+      ],
+      "fullTierABComplete": false
+    }
+  },
+  "visualAcceptance": "Pending human inspection; capture proves rendering, not visual quality"
+}
